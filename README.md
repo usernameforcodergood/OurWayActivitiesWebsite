@@ -27,3 +27,135 @@ Because OurWay is still developing, its final activities and services are not ye
 The ultimate goal is to create a visually distinctive, technically sophisticated and production-ready website that makes visitors feel invited to discover and experience something beyond an ordinary trip.
 
 **OurWay is not just about where you go. It is about what you experience along the way.**
+
+---
+
+## Tech stack
+
+| Area | Choice |
+| --- | --- |
+| Framework | Next.js 16 (App Router, Cache Components / Partial Prerendering, Turbopack) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS 4 with design tokens in `src/app/globals.css` |
+| Scroll animation | GSAP 3 + ScrollTrigger + SplitText (`@gsap/react`) |
+| UI motion | Framer Motion (menu, lightbox, form states, cursor preview) |
+| Smooth scroll | Lenis (wheel only, synced to GSAP's ticker, off with reduced motion) |
+| Forms | React Hook Form + Zod (one schema shared by client and server) |
+| Email | Resend, behind a provider interface (`src/lib/email.ts`) |
+| Icons | Lucide React |
+| i18n | Next.js native dictionaries, `/el` (default) and `/en` |
+
+Requires **Node.js 20+** (developed on Node 26).
+
+## Getting started
+
+```bash
+npm install
+cp .env.example .env.local   # then fill in values
+npm run dev                  # http://localhost:3000 → redirects to /el
+```
+
+Other scripts: `npm run build`, `npm run start`, `npm run lint`, `npx tsc --noEmit`.
+
+## Project structure
+
+```
+src/
+  app/
+    [locale]/                 Every page lives under /el or /en
+      layout.tsx              Root layout: fonts, <html lang>, nav, footer, Lenis
+      page.tsx                Homepage
+      activities/ [slug]/     Experiences list + reusable experience template
+      destinations/ about/ gallery/ contact/ privacy/
+      not-found.tsx error.tsx [...rest]/   Localised 404 / error states
+    api/contact/route.ts      Contact form endpoint (validation, spam guards, email)
+    sitemap.ts robots.ts icon.jpg
+  components/
+    layout/      Navbar, Footer, LanguageSwitcher, SmoothScroll, BackToTop
+    sections/    Hero, BrandPhilosophy, StorySection, ExperienceShowcase,
+                 PinnedStorySection, DiscoverSection, CTASection
+    animations/  TextReveal, ScrubText, ImageReveal, ExpandingImage,
+                 LayeredImages, ParallaxBackground
+    activities/  ExperienceCard
+    gallery/     GalleryGrid (masonry + accessible lightbox)
+    forms/       ContactForm, FormField
+    ui/          Button, SectionLabel, PageHero, Wordmark
+  content/       media.ts (image registry), activities.ts, destinations.ts, types.ts
+  i18n/          config, routes, dictionaries, compile-time message check
+  messages/      el.json, en.json  <- all interface and page copy
+  lib/           site.ts (company details), metadata.ts, validation.ts, email.ts, gsap.ts
+```
+
+## Design system
+
+Defined once in `src/app/globals.css` (`@theme`) and used through Tailwind utilities.
+
+- **Colour**: `ink` #0c1311 (base), `forest` #12211d, `moss` #1e3530, `stone` #ebe6da, `limestone` #f5f2ea, `bone` #f2efe7 (text on dark), `fog` #a9afa4 (muted on dark), `bark` #4a4a3f (muted on light). Accents: `lichen` #8ccbb8 (mint-teal from the logo), `lagoon` #2fa3b0 (logo arrow teal), `sand` #dcc8a2 (CTA), `clay` #b98458. All body-text pairs are 7:1 or better.
+- **Type**: Noto Serif Display (variable, Greek + Latin) for headlines; Manrope (Greek + Latin) for UI and body text. Fluid steps: `text-display-xl/lg/md/sm`, `text-lead`, `text-eyebrow`.
+- **Layout**: `container-x` (max 96rem, fluid gutter), `section-y` (fluid vertical rhythm), 12-column grid, sections that alternate dark and light.
+- **Motion**: easing `expo.out` / `--ease-out-expo` (0.16, 1, 0.3, 1); reveals 1.2–1.6s; scrubbed effects are tied to scroll position.
+- **Breakpoints**: Tailwind defaults (sm 640, md 768, lg 1024, xl 1280) plus `xs` 416.
+
+## Animation overview
+
+| Where | Technique |
+| --- | --- |
+| Hero | Image settles from a slow zoom, headline rises line by line out of SplitText masks, scrubbed parallax and fade on scroll-out |
+| Philosophy | Words light up as you scroll (scrubbed SplitText) |
+| Story blocks | Directional clip-path reveals + inner zoom + parallax; a full-bleed image that expands from a rounded frame; three layered images at different scroll speeds |
+| Experience themes | Rule lines draw in, staggered rows; on desktop a cursor-following image preview (Framer Motion springs) |
+| The journey | Pinned for about 3 viewport heights: chapters hand over, images wipe up, a progress rail fills, snaps per chapter. **Desktop only**; mobile gets a natural vertical sequence |
+| Discover / CTA | Collage reveals with hover zoom; parallax background |
+| Nav / menu | Hides on scroll down, reveals on scroll up; full-screen menu with clip-path and staggered links |
+
+Every animation runs inside `gsap.matchMedia()` and is reverted on unmount. With `prefers-reduced-motion`, all motion and Lenis are off and all content is visible. Without JavaScript, all content is visible too.
+
+## Editing content
+
+- **Copy**: `src/messages/el.json` and `en.json`. They must keep the same shape; `npx tsc` fails if a key is missing in one language.
+- **Company details**: `src/lib/site.ts` (logo, email, phone, social links). Empty values are hidden.
+- **Images**: `src/content/media.ts`. Each photo has a semantic key. To replace one, put the file in `public/images/`, change its `src` (e.g. `/images/hero.jpg`), and update `width`, `height` and the Greek/English `alt`. The gallery order is `galleryKeys` in the same file.
+- **Experiences**: `src/content/activities.ts`. Copy the draft template, fill **only confirmed** fields and set `status: "published"`. Empty fields are never shown. Drafts return 404 in production and render only with `SHOW_DRAFT_CONTENT=true`.
+- **Destinations**: `src/content/destinations.ts`, same pattern.
+
+### Placeholders still in use
+
+- **Photography**: Unsplash images (free under the Unsplash License) illustrate the mood. They do **not** show confirmed OurWay places or activities. Replace them with OurWay's own photos.
+- **Logo**: `public/brand/ourway-logo.jpg` (300×300 JPG on white, shown as a round badge). A transparent PNG or SVG at a higher resolution would look sharper.
+- **Privacy policy**: interim text, clearly marked. It needs legal review. Nothing on the site claims GDPR compliance.
+- **Experiences / destinations catalogue**: intentionally empty until confirmed. The pages show an honest "in progress" state.
+
+## Contact form and email setup
+
+The form validates on the client and again on the server (`src/app/api/contact/route.ts`). Spam is blocked by a honeypot field, a minimum fill time and a per-IP rate limit (best effort, in memory). Success appears **only** after the email provider confirms delivery. Without credentials, the API returns `503 notConfigured` and the visitor is told the message was **not** sent. Submissions are never stored or logged.
+
+1. Create an account at <https://resend.com> and an API key.
+2. Set `RESEND_API_KEY` and `CONTACT_EMAIL` (the inbox that receives inquiries, e.g. `ourway.activities@gmail.com`).
+3. For production, verify the OurWay domain in Resend (it adds DNS records) and set `CONTACT_FROM_EMAIL="OurWay <hello@your-domain.gr>"`. Until then the shared `onboarding@resend.dev` sender is used, and Resend only delivers to the account owner's own address.
+
+To change provider, implement `EmailProvider` in `src/lib/email.ts`.
+
+## Deploying to Vercel
+
+1. Push this repository to GitHub.
+2. In Vercel: **Add New → Project → Import** the repository. The framework is detected as Next.js; keep the default build settings.
+3. Under **Settings → Environment Variables**, add `RESEND_API_KEY`, `CONTACT_EMAIL`, optionally `CONTACT_FROM_EMAIL`, and `NEXT_PUBLIC_SITE_URL` (the final domain, e.g. `https://www.ourway.gr`). Optionally set `SHOW_DRAFT_CONTENT=true` for **Preview** only.
+4. Deploy. Every push to `main` deploys to production; other branches get preview URLs.
+
+## Connecting the domain
+
+1. Vercel → Project → **Settings → Domains** → add `your-domain.gr` and `www.your-domain.gr`.
+2. At the domain registrar's DNS panel, add the records Vercel shows. Typically:
+   - apex `your-domain.gr`: **A** record → `76.76.21.21`
+   - `www`: **CNAME** → `cname.vercel-dns.com`
+
+   Always use the exact values shown in your Vercel dashboard.
+3. Choose the primary domain in Vercel (e.g. `www`) and let the other one redirect to it.
+4. HTTPS certificates are issued automatically once DNS propagates (minutes to a few hours).
+5. Set `NEXT_PUBLIC_SITE_URL` to the primary domain and redeploy, so canonical URLs, hreflang tags and the sitemap use it.
+
+DNS changes need the domain owner's access and are not made by this project.
+
+## SEO
+
+Each page has localised title and description, a canonical URL, `hreflang` alternates (`el`, `en`, `x-default` → Greek), Open Graph and Twitter cards, `/sitemap.xml` with language alternates, and `/robots.txt`. Structured data is limited to a minimal, accurate `Organization` (name and URL only).
