@@ -1,0 +1,309 @@
+{
+  "meta": {
+    "siteName": "OurWay",
+    "titleTemplate": "%s — OurWay",
+    "defaultTitle": "OurWay — Experience the place, not just the view",
+    "description": "OurWay creates experiences in Greek nature and culture: places you get to know up close, people you meet, traditions you take part in.",
+    "pages": {
+      "home": { "title": "OurWay — Experience the place, not just the view", "description": "Experiences in the Greek outdoors that bring together nature, culture and people. Discover a place from the inside." },
+      "activities": { "title": "Experiences", "description": "OurWay experiences: nature, culture and genuine encounters in Greece. See what we're preparing and tell us what you're looking for." },
+      "destinations": { "title": "Places", "description": "The landscapes that draw us: mountain villages, gorges and rivers, coastlines and plains. Places with character and people." },
+      "about": { "title": "Our philosophy", "description": "What OurWay means: getting to know a place up close, through its nature, its culture and its people." },
+      "gallery": { "title": "Gallery", "description": "Images of Greek landscapes, villages, people and traditions." },
+      "contact": { "title": "Contact", "description": "Tell us what you're interested in. Fill in the form and we'll get back to you." },
+      "privacy": { "title": "Privacy policy", "description": "How we handle the details you send us through the contact form." },
+      "notFound": { "title": "Page not found", "description": "The page you're looking for doesn't exist." }
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "activities": "Experiences",
+    "destinations": "Places",
+    "about": "Philosophy",
+    "gallery": "Gallery",
+    "contact": "Contact",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "primary": "Main navigation",
+    "skip": "Skip to content",
+    "inquire": "Make an inquiry",
+    "homeLink": "OurWay — home page",
+    "switchLanguage": "Αλλαγή σε Ελληνικά",
+    "languageGroup": "Language selection"
+  },
+  "common": {
+    "scroll": "Scroll",
+    "discover": "Discover",
+    "learnMore": "Learn more",
+    "back": "Back",
+    "draftBanner": "Page template — not a published experience. Visible in development only."
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Nature · Culture · Connection",
+      "titleLines": ["Step outside.", "Find your way."],
+      "lead": "More than a destination. A place you come to know up close: its paths, its people, its own pace.",
+      "ctaPrimary": "Start your experience",
+      "ctaSecondary": "Our philosophy",
+      "scroll": "Scroll to continue"
+    },
+    "philosophy": {
+      "label": "The idea",
+      "statement": "You can visit a place and leave having seen only the view. Or you can live it: walk its paths, sit at its table, listen to its stories.",
+      "aside": "OurWay exists for the second kind of journey. For people who want to get to know a place, not just pass through it.",
+      "link": "Read our philosophy"
+    },
+    "story": {
+      "label": "What you discover",
+      "title": "A place is many things at once",
+      "blocks": [
+        {
+          "kicker": "Nature",
+          "title": "The landscape is where it begins",
+          "body": "Mountains, gorges, rivers, coastlines. The ground under your feet, light that shifts through the day, a kind of quiet the city never offers. Nature isn't a backdrop — it's the first thing that introduces you to a place."
+        },
+        {
+          "kicker": "Culture",
+          "title": "What keeps a place alive",
+          "body": "Feasts, dances, music, skills handed down through generations. Every region has its own way of living and remembering — and it's worth seeing up close, with respect."
+        },
+        {
+          "kicker": "People",
+          "title": "Encounters outlast photographs",
+          "body": "The shepherd in the meadow, the family at the café on the square, the craftsman in his workshop. You don't just see the people of a place — you talk with them."
+        },
+        {
+          "kicker": "Place",
+          "title": "An identity no guidebook can hold",
+          "body": "The stone of the houses, the bridges, the hilltop chapels, the flavours. Everything that makes somewhere resemble nowhere else. That's what we look for, and what we want to share."
+        }
+      ]
+    },
+    "showcase": {
+      "label": "OurWay experiences",
+      "title": "Ways to know a place",
+      "intro": "Our first experiences are taking shape right now. Each one will bring together what follows, in its own way.",
+      "items": [
+        { "title": "Out in the open", "body": "Time in nature at the pace of the place, not the stopwatch." },
+        { "title": "Inside a tradition", "body": "Customs, celebrations and crafts, as the people who live them know them." },
+        { "title": "Face to face", "body": "Meeting the people who keep each place alive." },
+        { "title": "At the table", "body": "Flavours and conversations that tell you what no guide can." }
+      ],
+      "note": "Want to be the first to hear about our experiences, or have something specific in mind?",
+      "cta": "Tell us what interests you",
+      "allLink": "All experiences"
+    },
+    "pinned": {
+      "label": "The journey",
+      "chapters": [
+        { "kicker": "Arrive", "title": "Leave the noise behind", "body": "The road narrows, the landscape opens. Somewhere around here, your own pace starts to change." },
+        { "kicker": "Look", "title": "See more closely", "body": "The paths, the stone, the water. Everything that has shaped this place over centuries." },
+        { "kicker": "Meet", "title": "Get to know the people", "body": "Hear the stories, learn the customs, share a table. The place starts to have faces." },
+        { "kicker": "Keep", "title": "Leave differently than you came", "body": "Not only with photographs, but with a real connection to a place." }
+      ]
+    },
+    "discover": {
+      "label": "Explore",
+      "title": "Where would you like to begin?",
+      "tiles": {
+        "activities": { "title": "Experiences", "body": "What we're preparing and how it will feel." },
+        "destinations": { "title": "Places", "body": "The landscapes that draw us." },
+        "gallery": { "title": "Gallery", "body": "Images from the world of OurWay." }
+      }
+    },
+    "cta": {
+      "label": "Next step",
+      "title": "Your next experience starts here.",
+      "body": "Tell us what draws you — a place, an idea, a question. We'll get back to you.",
+      "button": "Get in touch"
+    }
+  },
+  "activities": {
+    "hero": {
+      "eyebrow": "Experiences",
+      "title": "Experiences that begin with a place",
+      "lead": "Every OurWay experience will be built around somewhere specific: its nature, its people, whatever makes it unlike anywhere else."
+    },
+    "emptyLabel": "In progress",
+    "emptyTitle": "Our first experiences are on their way",
+    "emptyBody": "We don't want to show you something that isn't ready yet. Until we announce our first experiences, tell us what interests you — a place, an activity, an idea — and we'll keep you posted.",
+    "emptyCta": "Tell us what you're looking for",
+    "themesTitle": "What they'll include",
+    "listTitle": "Available experiences",
+    "viewExperience": "View experience",
+    "detail": {
+      "overview": "The experience",
+      "details": "Details",
+      "location": "Location",
+      "type": "Type",
+      "duration": "Duration",
+      "difficulty": "Difficulty",
+      "groupSize": "Group size",
+      "availability": "Availability",
+      "included": "Included",
+      "important": "Good to know",
+      "gallery": "Images",
+      "inquireTitle": "Interested in this experience?",
+      "inquireBody": "Send us a message and we'll get back to you with all the details.",
+      "inquireCta": "Book or ask us",
+      "back": "All experiences"
+    }
+  },
+  "destinations": {
+    "hero": {
+      "eyebrow": "Places",
+      "title": "Places with character",
+      "lead": "We're drawn to places with an identity — where nature, history and people still live side by side."
+    },
+    "intro": "Our specific destinations will be announced soon. Until then, these are the landscapes that draw us.",
+    "landscapesLabel": "Our landscapes",
+    "landscapes": [
+      { "title": "Mountain villages", "body": "Stone houses, squares shaded by plane trees, arched bridges and cobbled paths. Communities that still keep their own rhythm." },
+      { "title": "Gorges and rivers", "body": "Landscapes carved by water. Cool air, stone, greenery and a stillness that slows you down." },
+      { "title": "Coastlines and cliffs", "body": "The sea as people who live beside it know it — not just a beach, but a way of life." },
+      { "title": "Plains and countryside", "body": "Pastures, olive groves, small chapels. The rural life that shaped the land and its food." }
+    ],
+    "listLabel": "Destinations",
+    "ctaTitle": "Have a place in mind?",
+    "ctaBody": "Tell us where you'd like to go and what you'd like to experience there.",
+    "cta": "Write to us"
+  },
+  "about": {
+    "hero": {
+      "eyebrow": "Philosophy",
+      "title": "Our way of getting to know a place",
+      "lead": "The name says almost everything. OurWay: the path we choose, and the way we walk it."
+    },
+    "meaningLabel": "The name",
+    "meaningTitle": "The way is more than the route",
+    "meaningBody": [
+      "Many people travel to see. We believe the real experience begins when you stop looking from a distance and step inside a place.",
+      "That's why OurWay doesn't simply plan routes from A to B. It plans time: time to understand where you are, who lives there and what this place has to tell you."
+    ],
+    "valuesLabel": "What guides us",
+    "values": [
+      { "title": "Authenticity", "body": "We show places as they are, not as a brochure would like them to be." },
+      { "title": "Respect", "body": "For nature, for local communities, for their traditions." },
+      { "title": "Connection", "body": "Between people, and between people and the place." },
+      { "title": "Curiosity", "body": "The urge to ask, to try, to discover something beyond the obvious." }
+    ],
+    "natureCultureTitle": "Nature and culture, together",
+    "natureCultureBody": "In Greece, landscape and culture are inseparable. The paths were opened by people, the villages built from the mountain's own stone, the songs tell of the sea and the pastures. You can't truly know one without the other.",
+    "evolvingLabel": "In progress",
+    "evolvingTitle": "An idea that's growing",
+    "evolvingBody": "OurWay is at its beginning. Our experiences, places and partnerships are taking shape step by step — carefully, and with people who share the same outlook.",
+    "evolvingCta": "Talk to us"
+  },
+  "gallery": {
+    "hero": {
+      "eyebrow": "Gallery",
+      "title": "Glimpses of our world",
+      "lead": "Landscapes, villages, people, traditions. Images of what inspires us."
+    },
+    "open": "Open image: {alt}",
+    "close": "Close",
+    "prev": "Previous image",
+    "next": "Next image",
+    "counter": "{current} of {total}",
+    "dialogLabel": "Image viewer",
+    "notice": "Placeholder photographs. They will be replaced with images from OurWay experiences."
+  },
+  "contact": {
+    "hero": {
+      "eyebrow": "Contact",
+      "title": "Let's talk about your next experience",
+      "lead": "Want to know more, make a booking, or just tell us what you're looking for? Write to us."
+    },
+    "asideTitle": "How it works",
+    "steps": [
+      { "title": "You write to us", "body": "Tell us what interests you, as specifically or as loosely as you like." },
+      { "title": "We reply", "body": "We get in touch to understand exactly what you're after." },
+      { "title": "We plan together", "body": "We find the experience that suits you." }
+    ],
+    "detailsTitle": "Contact details",
+    "detailsPending": "Our contact details will be announced soon. Until then, the form is the best way to reach us.",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "form": {
+      "title": "Inquiry form",
+      "requiredNote": "Fields marked * are required.",
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "interest": "What interests you",
+      "interestPlaceholder": "A place, an experience, an idea…",
+      "date": "Preferred date",
+      "participants": "Number of people",
+      "message": "Message",
+      "messagePlaceholder": "Tell us a little about what you're looking for",
+      "optional": "optional",
+      "consent": "I agree that my details will be used only to respond to my request, in line with the",
+      "consentLink": "privacy policy",
+      "honeypot": "Leave this field empty",
+      "submit": "Send",
+      "sending": "Sending…",
+      "successTitle": "Your message has been sent.",
+      "successBody": "Thank you! We'll get back to you as soon as we can.",
+      "sendAnother": "New message",
+      "errorTitle": "Your message was not sent",
+      "errors": {
+        "required": "This field is required.",
+        "nameShort": "Please enter your full name (at least 2 characters).",
+        "email": "Please enter a valid email, e.g. name@example.com.",
+        "phone": "That phone number doesn't look valid.",
+        "messageShort": "Your message needs at least 10 characters.",
+        "tooLong": "This text is too long.",
+        "participants": "Please enter a number from 1 to 100.",
+        "date": "The date can't be in the past.",
+        "consent": "We need your consent in order to reply.",
+        "generic": "Something went wrong. Please try again shortly.",
+        "network": "Couldn't reach the server. Check your connection and try again.",
+        "notConfigured": "Message sending hasn't been activated on this website yet. Your message was not sent.",
+        "rateLimited": "You've sent several messages in a short time. Please try again in a few minutes.",
+        "invalid": "Please check the form fields and try again."
+      },
+      "privacyNote": "We never share your details with third parties for advertising."
+    }
+  },
+  "privacy": {
+    "eyebrow": "Legal",
+    "title": "Privacy policy",
+    "draftNotice": "Interim text. The final privacy policy will be published after legal review.",
+    "updated": "Last updated: pending",
+    "sections": [
+      { "title": "What we collect", "body": "Through the contact form we collect only what you give us: your name, email, your message and — if you choose — phone number, interest, date and number of people." },
+      { "title": "Why we use it", "body": "Solely to respond to your request. We don't use it for advertising and we don't sell it." },
+      { "title": "How it is transmitted", "body": "Your message is sent securely (HTTPS) and delivered to the OurWay team through an email delivery service. The website does not store messages in a database." },
+      { "title": "Cookies and tracking", "body": "This website does not use advertising cookies or third-party tracking tools." },
+      { "title": "Your rights", "body": "You can ask to access, correct or delete your details. [Data controller contact details will be added here.]" }
+    ]
+  },
+  "footer": {
+    "tagline": "Experience the place, not just the view.",
+    "explore": "Explore",
+    "company": "OurWay",
+    "contactTitle": "Contact",
+    "contactPending": "Contact details will be announced soon.",
+    "contactForm": "Contact form",
+    "social": "Social",
+    "comingSoon": "coming soon",
+    "privacy": "Privacy policy",
+    "rights": "All rights reserved.",
+    "language": "Language",
+    "backToTop": "Back to top",
+    "photoCredit": "Placeholder photography: Unsplash"
+  },
+  "notFound": {
+    "eyebrow": "404",
+    "title": "This path doesn't lead anywhere",
+    "body": "The page you're looking for doesn't exist or has moved.",
+    "cta": "Back to home"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "body": "An unexpected error occurred. Please try again.",
+    "retry": "Try again"
+  }
+}

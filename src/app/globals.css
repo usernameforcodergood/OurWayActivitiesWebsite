@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   OurWay design tokens
+   Every colour, font, easing and fluid type step lives here. Components use
+   the generated Tailwind utilities (bg-ink, text-bone, font-display, ...).
+   ========================================================================== */
+
+@theme {
+  /* Colour — dark natural base */
+  --color-ink: #0c1311; /* page background, near-black forest (leans to logo green) */
+  --color-forest: #12211d; /* secondary dark surface — from the logo tree green */
+  --color-moss: #1e3530; /* raised dark surface */
+  /* Colour — light natural neutrals */
+  --color-stone: #ebe6da; /* light section background */
+  --color-limestone: #f5f2ea; /* lightest surface */
+  --color-bone: #f2efe7; /* foreground on dark */
+  --color-fog: #a9afa4; /* muted text on dark (7.9:1 on ink) */
+  --color-bark: #4a4a3f; /* muted text on light (8.2:1 on stone) */
+  /* Colour — accents */
+  --color-lichen: #8ccbb8; /* muted mint-teal accent, derived from the logo path/arrow */
+  --color-lagoon: #2fa3b0; /* logo arrow teal — use sparingly */
+  --color-sand: #dcc8a2; /* warm CTA */
+  --color-clay: #b98458; /* earthy accent */
+
+  /* Typography */
+  --font-display: var(--font-noto-serif-display), "Noto Serif", Georgia, serif;
+  --font-sans: var(--font-manrope), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* Breakpoints (Tailwind defaults kept; xs added) */
+  --breakpoint-xs: 26rem;
+}
+
+:root {
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --header-h: 4.5rem;
+  --section-y: clamp(6rem, 14vw, 12rem);
+  color-scheme: dark;
+}
+
+/* Fluid type scale ---------------------------------------------------------- */
+@utility text-display-xl {
+  font-size: clamp(3.1rem, 10.5vw, 10.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+}
+@utility text-display-lg {
+  font-size: clamp(2.6rem, 7vw, 6.75rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+@utility text-display-md {
+  font-size: clamp(2.1rem, 4.6vw, 4.25rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+@utility text-display-sm {
+  font-size: clamp(1.6rem, 2.6vw, 2.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+}
+@utility text-lead {
+  font-size: clamp(1.125rem, 1.45vw, 1.375rem);
+  line-height: 1.55;
+}
+@utility text-eyebrow {
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Layout helpers ------------------------------------------------------------ */
+@utility container-x {
+  width: 100%;
+  max-width: 96rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+@utility section-y {
+  padding-block: var(--section-y);
+}
+
+/* Base ---------------------------------------------------------------------- */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--color-lichen);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-lichen);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .on-light :focus-visible {
+    outline-color: var(--color-ink);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  img {
+    user-select: none;
+  }
+}
+
+/* Lenis (smooth scroll) ----------------------------------------------------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* Split-text line masks (GSAP SplitText) ------------------------------------ */
+.split-line {
+  overflow: clip;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+/* Elements that GSAP will animate in are hidden only when JS + motion are on,
+   so content is always visible without JavaScript or with reduced motion.   */
+html.js-motion [data-anim="hide"] {
+  visibility: hidden;
+}
+
+/* Film grain overlay for photography --------------------------------------- */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes scroll-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(100%);
+  }
+}
