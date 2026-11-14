@@ -1,39 +1,10 @@
 @import "tailwindcss";
+@import "../styles/theme.css";
 
 /* ==========================================================================
-   OurWay design tokens
-   Every colour, font, easing and fluid type step lives here. Components use
-   the generated Tailwind utilities (bg-ink, text-bone, font-display, ...).
+   Public website base styles. Design tokens live in src/styles/theme.css.
    ========================================================================== */
 
-@theme {
-  /* Colour — dark natural base */
-  --color-ink: #0c1311; /* page background, near-black forest (leans to logo green) */
-  --color-forest: #12211d; /* secondary dark surface — from the logo tree green */
-  --color-moss: #1e3530; /* raised dark surface */
-  /* Colour — light natural neutrals */
-  --color-stone: #ebe6da; /* light section background */
-  --color-limestone: #f5f2ea; /* lightest surface */
-  --color-bone: #f2efe7; /* foreground on dark */
-  --color-fog: #a9afa4; /* muted text on dark (7.9:1 on ink) */
-  --color-bark: #4a4a3f; /* muted text on light (8.2:1 on stone) */
-  /* Colour — accents */
-  --color-lichen: #8ccbb8; /* muted mint-teal accent, derived from the logo path/arrow */
-  --color-lagoon: #2fa3b0; /* logo arrow teal — use sparingly */
-  --color-sand: #dcc8a2; /* warm CTA */
-  --color-clay: #b98458; /* earthy accent */
-
-  /* Typography */
-  --font-display: var(--font-noto-serif-display), "Noto Serif", Georgia, serif;
-  --font-sans: var(--font-manrope), system-ui, -apple-system, "Segoe UI", sans-serif;
-
-  /* Motion */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
-
-  /* Breakpoints (Tailwind defaults kept; xs added) */
-  --breakpoint-xs: 26rem;
-}
 
 :root {
   --gutter: clamp(1.25rem, 4vw, 3.5rem);

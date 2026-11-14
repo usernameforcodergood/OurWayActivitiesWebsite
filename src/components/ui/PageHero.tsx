@@ -1,5 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { MediaKey } from "@/content/media";
+import type { CmsImage } from "@/lib/cms/types";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { ImageReveal } from "@/components/animations/ImageReveal";
 import { SectionLabel } from "./SectionLabel";
@@ -9,7 +10,7 @@ type Props = {
   eyebrow: string;
   title: string;
   lead?: string;
-  image?: MediaKey;
+  image?: MediaKey | CmsImage | null;
 };
 
 /** Shared opening for inner pages: editorial title, lead, wide image reveal. */

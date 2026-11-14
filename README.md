@@ -112,18 +112,65 @@ Every animation runs inside `gsap.matchMedia()` and is reverted on unmount. With
 
 ## Editing content
 
-- **Copy**: `src/messages/el.json` and `en.json`. They must keep the same shape; `npx tsc` fails if a key is missing in one language.
-- **Company details**: `src/lib/site.ts` (logo, email, phone, social links). Empty values are hidden.
-- **Images**: `src/content/media.ts`. Each photo has a semantic key. To replace one, put the file in `public/images/`, change its `src` (e.g. `/images/hero.jpg`), and update `width`, `height` and the Greek/English `alt`. The gallery order is `galleryKeys` in the same file.
-- **Experiences**: `src/content/activities.ts`. Copy the draft template, fill **only confirmed** fields and set `status: "published"`. Empty fields are never shown. Drafts return 404 in production and render only with `SHOW_DRAFT_CONTENT=true`.
-- **Destinations**: `src/content/destinations.ts`, same pattern.
+- **Excursions, announcements, uploaded images, contact details**: managed in the **admin dashboard** at `/admin` (see below). No code changes needed.
+- **Fixed page copy** (headlines, philosophy texts, labels): `src/messages/el.json` and `en.json`. They must keep the same shape; `npx tsc` fails if a key is missing in one language.
+- **Built-in mood photography** (hero, story sections, gallery page): `src/content/media.ts`. Each photo has a semantic key. To replace one, put the file in `public/images/`, change its `src` (e.g. `/images/hero.jpg`), and update `width`, `height` and the Greek/English `alt`. The gallery order is `galleryKeys` in the same file.
+- **Logo and fallback contact details**: `src/lib/site.ts`.
+
+## Admin dashboard (CMS)
+
+A private dashboard at **`/admin`** (Greek interface) for managing the site without touching code:
+
+| Section | What the administrator can do |
+| --- | --- |
+| Πίνακας ελέγχου (Dashboard) | Counts of excursions (total / published / drafts) and announcements (with how many are live), recent changes, quick actions |
+| Εκδρομές (Excursions) | Create, edit, delete (with confirmation), save as draft, publish, unpublish, preview before publishing; Greek and English content in separate tabs; cover image + ordered gallery; destination, category, duration, difficulty, participants, price, available dates, extra info (all optional); featured toggle; URL slug (auto-generated from the Greek title, transliterated) |
+| Ανακοινώσεις (Announcements) | Same editing flow, plus publication date (can be in the future) and optional expiry date, both in Greek time |
+| Πολυμέσα (Media) | Upload multiple images, edit alt text in both languages, see where each image is used, delete |
+| Ρυθμίσεις (Settings) | Public contact details and social links (footer + contact page), change own password |
+
+Lists support search, status filter, sorting and pagination.
+
+**How content reaches the website.** Published excursions appear on `/activities`, on their own page `/activities/<slug>`, on the homepage (featured first) and grouped by destination on `/destinations`. Active announcements appear on `/news`, `/news/<slug>` and on the homepage. Each save clears the related cache, so changes show immediately. Announcements also honour their publish and expiry times within a few minutes.
+
+**Languages.** Each excursion or announcement has separate Greek and English fields. A language version goes public only when it has a **title and a short description** in that language. Incomplete translations are never shown as finished pages: the item is left out of that language's lists, and its page redirects to the list.
+
+### Architecture and security
+
+- **Supabase** provides the PostgreSQL database, email/password login and image storage. The schema, Row Level Security policies and storage bucket are in `supabase/migrations/0001_cms.sql`.
+- **Row Level Security**: visitors can only **read** published excursions and currently active announcements. Only users listed in `admin_users` can create, change or delete anything, including uploads in the `media` storage bucket. The database enforces this independently of the website code.
+- **Server-side checks**: every admin page, preview and Server Action calls `requireAdmin()` (`src/lib/auth.ts`). It verifies the session with Supabase Auth and checks `admin_users`. `src/proxy.ts` refreshes the session cookie and redirects anonymous visitors to `/admin/login` early. Admin pages are always rendered per request, never cached, and send `noindex`.
+- **No secret keys in the app.** The website only uses the public URL and publishable key. Admin writes run with the logged-in admin's own session. The database connection string is used only by the two local setup scripts and must not be added to Vercel.
+- **No public registration.** Admin accounts are created by the developer (see below).
+- **Images** are resized in the browser (max 2400px, WebP) and uploaded straight to Supabase Storage, then served through `next/image`. Nothing is stored inside the deployment.
+
+### Setting up Supabase (one time)
+
+1. Create a free project at <https://supabase.com> (region: Frankfurt / `eu-central-1`).
+2. Copy `.env.example` to `.env.local` and fill in:
+   - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: **Project Settings → API Keys** (or the **Connect** button).
+   - `SUPABASE_DB_URL`: **Connect → Session pooler** connection string, with your database password filled in.
+3. Create the tables, security policies and image bucket:
+   ```bash
+   npm run db:setup
+   ```
+   (Alternatively, paste `supabase/migrations/0001_cms.sql` into **SQL Editor → Run**.)
+4. Create the administrator: **Authentication → Users → Add user → Create new user**. Enter the email and a strong password, and tick **Auto Confirm User**. Then grant admin rights:
+   ```bash
+   npm run admin:grant -- name@example.com
+   ```
+   `npm run admin:grant -- --list` shows all admins, and `-- email --revoke` removes rights. More admins can be added the same way.
+5. Recommended: **Authentication → Sign In / Providers → Email**: turn **off** "Allow new users to sign up", so nobody can create accounts through the Supabase API.
+6. Restart `npm run dev` and sign in at <http://localhost:3000/admin>.
+
+On Vercel, add only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (plus the email variables).
 
 ### Placeholders still in use
 
 - **Photography**: Unsplash images (free under the Unsplash License) illustrate the mood. They do **not** show confirmed OurWay places or activities. Replace them with OurWay's own photos.
 - **Logo**: `public/brand/ourway-logo.jpg` (300×300 JPG on white, shown as a round badge). A transparent PNG or SVG at a higher resolution would look sharper.
 - **Privacy policy**: interim text, clearly marked. It needs legal review. Nothing on the site claims GDPR compliance.
-- **Experiences / destinations catalogue**: intentionally empty until confirmed. The pages show an honest "in progress" state.
+- **Experiences / announcements**: none until the administrator publishes them in `/admin`. The pages show an honest "in progress" state meanwhile.
 
 ## Contact form and email setup
 
@@ -139,7 +186,7 @@ To change provider, implement `EmailProvider` in `src/lib/email.ts`.
 
 1. Push this repository to GitHub.
 2. In Vercel: **Add New → Project → Import** the repository. The framework is detected as Next.js; keep the default build settings.
-3. Under **Settings → Environment Variables**, add `RESEND_API_KEY`, `CONTACT_EMAIL`, optionally `CONTACT_FROM_EMAIL`, and `NEXT_PUBLIC_SITE_URL` (the final domain, e.g. `https://www.ourway.gr`). Optionally set `SHOW_DRAFT_CONTENT=true` for **Preview** only.
+3. Under **Settings → Environment Variables**, add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`, optionally `CONTACT_FROM_EMAIL`, and `NEXT_PUBLIC_SITE_URL` (the final domain, e.g. `https://www.ourway.gr`). Do **not** add `SUPABASE_DB_URL`.
 4. Deploy. Every push to `main` deploys to production; other branches get preview URLs.
 
 ## Connecting the domain

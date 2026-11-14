@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { gsap, useGSAP, MQ } from "@/lib/gsap";
 import { media, type MediaKey } from "@/content/media";
 import type { Locale } from "@/i18n/config";
+import type { CmsImage } from "@/lib/cms/types";
 import { cn } from "@/lib/utils";
 
 export type RevealDirection = "up" | "down" | "left" | "right" | "center";
@@ -18,7 +19,8 @@ const clipFrom: Record<RevealDirection, string> = {
 };
 
 type ImageRevealProps = {
-  image: MediaKey;
+  /** A built-in photo key, or an uploaded CMS image ({ src, alt, ... }). */
+  image: MediaKey | CmsImage;
   locale: Locale;
   sizes: string;
   className?: string;
@@ -49,7 +51,10 @@ export function ImageReveal({
 }: ImageRevealProps) {
   const frame = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
-  const item = media[image];
+  const item =
+    typeof image === "string"
+      ? { src: media[image].src, alt: media[image].alt[locale] }
+      : { src: image.src, alt: image.alt };
 
   useGSAP(
     () => {
@@ -90,7 +95,7 @@ export function ImageReveal({
       >
         <Image
           src={item.src}
-          alt={decorative ? "" : item.alt[locale]}
+          alt={decorative ? "" : item.alt}
           fill
           sizes={sizes}
           priority={priority}

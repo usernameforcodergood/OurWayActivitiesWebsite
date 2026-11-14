@@ -13,8 +13,8 @@ import { Wordmark } from "@/components/ui/Wordmark";
 import { ButtonLink } from "@/components/ui/Button";
 import { cn, pad } from "@/lib/utils";
 
-type NavKey = "activities" | "destinations" | "about" | "gallery" | "contact";
-const NAV_ITEMS: NavKey[] = ["activities", "destinations", "about", "gallery", "contact"];
+type NavKey = "activities" | "destinations" | "news" | "about" | "gallery" | "contact";
+const NAV_ITEMS: NavKey[] = ["activities", "destinations", "news", "about", "gallery", "contact"];
 
 const ease = [0.16, 1, 0.3, 1] as const;
 

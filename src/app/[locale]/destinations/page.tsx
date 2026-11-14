@@ -5,7 +5,8 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { routes } from "@/i18n/routes";
 import { buildMetadata } from "@/lib/metadata";
 import type { MediaKey } from "@/content/media";
-import { getDestinations } from "@/content/destinations";
+import { getPublishedExcursions } from "@/lib/cms/public";
+import { ExperienceCard } from "@/components/activities/ExperienceCard";
 import { PageHero } from "@/components/ui/PageHero";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { ImageReveal } from "@/components/animations/ImageReveal";
@@ -28,7 +29,13 @@ export default async function DestinationsPage({ params }: PageProps<"/[locale]/
   if (!hasLocale(locale)) notFound();
   const t = await getDictionary(locale);
   const d = t.destinations;
-  const confirmed = getDestinations();
+  // Group published experiences by their destination field.
+  const byPlace = new Map<string, Awaited<ReturnType<typeof getPublishedExcursions>>>();
+  for (const ex of await getPublishedExcursions(locale)) {
+    if (!ex.destination) continue;
+    byPlace.set(ex.destination, [...(byPlace.get(ex.destination) ?? []), ex]);
+  }
+  const places = [...byPlace.entries()];
 
   return (
     <>
@@ -74,23 +81,26 @@ export default async function DestinationsPage({ params }: PageProps<"/[locale]/
         </div>
       </section>
 
-      {confirmed.length > 0 && (
-        <section aria-labelledby="destinations-list" className="on-light section-y bg-stone text-ink">
+      {/* Places with published experiences (managed in the admin dashboard) */}
+      {places.length > 0 && (
+        <section aria-labelledby="destinations-list" className="section-y border-t border-bone/10 bg-ink text-bone">
           <div className="container-x">
-            <SectionLabel className="text-bark">{d.listLabel}</SectionLabel>
+            <SectionLabel className="text-fog">{d.listLabel}</SectionLabel>
             <h2 id="destinations-list" className="sr-only">
               {d.listLabel}
             </h2>
-            <ul className="mt-12 grid gap-12 md:grid-cols-3">
-              {confirmed.map((dest) => (
-                <li key={dest.slug}>
-                  <ImageReveal image={dest.image} locale={locale} sizes="(min-width: 768px) 33vw, 100vw" className="aspect-[4/5]" />
-                  <h3 className="text-display-sm mt-6">{dest.name[locale]}</h3>
-                  {dest.region && <p className="text-eyebrow mt-2 text-bark">{dest.region[locale]}</p>}
-                  <p className="mt-3 text-bark">{dest.summary[locale]}</p>
-                </li>
+            <div className="mt-14 space-y-20">
+              {places.map(([place, items]) => (
+                <div key={place}>
+                  <h3 className="text-display-md mb-10">{place}</h3>
+                  <div className="grid gap-x-8 gap-y-16 md:grid-cols-3">
+                    {items.map((ex, i) => (
+                      <ExperienceCard key={ex.slug} excursion={ex} locale={locale} index={i} cta={t.activities.viewExperience} layout="column" />
+                    ))}
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </section>
       )}

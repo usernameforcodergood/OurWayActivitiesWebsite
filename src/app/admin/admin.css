@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@import "../../styles/theme.css";
+
+/* Admin dashboard base — calm, light, functional. No scroll animations. */
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    background: #f6f5f1;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-lagoon);
+    outline-offset: 2px;
+  }
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+@utility admin-input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(12 19 17 / 0.18);
+  background: white;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  transition: border-color 150ms, box-shadow 150ms;
+  &:focus {
+    outline: none;
+    border-color: var(--color-lagoon);
+    box-shadow: 0 0 0 3px rgb(47 163 176 / 0.2);
+  }
+  &[aria-invalid="true"] {
+    border-color: #b42318;
+  }
+}
+
+@utility admin-card {
+  border-radius: 0.875rem;
+  border: 1px solid rgb(12 19 17 / 0.08);
+  background: white;
+  box-shadow: 0 1px 2px rgb(12 19 17 / 0.04);
+}
+
+dialog::backdrop {
+  background: rgb(12 19 17 / 0.45);
+}
