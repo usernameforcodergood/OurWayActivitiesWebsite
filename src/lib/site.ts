@@ -25,9 +25,9 @@ export const siteConfig: SiteConfig = {
    * and set `src`, e.g. "/brand/ourway-logo.png", plus its real width/height.
    * While empty, a typographic wordmark is shown instead.
    */
-  // Current file: 300×300 JPG on white (from OurWay). Replace with a transparent
-  // PNG/SVG at higher resolution when available.
-  logo: { src: "/brand/ourway-logo.jpg", width: 300, height: 300 },
+  // Current file: 1200×1200 WebP on white (from OurWay's 2000px original),
+  // shown as a round badge. Favicons: src/app/icon.png and apple-icon.png.
+  logo: { src: "/brand/ourway-logo.webp", width: 1200, height: 1200 },
   /** From the official logo. */
   tagline: "Alternative Experiences",
   /** From OurWay's public Facebook page (Nov 2026). Empty values are not rendered. */

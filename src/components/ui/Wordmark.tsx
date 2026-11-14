@@ -7,7 +7,16 @@ import { cn } from "@/lib/utils";
  * badge (the supplied file has a white background and a round composition).
  * Otherwise — or if no logo is configured — a typographic wordmark.
  */
-export function Wordmark({ className, useLogo = false }: { className?: string; useLogo?: boolean }) {
+export function Wordmark({
+  className,
+  useLogo = false,
+  accent = true,
+}: {
+  className?: string;
+  useLogo?: boolean;
+  /** Colour "Way" in the accent; turn off when the wordmark is a tinted backdrop. */
+  accent?: boolean;
+}) {
   const { logo } = siteConfig;
   if (useLogo && logo.src) {
     return (
@@ -17,7 +26,9 @@ export function Wordmark({ className, useLogo = false }: { className?: string; u
           alt="OurWay — Alternative Experiences"
           width={logo.width}
           height={logo.height}
-          sizes="112px"
+          // Badge is at most ~96px; request enough pixels for 3× phone screens.
+          sizes="128px"
+          quality={90}
           className="size-full scale-[1.06] object-contain"
           priority
         />
@@ -26,7 +37,7 @@ export function Wordmark({ className, useLogo = false }: { className?: string; u
   }
   return (
     <span className={cn("font-display tracking-[-0.02em]", className)}>
-      Our<span className="italic text-lichen">Way</span>
+      Our<span className={cn("italic", accent && "text-lichen")}>Way</span>
     </span>
   );
 }
