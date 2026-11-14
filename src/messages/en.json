@@ -5,14 +5,42 @@
     "defaultTitle": "OurWay — Experience the place, not just the view",
     "description": "OurWay creates experiences in Greek nature and culture: places you get to know up close, people you meet, traditions you take part in.",
     "pages": {
-      "home": { "title": "OurWay — Experience the place, not just the view", "description": "Experiences in the Greek outdoors that bring together nature, culture and people. Discover a place from the inside." },
-      "activities": { "title": "Experiences", "description": "OurWay experiences: nature, culture and genuine encounters in Greece. See what we're preparing and tell us what you're looking for." },
-      "destinations": { "title": "Places", "description": "The landscapes that draw us: mountain villages, gorges and rivers, coastlines and plains. Places with character and people." },
-      "about": { "title": "Our philosophy", "description": "What OurWay means: getting to know a place up close, through its nature, its culture and its people." },
-      "gallery": { "title": "Gallery", "description": "Images of Greek landscapes, villages, people and traditions." },
-      "contact": { "title": "Contact", "description": "Tell us what you're interested in. Fill in the form and we'll get back to you." },
-      "privacy": { "title": "Privacy policy", "description": "How we handle the details you send us through the contact form." },
-      "notFound": { "title": "Page not found", "description": "The page you're looking for doesn't exist." }
+      "home": {
+        "title": "OurWay — Experience the place, not just the view",
+        "description": "Experiences in the Greek outdoors that bring together nature, culture and people. Discover a place from the inside."
+      },
+      "activities": {
+        "title": "Experiences",
+        "description": "OurWay experiences: nature, culture and genuine encounters in Greece. See what we're preparing and tell us what you're looking for."
+      },
+      "destinations": {
+        "title": "Places",
+        "description": "The landscapes that draw us: mountain villages, gorges and rivers, coastlines and plains. Places with character and people."
+      },
+      "about": {
+        "title": "Our philosophy",
+        "description": "What OurWay means: getting to know a place up close, through its nature, its culture and its people."
+      },
+      "gallery": {
+        "title": "Gallery",
+        "description": "Images of Greek landscapes, villages, people and traditions."
+      },
+      "contact": {
+        "title": "Contact",
+        "description": "Tell us what you're interested in. Fill in the form and we'll get back to you."
+      },
+      "privacy": {
+        "title": "Privacy policy",
+        "description": "How we handle the details you send us through the contact form."
+      },
+      "notFound": {
+        "title": "Page not found",
+        "description": "The page you're looking for doesn't exist."
+      },
+      "news": {
+        "title": "News",
+        "description": "News and announcements from OurWay: new experiences, dates and what we're preparing."
+      }
     }
   },
   "nav": {
@@ -30,19 +58,24 @@
     "inquire": "Make an inquiry",
     "homeLink": "OurWay — home page",
     "switchLanguage": "Αλλαγή σε Ελληνικά",
-    "languageGroup": "Language selection"
+    "languageGroup": "Language selection",
+    "news": "News"
   },
   "common": {
     "scroll": "Scroll",
     "discover": "Discover",
     "learnMore": "Learn more",
     "back": "Back",
-    "draftBanner": "Page template — not a published experience. Visible in development only."
+    "previewBanner": "Preview — this is how it will look. Visitors can't see it until it is published.",
+    "previewOther": "Preview in Greek"
   },
   "home": {
     "hero": {
       "eyebrow": "Nature · Culture · Connection",
-      "titleLines": ["Step outside.", "Find your way."],
+      "titleLines": [
+        "Step outside.",
+        "Find your way."
+      ],
       "lead": "More than a destination. A place you come to know up close: its paths, its people, its own pace.",
       "ctaPrimary": "Start your experience",
       "ctaSecondary": "Our philosophy",
@@ -85,10 +118,22 @@
       "title": "Ways to know a place",
       "intro": "Our first experiences are taking shape right now. Each one will bring together what follows, in its own way.",
       "items": [
-        { "title": "Out in the open", "body": "Time in nature at the pace of the place, not the stopwatch." },
-        { "title": "Inside a tradition", "body": "Customs, celebrations and crafts, as the people who live them know them." },
-        { "title": "Face to face", "body": "Meeting the people who keep each place alive." },
-        { "title": "At the table", "body": "Flavours and conversations that tell you what no guide can." }
+        {
+          "title": "Out in the open",
+          "body": "Time in nature at the pace of the place, not the stopwatch."
+        },
+        {
+          "title": "Inside a tradition",
+          "body": "Customs, celebrations and crafts, as the people who live them know them."
+        },
+        {
+          "title": "Face to face",
+          "body": "Meeting the people who keep each place alive."
+        },
+        {
+          "title": "At the table",
+          "body": "Flavours and conversations that tell you what no guide can."
+        }
       ],
       "note": "Want to be the first to hear about our experiences, or have something specific in mind?",
       "cta": "Tell us what interests you",
@@ -97,19 +142,44 @@
     "pinned": {
       "label": "The journey",
       "chapters": [
-        { "kicker": "Arrive", "title": "Leave the noise behind", "body": "The road narrows, the landscape opens. Somewhere around here, your own pace starts to change." },
-        { "kicker": "Look", "title": "See more closely", "body": "The paths, the stone, the water. Everything that has shaped this place over centuries." },
-        { "kicker": "Meet", "title": "Get to know the people", "body": "Hear the stories, learn the customs, share a table. The place starts to have faces." },
-        { "kicker": "Keep", "title": "Leave differently than you came", "body": "Not only with photographs, but with a real connection to a place." }
+        {
+          "kicker": "Arrive",
+          "title": "Leave the noise behind",
+          "body": "The road narrows, the landscape opens. Somewhere around here, your own pace starts to change."
+        },
+        {
+          "kicker": "Look",
+          "title": "See more closely",
+          "body": "The paths, the stone, the water. Everything that has shaped this place over centuries."
+        },
+        {
+          "kicker": "Meet",
+          "title": "Get to know the people",
+          "body": "Hear the stories, learn the customs, share a table. The place starts to have faces."
+        },
+        {
+          "kicker": "Keep",
+          "title": "Leave differently than you came",
+          "body": "Not only with photographs, but with a real connection to a place."
+        }
       ]
     },
     "discover": {
       "label": "Explore",
       "title": "Where would you like to begin?",
       "tiles": {
-        "activities": { "title": "Experiences", "body": "What we're preparing and how it will feel." },
-        "destinations": { "title": "Places", "body": "The landscapes that draw us." },
-        "gallery": { "title": "Gallery", "body": "Images from the world of OurWay." }
+        "activities": {
+          "title": "Experiences",
+          "body": "What we're preparing and how it will feel."
+        },
+        "destinations": {
+          "title": "Places",
+          "body": "The landscapes that draw us."
+        },
+        "gallery": {
+          "title": "Gallery",
+          "body": "Images from the world of OurWay."
+        }
       }
     },
     "cta": {
@@ -117,6 +187,16 @@
       "title": "Your next experience starts here.",
       "body": "Tell us what draws you — a place, an idea, a question. We'll get back to you.",
       "button": "Get in touch"
+    },
+    "featured": {
+      "label": "Upcoming experiences",
+      "title": "Get ready for the next one",
+      "all": "All experiences"
+    },
+    "news": {
+      "label": "News",
+      "title": "Latest from OurWay",
+      "all": "All news"
     }
   },
   "activities": {
@@ -147,7 +227,13 @@
       "inquireTitle": "Interested in this experience?",
       "inquireBody": "Send us a message and we'll get back to you with all the details.",
       "inquireCta": "Book or ask us",
-      "back": "All experiences"
+      "back": "All experiences",
+      "destination": "Destination",
+      "category": "Activity",
+      "participants": "Participants",
+      "price": "Price",
+      "dates": "Available dates",
+      "info": "Information"
     }
   },
   "destinations": {
@@ -159,10 +245,22 @@
     "intro": "Our specific destinations will be announced soon. Until then, these are the landscapes that draw us.",
     "landscapesLabel": "Our landscapes",
     "landscapes": [
-      { "title": "Mountain villages", "body": "Stone houses, squares shaded by plane trees, arched bridges and cobbled paths. Communities that still keep their own rhythm." },
-      { "title": "Gorges and rivers", "body": "Landscapes carved by water. Cool air, stone, greenery and a stillness that slows you down." },
-      { "title": "Coastlines and cliffs", "body": "The sea as people who live beside it know it — not just a beach, but a way of life." },
-      { "title": "Plains and countryside", "body": "Pastures, olive groves, small chapels. The rural life that shaped the land and its food." }
+      {
+        "title": "Mountain villages",
+        "body": "Stone houses, squares shaded by plane trees, arched bridges and cobbled paths. Communities that still keep their own rhythm."
+      },
+      {
+        "title": "Gorges and rivers",
+        "body": "Landscapes carved by water. Cool air, stone, greenery and a stillness that slows you down."
+      },
+      {
+        "title": "Coastlines and cliffs",
+        "body": "The sea as people who live beside it know it — not just a beach, but a way of life."
+      },
+      {
+        "title": "Plains and countryside",
+        "body": "Pastures, olive groves, small chapels. The rural life that shaped the land and its food."
+      }
     ],
     "listLabel": "Destinations",
     "ctaTitle": "Have a place in mind?",
@@ -183,10 +281,22 @@
     ],
     "valuesLabel": "What guides us",
     "values": [
-      { "title": "Authenticity", "body": "We show places as they are, not as a brochure would like them to be." },
-      { "title": "Respect", "body": "For nature, for local communities, for their traditions." },
-      { "title": "Connection", "body": "Between people, and between people and the place." },
-      { "title": "Curiosity", "body": "The urge to ask, to try, to discover something beyond the obvious." }
+      {
+        "title": "Authenticity",
+        "body": "We show places as they are, not as a brochure would like them to be."
+      },
+      {
+        "title": "Respect",
+        "body": "For nature, for local communities, for their traditions."
+      },
+      {
+        "title": "Connection",
+        "body": "Between people, and between people and the place."
+      },
+      {
+        "title": "Curiosity",
+        "body": "The urge to ask, to try, to discover something beyond the obvious."
+      }
     ],
     "natureCultureTitle": "Nature and culture, together",
     "natureCultureBody": "In Greece, landscape and culture are inseparable. The paths were opened by people, the villages built from the mountain's own stone, the songs tell of the sea and the pastures. You can't truly know one without the other.",
@@ -217,9 +327,18 @@
     },
     "asideTitle": "How it works",
     "steps": [
-      { "title": "You write to us", "body": "Tell us what interests you, as specifically or as loosely as you like." },
-      { "title": "We reply", "body": "We get in touch to understand exactly what you're after." },
-      { "title": "We plan together", "body": "We find the experience that suits you." }
+      {
+        "title": "You write to us",
+        "body": "Tell us what interests you, as specifically or as loosely as you like."
+      },
+      {
+        "title": "We reply",
+        "body": "We get in touch to understand exactly what you're after."
+      },
+      {
+        "title": "We plan together",
+        "body": "We find the experience that suits you."
+      }
     ],
     "detailsTitle": "Contact details",
     "detailsPending": "Our contact details will be announced soon. Until then, the form is the best way to reach us.",
@@ -273,11 +392,26 @@
     "draftNotice": "Interim text. The final privacy policy will be published after legal review.",
     "updated": "Last updated: pending",
     "sections": [
-      { "title": "What we collect", "body": "Through the contact form we collect only what you give us: your name, email, your message and — if you choose — phone number, interest, date and number of people." },
-      { "title": "Why we use it", "body": "Solely to respond to your request. We don't use it for advertising and we don't sell it." },
-      { "title": "How it is transmitted", "body": "Your message is sent securely (HTTPS) and delivered to the OurWay team through an email delivery service. The website does not store messages in a database." },
-      { "title": "Cookies and tracking", "body": "This website does not use advertising cookies or third-party tracking tools." },
-      { "title": "Your rights", "body": "You can ask to access, correct or delete your details. [Data controller contact details will be added here.]" }
+      {
+        "title": "What we collect",
+        "body": "Through the contact form we collect only what you give us: your name, email, your message and — if you choose — phone number, interest, date and number of people."
+      },
+      {
+        "title": "Why we use it",
+        "body": "Solely to respond to your request. We don't use it for advertising and we don't sell it."
+      },
+      {
+        "title": "How it is transmitted",
+        "body": "Your message is sent securely (HTTPS) and delivered to the OurWay team through an email delivery service. The website does not store messages in a database."
+      },
+      {
+        "title": "Cookies and tracking",
+        "body": "This website does not use advertising cookies or third-party tracking tools."
+      },
+      {
+        "title": "Your rights",
+        "body": "You can ask to access, correct or delete your details. [Data controller contact details will be added here.]"
+      }
     ]
   },
   "footer": {
@@ -305,5 +439,16 @@
     "title": "Something went wrong",
     "body": "An unexpected error occurred. Please try again.",
     "retry": "Try again"
+  },
+  "news": {
+    "hero": {
+      "eyebrow": "News",
+      "title": "News from OurWay",
+      "lead": "New experiences, dates and what we're preparing."
+    },
+    "empty": "There are no active announcements right now.",
+    "readMore": "Read more",
+    "back": "All news",
+    "validUntil": "Valid until {date}"
   }
 }

@@ -4,7 +4,7 @@ import { hasLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localePath, routes } from "@/i18n/routes";
 import { buildMetadata } from "@/lib/metadata";
-import { getActivities } from "@/content/activities";
+import { getPublishedExcursions } from "@/lib/cms/public";
 import { PageHero } from "@/components/ui/PageHero";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { ButtonLink } from "@/components/ui/Button";
@@ -25,7 +25,7 @@ export default async function ActivitiesPage({ params }: PageProps<"/[locale]/ac
   if (!hasLocale(locale)) notFound();
   const t = await getDictionary(locale);
   const a = t.activities;
-  const list = getActivities();
+  const list = await getPublishedExcursions(locale);
 
   return (
     <>
@@ -39,8 +39,8 @@ export default async function ActivitiesPage({ params }: PageProps<"/[locale]/ac
               {a.listTitle}
             </h2>
             <div className="mt-14 grid gap-x-8 gap-y-20 md:grid-cols-12">
-              {list.map((activity, i) => (
-                <ExperienceCard key={activity.slug} activity={activity} locale={locale} index={i} cta={a.viewExperience} />
+              {list.map((excursion, i) => (
+                <ExperienceCard key={excursion.slug} excursion={excursion} locale={locale} index={i} cta={a.viewExperience} />
               ))}
             </div>
           </div>

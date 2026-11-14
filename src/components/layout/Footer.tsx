@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { localePath, routes } from "@/i18n/routes";
-import { siteConfig } from "@/lib/site";
+import { getContactDetails } from "@/lib/cms/contact";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { BackToTop } from "./BackToTop";
 import { Wordmark } from "@/components/ui/Wordmark";
@@ -16,11 +16,12 @@ async function getYear() {
 export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
   const f = t.footer;
   const year = await getYear();
-  const explore = (["activities", "destinations", "about", "gallery", "contact"] as const).map((k) => ({
+  const explore = (["activities", "destinations", "news", "about", "gallery", "contact"] as const).map((k) => ({
     href: localePath(locale, routes[k]),
     label: t.nav[k],
   }));
-  const { email, phone, address } = siteConfig.contact;
+  const contact = await getContactDetails(locale);
+  const { email, phone, address } = contact;
   const hasContact = Boolean(email || phone || address);
 
   return (
@@ -83,7 +84,7 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
         <div className="md:col-span-2">
           <h2 className="text-eyebrow mb-5 font-sans text-fog">{f.social}</h2>
           <ul className="space-y-1">
-            {siteConfig.social.map((s) => (
+            {contact.social.map((s) => (
               <li key={s.key}>
                 {s.href ? (
                   <a href={s.href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center text-bone/85 hover:text-lichen">

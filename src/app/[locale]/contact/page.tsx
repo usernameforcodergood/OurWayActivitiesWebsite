@@ -5,7 +5,7 @@ import { hasLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localePath, routes } from "@/i18n/routes";
 import { buildMetadata } from "@/lib/metadata";
-import { siteConfig } from "@/lib/site";
+import { getContactDetails } from "@/lib/cms/contact";
 import { PageHero } from "@/components/ui/PageHero";
 import { ImageReveal } from "@/components/animations/ImageReveal";
 import { ContactForm } from "@/components/forms/ContactForm";
@@ -23,7 +23,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
   if (!hasLocale(locale)) notFound();
   const t = await getDictionary(locale);
   const c = t.contact;
-  const { email, phone, address } = siteConfig.contact;
+  const { email, phone, address } = await getContactDetails(locale);
   const details = [
     email && { icon: Mail, label: c.email, value: email, href: `mailto:${email}` },
     phone && { icon: Phone, label: c.phone, value: phone, href: `tel:${phone.replace(/\s/g, "")}` },

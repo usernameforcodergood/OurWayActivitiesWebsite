@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
       // Placeholder photography (Unsplash License). Replace with own images in /public/images
       // and update src/content/media.ts — see README "Replacing images".
       { protocol: "https", hostname: "images.unsplash.com" },
+      // Images uploaded through the admin dashboard (Supabase Storage, public bucket).
+      { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" },
     ],
   },
   async redirects() {
