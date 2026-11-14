@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
+    // 75 = default for photos; 90 = logo (fine lines and lettering).
+    qualities: [75, 90],
     remotePatterns: [
       // Placeholder photography (Unsplash License). Replace with own images in /public/images
       // and update src/content/media.ts — see README "Replacing images".

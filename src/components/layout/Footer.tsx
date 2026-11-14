@@ -104,7 +104,7 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
       </div>
 
       <div aria-hidden className="container-x select-none overflow-hidden">
-        <Wordmark className="block translate-y-[0.18em] text-center text-[clamp(5rem,27vw,26rem)] leading-[0.8] text-bone/[0.07]" />
+        <Wordmark accent={false} className="block translate-y-[0.18em] text-center text-[clamp(5rem,27vw,26rem)] leading-[0.8] text-bone/[0.07]" />
       </div>
 
       <div className="border-t border-bone/10">

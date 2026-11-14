@@ -69,7 +69,7 @@ src/
       destinations/ about/ gallery/ contact/ privacy/
       not-found.tsx error.tsx [...rest]/   Localised 404 / error states
     api/contact/route.ts      Contact form endpoint (validation, spam guards, email)
-    sitemap.ts robots.ts icon.jpg
+    sitemap.ts robots.ts icon.png apple-icon.png
   components/
     layout/      Navbar, Footer, LanguageSwitcher, SmoothScroll, BackToTop
     sections/    Hero, BrandPhilosophy, StorySection, ExperienceShowcase,
@@ -168,7 +168,7 @@ On Vercel, add only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISH
 ### Placeholders still in use
 
 - **Photography**: Unsplash images (free under the Unsplash License) illustrate the mood. They do **not** show confirmed OurWay places or activities. Replace them with OurWay's own photos.
-- **Logo**: `public/brand/ourway-logo.jpg` (300×300 JPG on white, shown as a round badge). A transparent PNG or SVG at a higher resolution would look sharper.
+- **Logo**: `public/brand/ourway-logo.webp` (1200×1200 on white, shown as a round badge; favicons in `src/app/icon.png` and `apple-icon.png`). A transparent PNG or SVG would allow it to sit directly on dark backgrounds.
 - **Privacy policy**: interim text, clearly marked. It needs legal review. Nothing on the site claims GDPR compliance.
 - **Experiences / announcements**: none until the administrator publishes them in `/admin`. The pages show an honest "in progress" state meanwhile.
 
