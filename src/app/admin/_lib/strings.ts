@@ -219,7 +219,7 @@ export const t = {
     newPassword: "Νέος κωδικός",
     confirmPassword: "Επιβεβαίωση κωδικού",
     changePassword: "Αλλαγή κωδικού",
-    passwordShort: "Τουλάχιστον 10 χαρακτήρες.",
+    passwordShort: "Τουλάχιστον 12 χαρακτήρες.",
     passwordMismatch: "Οι κωδικοί δεν ταιριάζουν.",
     passwordChanged: "Ο κωδικός άλλαξε.",
     adminsTitle: "Διαχειριστές",
