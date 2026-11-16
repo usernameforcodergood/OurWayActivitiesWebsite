@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
     description: t.meta.description,
     applicationName: siteConfig.name,
     formatDetection: { telephone: false, email: false, address: false },
+    robots: siteConfig.indexable ? undefined : { index: false, follow: false },
   };
 }
 

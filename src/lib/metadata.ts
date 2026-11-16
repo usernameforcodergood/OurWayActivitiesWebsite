@@ -49,6 +49,6 @@ export function buildMetadata({
       images: [{ url: ogImage.src, width: 1200, height: 630, alt: ogImage.alt }],
     },
     twitter: { card: "summary_large_image", title, description, images: [ogImage.src] },
-    robots: noIndex ? { index: false, follow: false } : undefined,
+    robots: noIndex || !siteConfig.indexable ? { index: false, follow: false } : undefined,
   };
 }
