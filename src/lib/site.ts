@@ -11,6 +11,7 @@ function resolveSiteUrl(): string {
 type SiteConfig = {
   name: string;
   url: string;
+  indexable: boolean;
   logo: { src: string; width: number; height: number };
   tagline: string;
   contact: { email: string; phone: string; address: string };
@@ -20,6 +21,13 @@ type SiteConfig = {
 export const siteConfig: SiteConfig = {
   name: "OurWay",
   url: resolveSiteUrl(),
+  /**
+   * Pre-launch switch. While false, every page tells search engines
+   * "noindex, nofollow" and robots.txt drops the sitemap, so the site stays
+   * out of Google even though anyone with the link can open it.
+   * Set to true at launch.
+   */
+  indexable: false,
   /**
    * Official logo. Save the file (transparent PNG or SVG) to /public/brand/
    * and set `src`, e.g. "/brand/ourway-logo.png", plus its real width/height.
