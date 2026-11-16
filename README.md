@@ -186,8 +186,8 @@ One-time setup (needs the Supabase dashboard; the website code cannot change the
    npm run admin:recovery-key
    ```
 2. **Authentication → URL Configuration**: set **Site URL** to the live domain and add these **Redirect URLs**: `https://<your-domain>/admin/reset-password` and `http://localhost:3000/admin/reset-password`.
-3. **Authentication → Emails → Templates → Reset password**: subject `Reset your OurWay administrator password`, body = the contents of `supabase/templates/reset-password.html`. (Without this template the link format will not match and the reset page will report an invalid link.)
-4. **Authentication → Emails → SMTP Settings**: enable a custom SMTP server. Supabase's built-in sender only delivers to the project's team members and a few emails per hour. With Resend: host `smtp.resend.com`, port `465`, user `resend`, password = a Resend API key, sender = an address on the verified OurWay domain.
+3. **Authentication → Emails → SMTP Settings**: enable a custom SMTP server. Supabase's built-in sender only delivers to the project's team members, a few emails per hour, and doesn't allow template edits. With Resend: host `smtp.resend.com`, port `465`, user `resend`, password = a Resend API key, sender = an address on the verified OurWay domain.
+4. **Authentication → Emails → Templates → Reset password** (editable once custom SMTP is on): subject `Reset your OurWay administrator password`, body = the contents of `supabase/templates/reset-password.html`. Until then Supabase's default email is sent; its link also works (the reset page accepts both link formats), but it is unbranded and is used up as soon as it is opened.
 5. The link lifetime is Supabase's **Email OTP expiration** setting (Authentication → Sign In / Providers → Email); the email deliberately does not state a fixed time.
 
 ### Placeholders still in use

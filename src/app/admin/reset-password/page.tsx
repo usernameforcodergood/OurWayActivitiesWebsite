@@ -7,6 +7,7 @@ import { authStrings, resolveAuthLang, withLang } from "../_lib/auth-strings";
 import { RECOVERY_COOKIE } from "../_lib/recovery";
 import { AuthPage } from "../_components/AuthPage";
 import { ResetPasswordForm } from "./ResetPasswordForm";
+import { HashRecovery } from "./HashRecovery";
 
 export const instant = false;
 
@@ -41,12 +42,8 @@ export default async function ResetPasswordPage({ searchParams }: PageProps<"/ad
   const valid = !providerError && (Boolean(tokenHash) || verified);
   const path = tokenHash ? `/admin/reset-password?token_hash=${encodeURIComponent(tokenHash)}&type=recovery` : "/admin/reset-password";
 
-  return (
-    <AuthPage lang={lang} path={path} title={valid ? s.title : s.invalidTitle} subtitle={valid ? s.intro : undefined}>
-      {valid ? (
-        <ResetPasswordForm lang={lang} tokenHash={tokenHash} verified={verified} />
-      ) : (
-        <div className="space-y-5">
+  const invalid = (
+    <div className="space-y-5">
           <p role="alert" className="flex gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
             <AlertCircle aria-hidden className="mt-0.5 size-4 shrink-0" />
             {s.invalidLink}
@@ -63,6 +60,18 @@ export default async function ResetPasswordPage({ searchParams }: PageProps<"/ad
             </Link>
           </div>
         </div>
+  );
+
+  return (
+    <AuthPage lang={lang} path={path} title={providerError ? s.invalidTitle : s.title} subtitle={valid ? s.intro : undefined}>
+      {valid ? (
+        <ResetPasswordForm lang={lang} tokenHash={tokenHash} verified={verified} />
+      ) : providerError ? (
+        invalid
+      ) : (
+        // No token in the query: the link may carry the session in the URL
+        // fragment (Supabase's default email template). Only the browser sees it.
+        <HashRecovery fallback={invalid} checking={s.checking} />
       )}
     </AuthPage>
   );

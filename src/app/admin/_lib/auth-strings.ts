@@ -58,6 +58,7 @@ const el = {
     invalidLink:
       "Ο σύνδεσμος επαναφοράς δεν είναι έγκυρος, έχει λήξει ή έχει ήδη χρησιμοποιηθεί. Ζητήστε νέο σύνδεσμο.",
     requestNew: "Αίτηση νέου συνδέσμου",
+    checking: "Έλεγχος συνδέσμου…",
     errors: {
       short: `Ο κωδικός πρέπει να έχει τουλάχιστον ${PASSWORD_MIN_LENGTH} χαρακτήρες.`,
       long: "Ο κωδικός είναι πολύ μεγάλος (έως 72 χαρακτήρες).",
@@ -119,6 +120,7 @@ const en: AuthStrings = {
     invalidTitle: "This link is not valid",
     invalidLink: "This password reset link is invalid, has expired or has already been used. Please request a new one.",
     requestNew: "Request a new link",
+    checking: "Checking your link…",
     errors: {
       short: `Your password must be at least ${PASSWORD_MIN_LENGTH} characters long.`,
       long: "Your password is too long (72 characters maximum).",

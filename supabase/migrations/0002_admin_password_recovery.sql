@@ -20,6 +20,7 @@ create table if not exists private.app_secrets (
   secret_hash bytea not null,
   updated_at  timestamptz not null default now()
 );
+alter table private.app_secrets enable row level security; -- no policies: API roles see nothing
 revoke all on table private.app_secrets from public;
 revoke all on table private.app_secrets from anon, authenticated;
 

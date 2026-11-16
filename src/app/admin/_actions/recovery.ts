@@ -62,6 +62,41 @@ export async function requestPasswordReset(_prev: ForgotState, formData: FormDat
 }
 
 // ---------------------------------------------------------------------------
+// Step 2a — Supabase's default email template
+// Its link goes through Supabase's /verify endpoint, which uses up the token
+// and redirects to /admin/reset-password#access_token=…&type=recovery. The
+// page hands those tokens to this action once, which stores them as the
+// (httpOnly) session after Supabase confirms them, and only for administrators.
+// ---------------------------------------------------------------------------
+
+const JWT_RE = /^[\w-]+\.[\w-]+\.[\w-]+$/;
+
+export async function acceptRecoveryTokens(accessToken: string, refreshToken: string): Promise<{ ok: boolean }> {
+  if (typeof accessToken !== "string" || typeof refreshToken !== "string") return { ok: false };
+  if (!JWT_RE.test(accessToken) || accessToken.length > 4096 || !/^[\w-]{6,512}$/.test(refreshToken)) return { ok: false };
+
+  const supabase = await createSupabaseServerClient();
+  // setSession validates the access token with Supabase Auth before accepting it.
+  const { data, error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+  if (error || !data.user) return { ok: false };
+
+  const { data: admin } = await supabase.from("admin_users").select("user_id").eq("user_id", data.user.id).maybeSingle();
+  if (!admin) {
+    await supabase.auth.signOut();
+    return { ok: false };
+  }
+
+  (await cookies()).set(RECOVERY_COOKIE, data.user.id, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/admin",
+    maxAge: 15 * 60,
+  });
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
 // Step 2 — choose a new password from the emailed link
 // ---------------------------------------------------------------------------
 
