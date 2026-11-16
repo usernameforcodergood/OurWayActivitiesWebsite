@@ -24,10 +24,10 @@ export function PasswordForm() {
   return (
     <form ref={form} action={action} className="space-y-4">
       <Field id="password" label={t.settings.newPassword} hint={t.settings.passwordShort}>
-        <input id="password" name="password" type="password" autoComplete="new-password" minLength={10} required className="admin-input" />
+        <input id="password" name="password" type="password" autoComplete="new-password" minLength={12} required className="admin-input" />
       </Field>
       <Field id="confirm" label={t.settings.confirmPassword} error={error}>
-        <input id="confirm" name="confirm" type="password" autoComplete="new-password" minLength={10} required className="admin-input" aria-invalid={Boolean(error) || undefined} />
+        <input id="confirm" name="confirm" type="password" autoComplete="new-password" minLength={12} required className="admin-input" aria-invalid={Boolean(error) || undefined} />
       </Field>
       <button type="submit" disabled={pending} className="min-h-10 rounded-lg bg-forest px-4 text-sm font-semibold text-bone hover:bg-moss disabled:opacity-60">
         {pending ? t.common.saving : t.settings.changePassword}

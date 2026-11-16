@@ -5,6 +5,7 @@ import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { requireAdmin } from "@/lib/auth";
+import { PASSWORD_MIN_LENGTH } from "../_lib/auth-strings";
 
 export type LoginState = { error?: "invalid" | "forbidden" | "notConfigured" | "rateLimited" | "generic"; email?: string };
 
@@ -16,7 +17,9 @@ const loginSchema = z.object({
 
 /** Only same-site admin paths are allowed as a post-login destination. */
 function safeNext(next: string | undefined): string {
-  return next && /^\/admin(\/[\w\-/]*)?$/.test(next) && !next.startsWith("/admin/login") ? next : "/admin";
+  return next && /^\/admin(\/[\w\-/]*)?$/.test(next) && !/^\/admin\/(login|forgot-password|reset-password)/.test(next)
+    ? next
+    : "/admin";
 }
 
 export async function signIn(_prev: LoginState, formData: FormData): Promise<LoginState> {
@@ -61,7 +64,7 @@ export async function changePassword(_prev: PasswordResult | null, formData: For
   await requireAdmin();
   const password = String(formData.get("password") ?? "");
   const confirm = String(formData.get("confirm") ?? "");
-  if (password.length < 10) return { ok: false, error: "short" };
+  if (password.length < PASSWORD_MIN_LENGTH) return { ok: false, error: "short" };
   if (password !== confirm) return { ok: false, error: "mismatch" };
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.updateUser({ password });

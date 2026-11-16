@@ -7,13 +7,16 @@ import { createServerClient } from "@supabase/ssr";
  * is no session at all. The real authorization check (is this user an
  * admin?) happens on the server in requireAdmin() and in RLS.
  */
+const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/forgot-password", "/admin/reset-password"]);
+
 export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const isLogin = request.nextUrl.pathname === "/admin/login";
+  // Signed-out admin pages: login and password recovery.
+  const isPublic = PUBLIC_ADMIN_PATHS.has(request.nextUrl.pathname);
 
   if (!url || !key) {
-    if (isLogin) return NextResponse.next();
+    if (isPublic) return NextResponse.next();
     return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
@@ -34,7 +37,7 @@ export async function proxy(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const signedIn = Boolean(data?.claims?.sub);
 
-  if (!signedIn && !isLogin) {
+  if (!signedIn && !isPublic) {
     const login = new URL("/admin/login", request.url);
     login.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(login);
@@ -42,6 +45,8 @@ export async function proxy(request: NextRequest) {
 
   response.headers.set("X-Robots-Tag", "noindex, nofollow");
   response.headers.set("Cache-Control", "private, no-store");
+  // Reset links carry a one-time token in the URL: never leak it via Referer.
+  response.headers.set("Referrer-Policy", "no-referrer");
   return response;
 }
 

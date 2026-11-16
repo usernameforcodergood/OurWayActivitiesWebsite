@@ -140,7 +140,7 @@ Lists support search, status filter, sorting and pagination.
 - **Supabase** provides the PostgreSQL database, email/password login and image storage. The schema, Row Level Security policies and storage bucket are in `supabase/migrations/0001_cms.sql`.
 - **Row Level Security**: visitors can only **read** published excursions and currently active announcements. Only users listed in `admin_users` can create, change or delete anything, including uploads in the `media` storage bucket. The database enforces this independently of the website code.
 - **Server-side checks**: every admin page, preview and Server Action calls `requireAdmin()` (`src/lib/auth.ts`). It verifies the session with Supabase Auth and checks `admin_users`. `src/proxy.ts` refreshes the session cookie and redirects anonymous visitors to `/admin/login` early. Admin pages are always rendered per request, never cached, and send `noindex`.
-- **No secret keys in the app.** The website only uses the public URL and publishable key. Admin writes run with the logged-in admin's own session. The database connection string is used only by the two local setup scripts and must not be added to Vercel.
+- **No service-role key in the app.** The website uses the public URL and publishable key; admin writes run with the logged-in admin's own session. The only server secret is `ADMIN_RECOVERY_KEY` (see *Admin password recovery*), which can do nothing except tell the server whether an email belongs to an admin. The database connection string is used only by the local setup scripts and must not be added to Vercel.
 - **No public registration.** Admin accounts are created by the developer (see below).
 - **Images** are resized in the browser (max 2400px, WebP) and uploaded straight to Supabase Storage, then served through `next/image`. Nothing is stored inside the deployment.
 
@@ -163,7 +163,32 @@ Lists support search, status filter, sorting and pagination.
 5. Recommended: **Authentication → Sign In / Providers → Email**: turn **off** "Allow new users to sign up", so nobody can create accounts through the Supabase API.
 6. Restart `npm run dev` and sign in at <http://localhost:3000/admin>.
 
-On Vercel, add only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (plus the email variables).
+On Vercel, add only `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `ADMIN_RECOVERY_KEY` (plus the email variables).
+
+### Admin password recovery
+
+`/admin/login` → **"Ξέχασες τον κωδικό σου;"** → `/admin/forgot-password` → email → `/admin/reset-password`. The pages are Greek by default, English with `?lang=en` (EL/EN switch top right). The flow uses Supabase Auth's own recovery (`resetPasswordForEmail()` + `verifyOtp()`); there is no custom token system.
+
+How it is secured:
+
+- **Admins only.** Before anything is sent, the server asks the database (`admin_recovery_eligible()`, migration `0002`) whether the email belongs to a confirmed, non-banned user in `admin_users`. The function only answers callers holding the server-only `ADMIN_RECOVERY_KEY`, so nobody can use the public API to test which emails are admins. Non-admin accounts never get an email, and if a non-admin somehow holds a valid recovery token, the reset page signs them out without changing anything. Recovery can never create an admin: admin rights come only from `npm run admin:grant`.
+- **No account enumeration.** Every valid email gets the same message, in the same (padded) time, and no cookie is set.
+- **Single-use, time-limited links.** Supabase creates, expires and invalidates the token. Opening the link does **not** use it up (so email link scanners can't burn it); it is verified only when the new password is submitted, after validation (≥ 12 characters, both fields match).
+- **After the change** every session of that account is signed out (`signOut({ scope: "global" })`) and the admin must sign in with the new password. Passwords are only ever handled by Supabase Auth (hashed); none is sent by email.
+
+One-time setup (needs the Supabase dashboard; the website code cannot change these settings):
+
+1. Apply the new migration and create the recovery key (writes `ADMIN_RECOVERY_KEY` to `.env.local`; copy the same value to Vercel, Production):
+   ```bash
+   npm run db:setup
+   ```
+   ```bash
+   npm run admin:recovery-key
+   ```
+2. **Authentication → URL Configuration**: set **Site URL** to the live domain and add these **Redirect URLs**: `https://<your-domain>/admin/reset-password` and `http://localhost:3000/admin/reset-password`.
+3. **Authentication → Emails → Templates → Reset password**: subject `Reset your OurWay administrator password`, body = the contents of `supabase/templates/reset-password.html`. (Without this template the link format will not match and the reset page will report an invalid link.)
+4. **Authentication → Emails → SMTP Settings**: enable a custom SMTP server. Supabase's built-in sender only delivers to the project's team members and a few emails per hour. With Resend: host `smtp.resend.com`, port `465`, user `resend`, password = a Resend API key, sender = an address on the verified OurWay domain.
+5. The link lifetime is Supabase's **Email OTP expiration** setting (Authentication → Sign In / Providers → Email); the email deliberately does not state a fixed time.
 
 ### Placeholders still in use
 
@@ -186,7 +211,7 @@ To change provider, implement `EmailProvider` in `src/lib/email.ts`.
 
 1. Push this repository to GitHub.
 2. In Vercel: **Add New → Project → Import** the repository. The framework is detected as Next.js; keep the default build settings.
-3. Under **Settings → Environment Variables**, add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`, optionally `CONTACT_FROM_EMAIL`, and `NEXT_PUBLIC_SITE_URL` (the final domain, e.g. `https://www.ourway.gr`). Do **not** add `SUPABASE_DB_URL`.
+3. Under **Settings → Environment Variables**, add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `ADMIN_RECOVERY_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`, optionally `CONTACT_FROM_EMAIL`, and `NEXT_PUBLIC_SITE_URL` (the final domain, e.g. `https://www.ourway.gr`). Do **not** add `SUPABASE_DB_URL`.
 4. Deploy. Every push to `main` deploys to production; other branches get preview URLs.
 
 ## Connecting the domain
