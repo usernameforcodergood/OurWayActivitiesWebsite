@@ -224,6 +224,13 @@ OurWay takes **requests, not payments**. There is no checkout, card form or paym
 
 **Security.** Visitors can't read any booking or personal data: they can only call `submit_booking_request()` / `submit_private_request()` (security-definer functions that validate everything again) and `public_departures()` (counts only). Bookings, private requests, notes, history and the email log are readable only by admins (RLS), and statuses change only through `admin_*` functions that check `is_admin()`.
 
+**Form submission key.** Since migration `0005`, the database accepts booking and tailor-made requests only when the website's server sends the server-only `SUBMISSION_KEY` (stored in the database as a hash in `private.app_secrets`). Calling `submit_*()` directly with the public key, which would skip the honeypot, fill timer and rate limit, is refused. Set it up once, in this order:
+1. `npm run submission-key` writes the key to `.env.local` and prints an SQL line with its hash.
+2. Add the same `SUBMISSION_KEY` value to Vercel → Settings → Environment Variables (Production), then deploy.
+3. Run the printed SQL line in Supabase → SQL Editor, then apply `supabase/migrations/0005_submission_key.sql`.
+
+If the key is missing or wrong, the forms answer "not available yet" and the server logs `database refused the submission: SUBMISSION_KEY is …`. To rotate it, repeat the three steps.
+
 **Tailor-made setup:** apply `supabase/migrations/0004_tailor_made.sql` **before deploying** the version that contains it. It reuses the `private_requests` table (no parallel table), adds the category and extra-requirements fields, maps the old statuses (Planning → In review, Proposal sent → Quotation sent, Accepted → Confirmed) and lets admins edit and delete requests. Safe to re-run.
 
 **Setup:** apply `supabase/migrations/0003_bookings.sql` (`npm run db:setup`, or paste it into Supabase → SQL Editor). It is safe to re-run, and it copies any dates in the old "Available dates" list into departures (the old list is kept, so the previously deployed site keeps working until you deploy). **Apply it before deploying this version**: the site's excursion queries depend on the new `departures` table.
