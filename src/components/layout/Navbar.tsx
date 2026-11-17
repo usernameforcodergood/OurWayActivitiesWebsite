@@ -10,11 +10,12 @@ import { localePath, routes } from "@/i18n/routes";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { getLenis } from "./SmoothScroll";
 import { Wordmark } from "@/components/ui/Wordmark";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
+import { useExperienceChoice } from "./ExperienceChoice";
 import { cn, pad } from "@/lib/utils";
 
-type NavKey = "activities" | "destinations" | "news" | "about" | "gallery" | "contact";
-const NAV_ITEMS: NavKey[] = ["activities", "destinations", "news", "about", "gallery", "contact"];
+type NavKey = "activities" | "tailorMade" | "destinations" | "news" | "about" | "gallery" | "contact";
+const NAV_ITEMS: NavKey[] = ["activities", "tailorMade", "destinations", "news", "about", "gallery", "contact"];
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -25,6 +26,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const dialog = useRef<HTMLDivElement>(null);
+  const choice = useExperienceChoice();
 
   // One passive, rAF-throttled scroll listener: solid background once the
   // hero is left behind, hide while scrolling down, reveal when scrolling up.
@@ -113,20 +115,20 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
             <Wordmark useLogo />
           </Link>
 
-          <nav aria-label={t.primary} className="hidden lg:block">
+          <nav aria-label={t.primary} className="hidden xl:block">
             <ul className="flex items-center gap-1">
               {NAV_ITEMS.filter((k) => k !== "contact").map((key) => (
                 <li key={key}>
                   <Link
                     href={localePath(locale, routes[key])}
                     aria-current={isActive(key) ? "page" : undefined}
-                    className="group relative inline-flex min-h-11 items-center px-3.5 text-sm font-medium text-bone/80 transition-colors hover:text-bone aria-[current=page]:text-bone"
+                    className="group relative inline-flex min-h-11 items-center whitespace-nowrap px-2.5 text-sm font-medium xl:px-3.5 text-bone/80 transition-colors hover:text-bone aria-[current=page]:text-bone"
                   >
                     {t[key]}
                     <span
                       aria-hidden
                       className={cn(
-                        "absolute inset-x-3.5 bottom-2 h-px origin-left bg-lichen transition-transform duration-500 ease-out-expo",
+                        "absolute inset-x-2.5 bottom-2 h-px xl:inset-x-3.5 origin-left bg-lichen transition-transform duration-500 ease-out-expo",
                         isActive(key) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
                       )}
                     />
@@ -144,9 +146,9 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
               className="text-bone"
             />
             <div className="hidden sm:block">
-              <ButtonLink href={localePath(locale, routes.contact)} className="!min-h-11 !px-5 !py-2.5 !text-sm">
+              <Button type="button" aria-haspopup="dialog" onClick={choice.open} className="!min-h-11 !px-5 !py-2.5 !text-sm">
                 {t.inquire}
-              </ButtonLink>
+              </Button>
             </div>
             <button
               ref={menuButton}
@@ -155,7 +157,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
               aria-expanded={open}
               aria-controls="mobile-menu"
               aria-label={open ? t.closeMenu : t.openMenu}
-              className="inline-flex size-11 items-center justify-center rounded-full border border-bone/25 text-bone transition-colors hover:border-bone lg:hidden"
+              className="inline-flex size-11 items-center justify-center rounded-full border border-bone/25 text-bone transition-colors hover:border-bone xl:hidden"
             >
               <span aria-hidden className="relative block h-3 w-5">
                 <span
@@ -185,7 +187,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
             aria-modal="true"
             aria-label={t.menu}
             data-lenis-prevent
-            className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-forest pt-[var(--header-h)] lg:hidden"
+            className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-forest pt-[var(--header-h)] xl:hidden"
             initial={{ clipPath: "inset(0% 0% 100% 0%)" }}
             animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
             exit={{ clipPath: "inset(0% 0% 100% 0%)" }}
@@ -232,9 +234,16 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
                 className="text-bone"
                 onNavigate={close}
               />
-              <ButtonLink href={localePath(locale, routes.contact)} onClick={close}>
+              <Button
+                type="button"
+                aria-haspopup="dialog"
+                onClick={() => {
+                  close();
+                  choice.open();
+                }}
+              >
                 {t.inquire}
-              </ButtonLink>
+              </Button>
             </motion.div>
           </motion.div>
         )}

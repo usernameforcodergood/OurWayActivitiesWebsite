@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/site";
 import type { ActionResult } from "@/lib/cms/schemas";
 import { renderCustomerBookingEmail, type BookingEmailData, type CustomerBookingEmail } from "@/lib/bookings/emails";
 import { adminInbox, deliver, type DeliveryResult, type EmailKind } from "@/lib/bookings/notify";
-import { PRIVATE_STATUSES } from "@/lib/bookings/validation";
+import { EXPERIENCE_TYPES, MAX_GROUP, PRIVATE_STATUSES } from "@/lib/bookings/validation";
 
 type Db = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 type EmailOutcome = DeliveryResult["status"] | "skipped";
@@ -146,7 +146,7 @@ export async function addRequestNote(input: z.input<typeof noteInput>): Promise<
   return { ok: true };
 }
 
-/* ----------------------------- Private requests ----------------------------- */
+/* -------------------- Tailor-made requests (private_requests) ------------------- */
 
 const privateStatusInput = z.object({ id: uuid, status: z.enum(PRIVATE_STATUSES), note });
 
@@ -195,6 +195,74 @@ export async function savePrivateProposal(input: z.input<typeof proposalInput>):
   const { error, count } = await db.from("private_requests").update(fields, { count: "exact" }).eq("id", id);
   if (error || !count) {
     console.error("[admin] proposal:", error?.message);
+    return { ok: false, error: "generic" };
+  }
+  return { ok: true };
+}
+
+const optText = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, "tooLong")
+    .transform((v) => v || null);
+const optDate = z
+  .string()
+  .trim()
+  .refine((v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v), "date")
+  .transform((v) => v || null);
+
+const detailsInput = z
+  .object({
+    id: uuid,
+    first_name: z.string().trim().min(1, "required").max(80, "tooLong"),
+    last_name: z.string().trim().min(1, "required").max(80, "tooLong"),
+    email: z.string().trim().toLowerCase().max(200, "tooLong").pipe(z.email("email")),
+    phone: z.string().trim().regex(/^[+()\d\s.-]{6,40}$/, "phone"),
+    participants: z.coerce.number().int("participants").min(1, "participants").max(MAX_GROUP, "participants"),
+    destination: optText(300),
+    experience_type: z.union([z.enum(EXPERIENCE_TYPES), z.literal("")]).transform((v) => v || null),
+    date_from: optDate,
+    date_to: optDate,
+    dates_flexible: z.boolean(),
+    budget_per_person: optText(120),
+    message: optText(3000),
+    additional_requirements: optText(2000),
+  })
+  .refine((v) => !v.date_from || !v.date_to || v.date_to >= v.date_from, { message: "dateOrder", path: ["date_to"] });
+
+export type TailorMadeDetailsInput = z.input<typeof detailsInput>;
+
+/** Admin correction of a tailor-made request's details (status changes go through setPrivateRequestStatus). */
+export async function updateTailorMadeRequest(input: TailorMadeDetailsInput): Promise<ActionResult> {
+  await requireAdmin();
+  const parsed = detailsInput.safeParse(input);
+  if (!parsed.success) {
+    const fieldErrors: Record<string, string> = {};
+    for (const issue of parsed.error.issues) {
+      const key = String(issue.path[0] ?? "");
+      if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
+    }
+    return { ok: false, error: "invalid", fieldErrors };
+  }
+  const { id, ...fields } = parsed.data;
+  const db = await createSupabaseServerClient();
+  const { error, count } = await db.from("private_requests").update(fields, { count: "exact" }).eq("id", id);
+  if (error || !count) {
+    console.error("[admin] tailor-made update:", error?.code, error?.message);
+    return { ok: false, error: "generic" };
+  }
+  return { ok: true };
+}
+
+/** Permanently deletes a request with its history, notes and email log (cascade). */
+export async function deleteTailorMadeRequest(id: string): Promise<ActionResult> {
+  await requireAdmin();
+  if (!uuid.safeParse(id).success) return { ok: false, error: "generic" };
+  const db = await createSupabaseServerClient();
+  const { error, count } = await db.from("private_requests").delete({ count: "exact" }).eq("id", id);
+  if (error || !count) {
+    console.error("[admin] tailor-made delete:", error?.code, error?.message);
     return { ok: false, error: "generic" };
   }
   return { ok: true };

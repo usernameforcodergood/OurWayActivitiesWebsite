@@ -1,7 +1,14 @@
 import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { DepartureRow } from "@/lib/cms/types";
-import { BOOKING_STATUSES, PRIVATE_STATUSES, type BookingStatus, type PrivateStatus } from "@/lib/bookings/validation";
+import {
+  BOOKING_STATUSES,
+  EXPERIENCE_TYPES,
+  PRIVATE_STATUSES,
+  type BookingStatus,
+  type ExperienceType,
+  type PrivateStatus,
+} from "@/lib/bookings/validation";
 import { ilikePattern } from "../_components/ListToolbar";
 import { PAGE_SIZE } from "./queries";
 
@@ -138,7 +145,7 @@ export async function getDeparturesWithStats(excursionId: string) {
   return rows.map((r) => ({ ...r, stats: stats.get(r.id) ?? { departure_id: r.id, confirmed: 0, pending_held: 0, pending_expired: 0 } }));
 }
 
-/* ----------------------------- Private requests ----------------------------- */
+/* -------------------- Tailor-made requests (private_requests) ------------------- */
 
 export type PrivateRequestRow = {
   id: string;
@@ -152,6 +159,7 @@ export type PrivateRequestRow = {
   destination: string | null;
   destination_flexible: boolean;
   excursion_type: string | null;
+  experience_type: ExperienceType | null;
   date_from: string | null;
   date_to: string | null;
   dates_flexible: boolean;
@@ -161,6 +169,7 @@ export type PrivateRequestRow = {
   activities: string | null;
   budget_per_person: string | null;
   message: string | null;
+  additional_requirements: string | null;
   locale: "el" | "en";
   proposal_itinerary: string | null;
   proposal_dates: string | null;
@@ -168,20 +177,27 @@ export type PrivateRequestRow = {
   consent_at: string;
   status_changed_at: string;
   created_at: string;
+  updated_at: string;
 };
 
 const PRIVATE_COLS =
-  "id, reference, status, first_name, last_name, email, phone, participants, destination, destination_flexible, excursion_type, date_from, date_to, dates_flexible, duration, difficulty, transport, activities, budget_per_person, message, locale, proposal_itinerary, proposal_dates, proposal_price_eur, consent_at, status_changed_at, created_at";
+  "id, reference, status, first_name, last_name, email, phone, participants, destination, destination_flexible, excursion_type, experience_type, date_from, date_to, dates_flexible, duration, difficulty, transport, activities, budget_per_person, message, additional_requirements, locale, proposal_itinerary, proposal_dates, proposal_price_eur, consent_at, status_changed_at, created_at, updated_at";
 
-export type PrivateListParams = { q: string; status: "all" | PrivateStatus; page: number };
+export const PRIVATE_SORTS = ["newest", "oldest", "status"] as const;
+export type PrivateSort = (typeof PRIVATE_SORTS)[number];
+export type PrivateListParams = { q: string; status: "all" | PrivateStatus; type: "all" | ExperienceType; sort: PrivateSort; page: number };
 
 export function parsePrivateParams(sp: Record<string, string | string[] | undefined>): PrivateListParams {
   const one = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : "");
   const status = one("status");
+  const type = one("type");
+  const sort = one("sort");
   const page = Number.parseInt(one("page"), 10);
   return {
     q: one("q").slice(0, 100),
     status: (PRIVATE_STATUSES as readonly string[]).includes(status) ? (status as PrivateStatus) : "all",
+    type: (EXPERIENCE_TYPES as readonly string[]).includes(type) ? (type as ExperienceType) : "all",
+    sort: (PRIVATE_SORTS as readonly string[]).includes(sort) ? (sort as PrivateSort) : "newest",
     page: Number.isFinite(page) && page > 0 ? page : 1,
   };
 }
@@ -190,12 +206,17 @@ export async function listPrivateRequests(p: PrivateListParams) {
   const db = await createSupabaseServerClient();
   let q = db.from("private_requests").select(PRIVATE_COLS, { count: "exact" });
   if (p.status !== "all") q = q.eq("status", p.status);
+  if (p.type !== "all") q = q.eq("experience_type", p.type);
   if (p.q) {
     const pat = ilikePattern(p.q);
-    q = q.or(`first_name.ilike.${pat},last_name.ilike.${pat},email.ilike.${pat},reference.ilike.${pat},destination.ilike.${pat}`);
+    q = q.or(
+      `first_name.ilike.${pat},last_name.ilike.${pat},email.ilike.${pat},phone.ilike.${pat},reference.ilike.${pat},destination.ilike.${pat},message.ilike.${pat}`,
+    );
   }
+  if (p.sort === "status") q = q.order("status_rank").order("created_at", { ascending: false });
+  else q = q.order("created_at", { ascending: p.sort === "oldest" });
   const from = (p.page - 1) * PAGE_SIZE;
-  const { data, count, error } = await q.order("created_at", { ascending: false }).range(from, from + PAGE_SIZE - 1);
+  const { data, count, error } = await q.range(from, from + PAGE_SIZE - 1);
   if (error) console.error("[admin] list private requests:", error.message);
   return { rows: (data ?? []) as PrivateRequestRow[], total: count ?? 0, pages: Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE)) };
 }

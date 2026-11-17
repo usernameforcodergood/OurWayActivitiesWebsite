@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import type { MediaKey } from "@/content/media";
 import type { CmsImage } from "@/lib/cms/types";
@@ -11,10 +12,12 @@ type Props = {
   title: string;
   lead?: string;
   image?: MediaKey | CmsImage | null;
+  /** Optional call to action under the lead. */
+  actions?: ReactNode;
 };
 
 /** Shared opening for inner pages: editorial title, lead, wide image reveal. */
-export function PageHero({ locale, eyebrow, title, lead, image }: Props) {
+export function PageHero({ locale, eyebrow, title, lead, image, actions }: Props) {
   return (
     <section className="bg-ink pt-[calc(var(--header-h)+clamp(3rem,10vw,8rem))] text-bone">
       <div className="container-x grid gap-10 md:grid-cols-12 md:items-end">
@@ -24,7 +27,12 @@ export function PageHero({ locale, eyebrow, title, lead, image }: Props) {
             {title}
           </TextReveal>
         </div>
-        {lead && <p className="text-lead text-bone/80 md:col-span-4">{lead}</p>}
+        {(lead || actions) && (
+          <div className="md:col-span-4">
+            {lead && <p className="text-lead text-bone/80">{lead}</p>}
+            {actions && <div className="mt-8">{actions}</div>}
+          </div>
+        )}
       </div>
       {image && (
         <div className="container-x mt-16 md:mt-24">

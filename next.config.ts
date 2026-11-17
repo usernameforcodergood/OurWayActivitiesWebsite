@@ -25,7 +25,13 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
-    return [{ source: "/", destination: "/el", permanent: false }];
+    return [
+      { source: "/", destination: "/el", permanent: false },
+      // "Private trips" became "Tailor-Made Experiences" (old links, sent emails).
+      { source: "/:locale(el|en)/private-trips", destination: "/:locale/tailor-made", permanent: true },
+      { source: "/admin/private-requests", destination: "/admin/tailor-made", permanent: true },
+      { source: "/admin/private-requests/:id", destination: "/admin/tailor-made/:id", permanent: true },
+    ];
   },
   async headers() {
     return [

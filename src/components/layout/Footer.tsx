@@ -6,6 +6,7 @@ import { getContactDetails } from "@/lib/cms/contact";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { BackToTop } from "./BackToTop";
 import { Wordmark } from "@/components/ui/Wordmark";
+import { ExperienceChoiceLink } from "./ExperienceChoice";
 
 /** Cached at build/revalidation time so the footer stays fully static. */
 async function getYear() {
@@ -16,7 +17,7 @@ async function getYear() {
 export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
   const f = t.footer;
   const year = await getYear();
-  const explore = (["activities", "destinations", "news", "about", "gallery", "contact"] as const).map((k) => ({
+  const explore = (["activities", "tailorMade", "destinations", "news", "about", "gallery", "contact"] as const).map((k) => ({
     href: localePath(locale, routes[k]),
     label: t.nav[k],
   }));
@@ -31,13 +32,10 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
           <Wordmark useLogo className="mb-8 size-24" />
           <p className="font-display text-display-sm max-w-sm text-bone/90">{f.tagline}</p>
           <div className="mt-8">
-            <Link
-              href={localePath(locale, routes.contact)}
-              className="text-eyebrow inline-flex min-h-11 items-center gap-3 text-lichen transition-colors hover:text-bone"
-            >
+            <ExperienceChoiceLink className="text-eyebrow inline-flex min-h-11 items-center gap-3 text-lichen transition-colors hover:text-bone">
               <span aria-hidden className="h-px w-8 bg-current" />
               {t.nav.inquire}
-            </Link>
+            </ExperienceChoiceLink>
           </div>
         </div>
 

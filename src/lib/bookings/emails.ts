@@ -263,12 +263,12 @@ export function renderAdminNewBooking(d: BookingEmailData, adminUrl: string): Re
 
 const P = {
   el: {
-    subject: "Λάβαμε το αίτημά σας για ιδιωτική εκδρομή — {ref}",
+    subject: "Η ιδέα σας έφτασε σε εμάς — {ref}",
     badge: "Αίτημα σε επεξεργασία",
-    heading: "Ας σχεδιάσουμε μαζί την εκδρομή σας",
+    heading: "Ας σχεδιάσουμε μαζί την επόμενη εμπειρία σας",
     intro: [
       "Γεια σας {name},",
-      "Ευχαριστούμε για το αίτημά σας! Η ομάδα της OurWay θα επικοινωνήσει μαζί σας σύντομα για να συζητήσουμε τις ιδέες σας.",
+      "Σας ευχαριστούμε! Η ιδέα σας έφτασε σε εμάς. Η ομάδα της OurWay θα επικοινωνήσει μαζί σας σύντομα για να σχεδιάσουμε μαζί την επόμενη εμπειρία σας.",
       "Το αίτημα δεν αποτελεί κράτηση ούτε δεσμευτική προσφορά: το πρόγραμμα, η διαθεσιμότητα και η τιμή θα διαμορφωθούν μαζί σας.",
     ],
     reference: "Κωδικός αιτήματος",
@@ -276,16 +276,16 @@ const P = {
     reply: "Για οποιαδήποτε ερώτηση, απαντήστε σε αυτό το email αναφέροντας τον κωδικό σας.",
   },
   en: {
-    subject: "We received your private trip request — {ref}",
+    subject: "Your idea has reached us — {ref}",
     badge: "Request received",
-    heading: "Let's plan your trip together",
+    heading: "Let's design your next experience together",
     intro: [
       "Hello {name},",
-      "Thank you for your request! The OurWay team will contact you soon to talk through your ideas.",
+      "Thank you! Your idea has reached us. The OurWay team will be in touch soon so we can design your next experience together.",
       "This request is not a booking or a binding quote: the itinerary, availability and price will be shaped together with you.",
     ],
     reference: "Request reference",
-    participants: "Group size",
+    participants: "Participants",
     reply: "If you have any questions, reply to this email and mention your reference.",
   },
 } as const;
@@ -303,7 +303,7 @@ export function renderPrivateReceived(d: PrivateEmailData): Rendered {
 }
 
 export function renderAdminNewPrivate(d: PrivateEmailData, adminUrl: string): Rendered {
-  const heading = "Νέο αίτημα ιδιωτικής εκδρομής";
+  const heading = "Νέο αίτημα Tailor-Made εμπειρίας";
   const rows: Array<[string, string]> = [
     ["Κωδικός", d.reference],
     ["Όνομα", `${d.firstName} ${d.lastName}`],
@@ -312,7 +312,7 @@ export function renderAdminNewPrivate(d: PrivateEmailData, adminUrl: string): Re
     ["Άτομα", String(d.participants)],
     ...d.details,
   ];
-  const intro = ["Νέο αίτημα για εκδρομή αποκλειστικά για ομάδα. Κατάσταση: «Νέο αίτημα»."];
+  const intro = ["Νέο αίτημα για εξατομικευμένη εμπειρία (Tailor-Made). Κατάσταση: «Νέο»."];
   const outro = [`Διαχείριση: ${adminUrl}`];
   return {
     subject: `${heading} ${d.reference} — ${d.firstName} ${d.lastName} (${d.participants} άτομα)`,
