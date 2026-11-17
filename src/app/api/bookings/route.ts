@@ -5,6 +5,7 @@ import { clientIp, rateLimited } from "@/lib/rate-limit";
 import { MIN_FILL_MS, bookingRequestSchema, mapDbError, type SubmitResponse } from "@/lib/bookings/validation";
 import { renderAdminNewBooking, renderCustomerBookingEmail, type BookingEmailData } from "@/lib/bookings/emails";
 import { adminInbox, deliver, type EmailKind } from "@/lib/bookings/notify";
+import { logKeyRefusal, submissionKey } from "@/lib/bookings/submission-key";
 
 /**
  * Booking request / expression of interest. The request is validated here and
@@ -57,9 +58,11 @@ export async function POST(request: Request) {
       special_requests: d.specialRequests ?? null,
       locale: d.locale,
       consent: d.consent,
+      submission_key: submissionKey(),
     },
   });
   if (error || !data) {
+    if (logKeyRefusal("bookings", error?.message)) return json({ ok: false, error: "notConfigured" }, 503);
     const mapped = mapDbError(error?.message);
     if (mapped.error === "generic") console.error("[bookings] submit failed:", error?.code, error?.message);
     const status = mapped.error === "invalid" ? 422 : mapped.error === "generic" ? 500 : 409;

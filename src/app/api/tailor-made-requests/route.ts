@@ -13,6 +13,7 @@ import {
 } from "@/lib/bookings/validation";
 import { formatDateLong, renderAdminNewPrivate, renderPrivateReceived } from "@/lib/bookings/emails";
 import { adminInbox, deliver, type EmailKind } from "@/lib/bookings/notify";
+import { logKeyRefusal, submissionKey } from "@/lib/bookings/submission-key";
 
 /**
  * Tailor-made experience request. Saved as "new" in public.private_requests;
@@ -120,9 +121,11 @@ export async function POST(request: Request) {
       additional_requirements: d.additionalRequirements ?? null,
       locale: d.locale,
       consent: d.consent,
+      submission_key: submissionKey(),
     },
   });
   if (error || !data) {
+    if (logKeyRefusal("tailor-made", error?.message)) return json({ ok: false, error: "notConfigured" }, 503);
     const mapped = mapDbError(error?.message);
     if (mapped.error === "generic") console.error("[tailor-made] submit failed:", error?.code, error?.message);
     return json({ ok: false, ...mapped }, mapped.error === "invalid" ? 422 : mapped.error === "generic" ? 500 : 409);
