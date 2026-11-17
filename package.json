@@ -10,8 +10,7 @@
     "db:setup": "node scripts/db-setup.mjs",
     "admin:grant": "node scripts/admin-grant.mjs",
     "typecheck": "tsc --noEmit",
-    "admin:recovery-key": "node scripts/admin-recovery-key.mjs",
-    "submission-key": "node scripts/submission-key.mjs"
+    "admin:recovery-key": "node scripts/admin-recovery-key.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

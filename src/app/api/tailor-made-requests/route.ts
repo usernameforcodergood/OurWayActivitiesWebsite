@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPublicSupabase } from "@/lib/supabase/public";
+import { getSubmissionSupabase } from "@/lib/supabase/server-secret";
 import { siteConfig } from "@/lib/site";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 import {
@@ -13,7 +13,6 @@ import {
 } from "@/lib/bookings/validation";
 import { formatDateLong, renderAdminNewPrivate, renderPrivateReceived } from "@/lib/bookings/emails";
 import { adminInbox, deliver, type EmailKind } from "@/lib/bookings/notify";
-import { logKeyRefusal, submissionKey } from "@/lib/bookings/submission-key";
 
 /**
  * Tailor-made experience request. Saved as "new" in public.private_requests;
@@ -99,7 +98,7 @@ export async function POST(request: Request) {
   if (Date.now() - d.startedAt < MIN_FILL_MS) return json({ ok: false, error: "invalid" }, 400);
   if (rateLimited(`tailor:${clientIp(request)}`, 5, 10 * 60 * 1000)) return json({ ok: false, error: "rateLimited" }, 429);
 
-  const db = getPublicSupabase();
+  const db = getSubmissionSupabase();
   if (!db) return json({ ok: false, error: "notConfigured" }, 503);
 
   const name = splitFullName(d.fullName)!; // guaranteed by the schema
@@ -121,11 +120,9 @@ export async function POST(request: Request) {
       additional_requirements: d.additionalRequirements ?? null,
       locale: d.locale,
       consent: d.consent,
-      submission_key: submissionKey(),
     },
   });
   if (error || !data) {
-    if (logKeyRefusal("tailor-made", error?.message)) return json({ ok: false, error: "notConfigured" }, 503);
     const mapped = mapDbError(error?.message);
     if (mapped.error === "generic") console.error("[tailor-made] submit failed:", error?.code, error?.message);
     return json({ ok: false, ...mapped }, mapped.error === "invalid" ? 422 : mapped.error === "generic" ? 500 : 409);
