@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   CalendarRange,
+  ClipboardList,
   ExternalLink,
   Image as ImageIcon,
   LayoutDashboard,
@@ -12,6 +13,7 @@ import {
   Megaphone,
   Menu,
   Settings,
+  Users,
   X,
 } from "lucide-react";
 import { signOut } from "../_actions/auth";
@@ -21,6 +23,8 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/admin", label: t.nav.dashboard, icon: LayoutDashboard, exact: true },
   { href: "/admin/excursions", label: t.nav.excursions, icon: CalendarRange },
+  { href: "/admin/bookings", label: t.nav.bookings, icon: ClipboardList },
+  { href: "/admin/private-requests", label: t.nav.privateRequests, icon: Users },
   { href: "/admin/announcements", label: t.nav.announcements, icon: Megaphone },
   { href: "/admin/media", label: t.nav.media, icon: ImageIcon },
   { href: "/admin/settings", label: t.nav.settings, icon: Settings },

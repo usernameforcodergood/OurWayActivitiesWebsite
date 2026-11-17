@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, Eye, Trash2, Wand2, X } from "lucide-react";
+import { Eye, Trash2, Wand2 } from "lucide-react";
 import { deleteExcursion, saveExcursion } from "../_actions/excursions";
 import { errorMessage, fmt, t } from "../_lib/strings";
 import { slugify } from "@/lib/cms/mappers";
@@ -25,7 +25,10 @@ const LOCALIZED = [
   "difficulty",
   "price_note",
   "availability_note",
+  "meeting_point",
+  "included",
   "info",
+  "cancellation_policy",
 ] as const;
 type LocalizedKey = `${(typeof LOCALIZED)[number]}_${Lang}`;
 
@@ -34,7 +37,8 @@ type FormState = {
   featured: boolean;
   participants: string;
   price_eur: string;
-  available_dates: string[];
+  kind: "excursion" | "event";
+  booking_mode: "departures" | "interest" | "none";
   cover: MediaRow | null;
   gallery: MediaRow[];
 } & Record<LocalizedKey, string>;
@@ -53,7 +57,8 @@ function fromRow(row: ExcursionRow | null): FormState {
     featured: row?.featured ?? false,
     participants: row?.participants ?? "",
     price_eur: row?.price_eur === null || row?.price_eur === undefined ? "" : String(row.price_eur),
-    available_dates: row?.available_dates ?? [],
+    kind: row?.kind ?? "excursion",
+    booking_mode: row?.booking_mode ?? "departures",
     cover: row?.cover ?? null,
     gallery: (row?.images ?? [])
       .slice()
@@ -63,11 +68,12 @@ function fromRow(row: ExcursionRow | null): FormState {
   };
 }
 
-export function ExcursionForm({ row }: { row: ExcursionRow | null }) {
+export function ExcursionForm({ row, initialKind = "excursion" }: { row: ExcursionRow | null; initialKind?: "excursion" | "event" }) {
+  const initial = () => (row ? fromRow(row) : { ...fromRow(null), kind: initialKind, booking_mode: initialKind === "event" ? ("interest" as const) : ("departures" as const) });
   const router = useRouter();
   const toast = useToast();
-  const [form, setForm] = useState<FormState>(() => fromRow(row));
-  const [saved, setSaved] = useState(() => JSON.stringify(fromRow(row)));
+  const [form, setForm] = useState<FormState>(initial);
+  const [saved, setSaved] = useState(() => JSON.stringify(initial()));
   const [status, setStatus] = useState<"draft" | "published">(row?.status ?? "draft");
   const [lang, setLang] = useState<Lang>("el");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -118,7 +124,8 @@ export function ExcursionForm({ row }: { row: ExcursionRow | null }) {
       gallery: form.gallery.map((g) => g.id),
       participants: form.participants,
       price_eur: form.price_eur.trim() === "" ? null : form.price_eur,
-      available_dates: form.available_dates.filter(Boolean),
+      kind: form.kind,
+      booking_mode: form.booking_mode,
       ...Object.fromEntries(LOCALIZED.flatMap((k) => (["el", "en"] as const).map((l) => [`${k}_${l}`, form[`${k}_${l}`]]))),
     };
     startTransition(async () => {
@@ -209,8 +216,17 @@ export function ExcursionForm({ row }: { row: ExcursionRow | null }) {
                 <input id={lf("availability_note")} value={form[lf("availability_note")]} onChange={(e) => set(lf("availability_note"), e.target.value)} className="admin-input" />
               </Field>
             </div>
+            <Field id={lf("meeting_point")} label={L.meetingPoint} optional>
+              <input id={lf("meeting_point")} value={form[lf("meeting_point")]} onChange={(e) => set(lf("meeting_point"), e.target.value)} className="admin-input" />
+            </Field>
+            <Field id={lf("included")} label={L.included} hint={L.includedHint} optional>
+              <textarea id={lf("included")} value={form[lf("included")]} onChange={(e) => set(lf("included"), e.target.value)} rows={3} className="admin-input" />
+            </Field>
             <Field id={lf("info")} label={L.info} hint={L.infoHint} optional>
               <textarea id={lf("info")} value={form[lf("info")]} onChange={(e) => set(lf("info"), e.target.value)} rows={4} className="admin-input" />
+            </Field>
+            <Field id={lf("cancellation_policy")} label={L.cancellationPolicy} optional>
+              <textarea id={lf("cancellation_policy")} value={form[lf("cancellation_policy")]} onChange={(e) => set(lf("cancellation_policy"), e.target.value)} rows={3} className="admin-input" />
             </Field>
           </div>
         </Card>
@@ -234,40 +250,42 @@ export function ExcursionForm({ row }: { row: ExcursionRow | null }) {
               />
             </Field>
           </div>
+          <p className="mt-3 text-xs text-bark">{L.priceDefaultHint}</p>
+        </Card>
+
+        <Card>
+          <h2 className="mb-5 text-lg font-semibold">{t.excursions.sections.booking}</h2>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field id="kind" label={L.kind}>
+              <select id="kind" value={form.kind} onChange={(e) => set("kind", e.target.value as FormState["kind"])} className="admin-input">
+                <option value="excursion">{L.kindExcursion}</option>
+                <option value="event">{L.kindEvent}</option>
+              </select>
+            </Field>
+          </div>
           <fieldset className="mt-5">
-            <legend className="mb-2 text-sm font-semibold">
-              {L.dates} <span className="text-xs font-normal text-bark/80">({t.common.optional})</span>
-            </legend>
-            <ul className="mb-2 flex flex-wrap gap-2">
-              {form.available_dates.map((d, i) => (
-                <li key={i} className="flex items-center gap-1 rounded-lg bg-stone/60 p-1">
-                  <label htmlFor={`date-${i}`} className="sr-only">
-                    {L.dates} {i + 1}
-                  </label>
-                  <input
-                    id={`date-${i}`}
-                    type="date"
-                    value={d}
-                    onChange={(e) => set("available_dates", form.available_dates.map((x, j) => (j === i ? e.target.value : x)))}
-                    className="admin-input w-auto py-1.5"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => set("available_dates", form.available_dates.filter((_, j) => j !== i))}
-                    aria-label={L.removeDate}
-                    className="rounded p-2 text-bark hover:bg-ink/5 hover:text-red-700"
-                  >
-                    <X aria-hidden className="size-4" />
-                  </button>
-                </li>
+            <legend className="mb-2 text-sm font-semibold">{L.bookingMode}</legend>
+            <div className="grid gap-2">
+              {(
+                [
+                  ["departures", L.modeDepartures, L.modeDeparturesHint],
+                  ["interest", L.modeInterest, L.modeInterestHint],
+                  ["none", L.modeNone, L.modeNoneHint],
+                ] as const
+              ).map(([value, label, hint]) => (
+                <label key={value} className="flex cursor-pointer items-start gap-3 rounded-lg p-3 ring-1 ring-ink/10 has-[:checked]:bg-emerald-50 has-[:checked]:ring-emerald-600/40">
+                  <input type="radio" name="booking_mode" value={value} checked={form.booking_mode === value} onChange={() => set("booking_mode", value)} className="mt-1 accent-emerald-700" />
+                  <span>
+                    <span className="block text-sm font-semibold">{label}</span>
+                    <span className="block text-xs text-bark">{hint}</span>
+                  </span>
+                </label>
               ))}
-            </ul>
-            {errors.available_dates && <p className="mb-2 text-xs text-red-700">{err("available_dates")}</p>}
-            <Btn variant="secondary" onClick={() => set("available_dates", [...form.available_dates, ""])}>
-              <CalendarPlus aria-hidden className="size-4" />
-              {L.addDate}
-            </Btn>
+            </div>
           </fieldset>
+          {form.booking_mode === "departures" && (
+            <p className="mt-4 rounded-lg bg-sky-50 p-3 text-xs text-sky-950">{row ? L.departuresBelow : L.departuresAfterSave}</p>
+          )}
         </Card>
 
         <Card>
@@ -380,7 +398,7 @@ export function ExcursionForm({ row }: { row: ExcursionRow | null }) {
             const res = await deleteExcursion(row.id);
             setDeleting(false);
             if (!res.ok) {
-              toast("error", t.common.error);
+              toast("error", errorMessage(res.error) ?? t.common.error);
               return;
             }
             setSaved(JSON.stringify(form));

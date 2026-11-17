@@ -85,6 +85,8 @@ export async function deleteExcursion(id: string): Promise<ActionResult> {
   await requireAdmin();
   const supabase = await createSupabaseServerClient();
   const { error, count } = await supabase.from("excursions").delete({ count: "exact" }).eq("id", id);
+  // Booking requests keep their excursion (history must survive): unpublish instead.
+  if (error?.code === "23503") return { ok: false, error: "hasBookings" };
   if (error || !count) return { ok: false, error: "generic" };
   updateTag(TAGS.excursions);
   return { ok: true };

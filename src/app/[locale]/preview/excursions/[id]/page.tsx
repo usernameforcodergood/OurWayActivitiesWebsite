@@ -20,7 +20,7 @@ export default async function ExcursionPreviewPage({ params }: PageProps<"/[loca
   const db = await createSupabaseServerClient();
   const { data } = await db
     .from("excursions")
-    .select("*, cover:media!excursions_cover_media_id_fkey(*), images:excursion_images(position, media(*))")
+    .select("*, cover:media!excursions_cover_media_id_fkey(*), images:excursion_images(position, media(*)), departures(*)")
     .eq("id", id)
     .maybeSingle();
   if (!data) notFound();
@@ -29,7 +29,7 @@ export default async function ExcursionPreviewPage({ params }: PageProps<"/[loca
   return (
     <>
       <PreviewBanner text={t.common.previewBanner} otherLabel={t.common.previewOther} locale={locale} other={`/${locale === "el" ? "en" : "el"}/preview/excursions/${id}`} />
-      <ExcursionView excursion={{ ...ex, title: ex.title || "—", summary: ex.summary || "" }} locale={locale} t={t} />
+      <ExcursionView excursion={{ ...ex, title: ex.title || "—", summary: ex.summary || "" }} locale={locale} t={t} preview />
     </>
   );
 }

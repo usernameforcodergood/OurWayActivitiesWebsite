@@ -7,6 +7,8 @@ import { t } from "../../../_lib/strings";
 import { getExcursionById } from "../../../_lib/queries";
 import { PageHeader } from "../../../_components/ui";
 import { ExcursionForm } from "../../../_components/ExcursionForm";
+import { DeparturesManager } from "../../../_components/DeparturesManager";
+import { getDeparturesWithStats } from "../../../_lib/booking-queries";
 
 // Request-time admin data; navigations may block.
 export const instant = false;
@@ -17,6 +19,8 @@ export default async function EditExcursionPage({ params }: PageProps<"/admin/ex
   const { id } = await params;
   const row = await getExcursionById(id);
   if (!row) notFound();
+  const departures = await getDeparturesWithStats(row.id);
+  const defaultPrice = row.price_eur === null || row.price_eur === "" ? null : Number(row.price_eur);
 
   return (
     <>
@@ -26,6 +30,11 @@ export default async function EditExcursionPage({ params }: PageProps<"/admin/ex
       <PageHeader title={row.title_el || row.title_en || t.excursions.editTitle} />
       {/* key: reset local form state when a different record loads */}
       <ExcursionForm key={row.id + row.updated_at} row={row} />
+      {(row.booking_mode === "departures" || departures.length > 0) && (
+        <div className="mt-6">
+          <DeparturesManager excursionId={row.id} rows={departures} defaultPrice={defaultPrice} />
+        </div>
+      )}
     </>
   );
 }

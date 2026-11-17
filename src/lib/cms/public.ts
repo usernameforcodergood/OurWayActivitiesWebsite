@@ -17,7 +17,7 @@ export const TAGS = {
 } as const;
 
 const EXCURSION_SELECT =
-  "*, cover:media!excursions_cover_media_id_fkey(*), images:excursion_images(position, media(*))";
+  "*, cover:media!excursions_cover_media_id_fkey(*), images:excursion_images(position, media(*)), departures(*)";
 const ANNOUNCEMENT_SELECT = "*, image:media!announcements_image_media_id_fkey(*)";
 
 function logError(scope: string, error: { message: string } | null) {
@@ -49,9 +49,39 @@ export async function getPublishedExcursions(locale: Locale): Promise<PublicExcu
 }
 
 export async function getFeaturedExcursions(locale: Locale, limit = 3): Promise<PublicExcursion[]> {
-  const all = await getPublishedExcursions(locale);
+  const all = (await getPublishedExcursions(locale)).filter((e) => e.kind === "excursion");
   const featured = all.filter((e) => e.featured);
   return (featured.length ? featured : all).slice(0, limit);
+}
+
+/**
+ * Published events, soonest upcoming departure first; events without dates
+ * (announced / dates to be set) follow, newest first.
+ */
+export async function getUpcomingEvents(locale: Locale, limit = 3): Promise<{ items: PublicExcursion[]; today: string }> {
+  const today = await athensToday();
+  const events = (await getPublishedExcursions(locale)).filter((e) => e.kind === "event");
+  const next = (e: PublicExcursion) =>
+    e.departures.find((d) => d.date >= today && d.status !== "cancelled" && d.status !== "completed")?.date;
+  // Events whose every date has passed are not "upcoming".
+  const live = events.filter((e) => next(e) || e.departures.length === 0);
+  const items = live
+    .sort((a, b) => {
+      const na = next(a), nb = next(b);
+      if (na && nb) return na.localeCompare(nb);
+      if (na) return -1;
+      if (nb) return 1;
+      return (b.publishedAt ?? "").localeCompare(a.publishedAt ?? "");
+    })
+    .slice(0, limit);
+  return { items, today };
+}
+
+/** Today's date in Greece (YYYY-MM-DD), refreshed hourly. */
+export async function athensToday(): Promise<string> {
+  "use cache";
+  cacheLife("hours");
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens" }).format(new Date());
 }
 
 /** Returns the excursion even if it is incomplete in `locale` (caller decides). */
