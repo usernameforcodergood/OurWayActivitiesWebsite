@@ -41,7 +41,7 @@ export function PrivateTripsSection({ locale, t }: { locale: Locale; t: Dictiona
               </li>
             ))}
           </ul>
-          <ButtonLink href={localePath(locale, routes.privateTrips)} className="mt-12 self-start">
+          <ButtonLink href={localePath(locale, routes.tailorMade)} className="mt-12 self-start">
             {t.cta}
           </ButtonLink>
         </div>

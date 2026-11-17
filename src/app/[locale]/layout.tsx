@@ -8,6 +8,7 @@ import { siteConfig } from "@/lib/site";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
+import { ExperienceChoiceProvider } from "@/components/layout/ExperienceChoice";
 import "../globals.css";
 
 const display = Noto_Serif_Display({
@@ -69,11 +70,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           {t.nav.skip}
         </a>
         <SmoothScroll />
-        <Navbar locale={locale} t={t.nav} />
-        <main id="main" tabIndex={-1} className="outline-none">
-          {children}
-        </main>
-        <Footer locale={locale} t={t} />
+        <ExperienceChoiceProvider locale={locale} t={t.choice}>
+          <Navbar locale={locale} t={t.nav} />
+          <main id="main" tabIndex={-1} className="outline-none">
+            {children}
+          </main>
+          <Footer locale={locale} t={t} />
+        </ExperienceChoiceProvider>
       </body>
     </html>
   );

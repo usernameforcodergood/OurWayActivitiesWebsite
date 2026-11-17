@@ -41,9 +41,9 @@
         "title": "News",
         "description": "News and announcements from OurWay: new experiences, dates and what we're preparing."
       },
-      "privateTrips": {
-        "title": "Private group trips",
-        "description": "Have your own group? Together we design a trip just for you, with the destination, dates and activities you choose."
+      "tailorMade": {
+        "title": "Tailor-Made Experiences",
+        "description": "Tailor-made experiences in Greece: together we design an experience around you — nature, adventure, culture, food — for friends, families, couples and corporate groups."
       }
     }
   },
@@ -54,6 +54,7 @@
     "about": "Philosophy",
     "gallery": "Gallery",
     "contact": "Contact",
+    "tailorMade": "Tailor-Made Experiences",
     "menu": "Menu",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
@@ -72,6 +73,27 @@
     "back": "Back",
     "previewBanner": "Preview — this is how it will look. Visitors can't see it until it is published.",
     "previewOther": "Preview in Greek"
+  },
+  "choice": {
+    "eyebrow": "Make an inquiry",
+    "title": "How would you like to live your next experience?",
+    "lead": "Every journey begins with an idea. Choose how you'd like to discover the world with us.",
+    "close": "Close",
+    "or": "or",
+    "tailor": {
+      "tag": "Create your own experience",
+      "title": "Tailor-Made Experiences",
+      "body": "Have something special in mind? Together we design a unique experience, shaped around your wishes, your schedule and your company. You imagine the experience. We take care of making it real.",
+      "cta": "Design your own experience"
+    },
+    "discover": {
+      "tag": "Ready to join",
+      "title": "Discover Our Experiences",
+      "body": "Explore OurWay's organised experiences and excursions. Choose the one that suits you and get ready for your next adventure.",
+      "cta": "Discover our experiences"
+    },
+    "contactNote": "Just have a question?",
+    "contactLink": "Write to us"
   },
   "home": {
     "hero": {
@@ -209,16 +231,16 @@
       "view": "View the event"
     },
     "private": {
-      "label": "Private group trips",
-      "tagline": "We plan it together. You experience it together.",
-      "title": "Let's design your own trip together!",
-      "body": "Have your own group and want something special? Together we design a trip just for you, tailored to your group, with the destination, dates and activities you choose.",
+      "label": "Tailor-Made Experiences",
+      "tagline": "You imagine the experience. We make it happen.",
+      "title": "Create your own experience",
+      "body": "Have something special in mind? Together we design a unique experience shaped around your wishes, your schedule and your company — in nature, adventure or culture.",
       "points": [
-        "Exclusively for your group",
+        "For friends, families, couples and corporate groups",
         "Destination, dates and pace that suit you",
         "No need to have it all figured out — we'll help"
       ],
-      "cta": "Design your own trip"
+      "cta": "Design your own experience"
     }
   },
   "activities": {
@@ -566,60 +588,134 @@
       }
     }
   },
-  "privateTrips": {
+  "tailorMade": {
     "hero": {
-      "eyebrow": "Private group trips",
-      "title": "Let's design your own trip together",
-      "lead": "We plan it together. You experience it together. A trip exclusively for your group, made to measure."
+      "eyebrow": "Create your own experience",
+      "title": "Tailor-Made Experiences",
+      "lead": "Not every journey needs to follow a fixed itinerary. Tell us what you have in mind and together we'll design an experience made entirely for you.",
+      "cta": "Start planning"
+    },
+    "audience": {
+      "label": "Who we design for",
+      "title": "An experience for every group",
+      "intro": "From two people to whole teams: we shape the place, the pace and the activities around the people who will live it.",
+      "items": [
+        {
+          "title": "Private groups & friends",
+          "body": "A getaway just for your group, at your own pace and built around your ideas."
+        },
+        {
+          "title": "Families",
+          "body": "Experiences young and old enjoy alike, with safety, comfort and plenty of time outdoors."
+        },
+        {
+          "title": "Couples",
+          "body": "A special day or a trip for two, far from the usual routes."
+        },
+        {
+          "title": "Corporate groups",
+          "body": "Outings and team building that bring people closer, away from the office."
+        },
+        {
+          "title": "Organised groups",
+          "body": "Clubs, schools and groups with shared interests — with the organisation a larger group needs."
+        },
+        {
+          "title": "Outdoor adventurers",
+          "body": "Custom outdoor adventures designed around your level, your stamina and your ambitions."
+        }
+      ]
+    },
+    "kinds": {
+      "label": "What we can design",
+      "title": "Not just hiking",
+      "body": "Nature is where we start, not where we stop. We combine activities, places and people into an experience that is unmistakably yours.",
+      "items": [
+        "Nature",
+        "Adventure",
+        "Culture",
+        "Exploration",
+        "Food & wine",
+        "Multi-day trips",
+        "Whatever you imagine"
+      ]
     },
     "stepsTitle": "How it works",
     "steps": [
       {
         "title": "Tell us what you imagine",
-        "body": "Whatever you already know — or simply that you want to get away together. Nothing needs to be decided yet."
+        "body": "Whatever you already know — or simply that you want to live something different. Nothing needs to be decided yet."
       },
       {
-        "title": "We plan it together",
+        "title": "We design it together",
         "body": "We suggest a destination, itinerary and activities and shape them with you."
       },
       {
-        "title": "You experience it together",
+        "title": "You live it",
         "body": "Once everything is agreed, we take care of the rest."
       }
     ],
     "notBooking": "A request is not a booking or a binding quote, and no payment is taken on the website. The itinerary, availability and price are shaped together with you.",
     "form": {
-      "title": "Tell us about your group",
-      "contactLegend": "Contact details",
-      "tripLegend": "The trip you have in mind",
-      "tripHint": "All optional. Fill in what you know — we'll work out the rest together.",
-      "participants": "Number of people",
-      "destination": "Preferred destination or region",
-      "destinationPlaceholder": "e.g. Pelion, Zagori, somewhere near Thessaloniki",
-      "destinationFlexible": "We haven't decided — suggest something",
-      "excursionType": "Type of trip",
-      "excursionTypePlaceholder": "e.g. hiking, culture, food, family",
-      "dateFrom": "From",
-      "dateTo": "To",
-      "datesLegend": "Preferred dates",
+      "title": "Let's design your next experience together!",
+      "lead": "Share your idea with us and the OurWay team will get in touch to create something truly special.",
+      "contactLegend": "Your details",
+      "experienceLegend": "The experience you have in mind",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "e.g. Maria Papadopoulou",
+      "email": "Email",
+      "phone": "Phone",
+      "experienceType": "Type of experience",
+      "types": {
+        "hiking": "Hiking",
+        "adventure": "Adventure",
+        "nature": "Nature exploration",
+        "culture": "Cultural experiences",
+        "gastronomy": "Gastronomy",
+        "multi_day": "Multi-day excursions",
+        "other": "Other"
+      },
+      "destination": "Preferred destination",
+      "destinationPlaceholder": "e.g. Zagori, Pelion, somewhere near Thessaloniki",
+      "dateFrom": "Desired date",
+      "dateTo": "Until",
+      "datesHint": "A single date or a date range.",
       "datesFlexible": "We're flexible with dates",
-      "duration": "Duration",
-      "durationPlaceholder": "e.g. one day, a weekend",
-      "difficulty": "Difficulty level",
-      "difficultyAny": "No preference",
-      "difficultyEasy": "Easy",
-      "difficultyModerate": "Moderate",
-      "difficultyDemanding": "Demanding",
-      "transport": "Transport",
-      "transportPlaceholder": "e.g. we need transport from Thessaloniki",
-      "activities": "Activities or special requests",
-      "budget": "Indicative budget per person",
-      "budgetPlaceholder": "e.g. €40–60",
-      "message": "Anything else you'd like to tell us",
-      "submit": "Send request",
-      "successTitle": "We've received your request!",
-      "successBody": "The OurWay team will contact you soon so we can plan your trip together. A request is not a booking or a binding quote.",
-      "another": "New request"
+      "participants": "Number of participants",
+      "budget": "Approximate budget per person",
+      "budgetPlaceholder": "e.g. €50–80",
+      "description": "Describe the experience you have in mind",
+      "descriptionPlaceholder": "What would you love to experience? What excites you, what would you rather avoid, what is the occasion…",
+      "additional": "Additional requirements or information",
+      "additionalPlaceholder": "e.g. transport, dietary needs, accessibility, children in the group",
+      "privacy": "Your details are used only to handle this request and to contact you. We never share them with third parties for advertising.",
+      "submit": "Send us your idea",
+      "sending": "Sending…",
+      "successTitle": "Thank you! Your idea has reached us.",
+      "successBody": "The OurWay team will be in touch soon so we can design your next experience together.",
+      "emailSent": "We've sent you an email with the details of your request.",
+      "emailFailed": "We couldn't send you a confirmation email, but your request has been saved. Please keep your reference.",
+      "another": "Share another idea",
+      "errors": {
+        "required": "This field is required.",
+        "fullName": "Please enter your first and last name.",
+        "email": "Enter a valid email, e.g. name@example.com.",
+        "phone": "This phone number doesn't look valid.",
+        "participants": "Enter a number from 1 to 500.",
+        "experienceType": "Choose a type of experience.",
+        "descriptionShort": "Tell us a little more — at least 20 characters.",
+        "tooLong": "This text is too long.",
+        "date": "Choose a valid date.",
+        "datePast": "The date can't be in the past.",
+        "dateOrder": "The end date must be after the start date.",
+        "consent": "We need your consent to handle the request.",
+        "duplicate": "We received a request from this email a moment ago. We'll be in touch soon.",
+        "rateLimited": "You've sent several requests in a short time. Please try again in a few minutes.",
+        "notConfigured": "Requests are not enabled on the website yet. Your request was not sent.",
+        "network": "Can't reach the server. Check your connection and try again.",
+        "invalid": "Please check the form and try again.",
+        "generic": "Something went wrong and your request was not sent. Please try again shortly."
+      }
     }
   }
 }

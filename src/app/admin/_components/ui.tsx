@@ -95,12 +95,12 @@ export function BookingStatusBadge({ status }: { status: keyof typeof t.bookings
 
 const PRIVATE_BADGE: Record<string, string> = {
   new: "bg-amber-100 text-amber-900",
+  in_review: "bg-indigo-100 text-indigo-900",
   contacted: "bg-sky-100 text-sky-900",
-  planning: "bg-indigo-100 text-indigo-900",
-  proposal_sent: "bg-violet-100 text-violet-900",
-  accepted: "bg-emerald-100 text-emerald-900",
-  rejected: "bg-red-100 text-red-900",
+  quotation_sent: "bg-violet-100 text-violet-900",
+  confirmed: "bg-emerald-100 text-emerald-900",
   completed: "bg-stone text-bark",
+  rejected: "bg-red-100 text-red-900",
 };
 
 export function PrivateStatusBadge({ status }: { status: keyof typeof t.privateRequests.statuses }) {

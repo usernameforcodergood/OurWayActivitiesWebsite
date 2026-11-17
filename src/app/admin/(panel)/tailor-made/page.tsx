@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
-import { PRIVATE_STATUSES } from "@/lib/bookings/validation";
+import { EXPERIENCE_TYPES, PRIVATE_STATUSES } from "@/lib/bookings/validation";
 import { cn } from "@/lib/utils";
 import { fmt, t } from "../../_lib/strings";
 import { listPrivateRequests, parsePrivateParams, type PrivateListParams } from "../../_lib/booking-queries";
@@ -15,17 +15,20 @@ function href(p: Partial<PrivateListParams>) {
   const sp = new URLSearchParams();
   if (p.q) sp.set("q", p.q);
   if (p.status && p.status !== "all") sp.set("status", p.status);
+  if (p.type && p.type !== "all") sp.set("type", p.type);
+  if (p.sort && p.sort !== "newest") sp.set("sort", p.sort);
   if (p.page && p.page > 1) sp.set("page", String(p.page));
   const s = sp.toString();
-  return s ? `/admin/private-requests?${s}` : "/admin/private-requests";
+  return s ? `/admin/tailor-made?${s}` : "/admin/tailor-made";
 }
 
-export default async function PrivateRequestsPage({ searchParams }: PageProps<"/admin/private-requests">) {
+/** Tailor-Made Requests: separate from excursion bookings. */
+export default async function TailorMadeRequestsPage({ searchParams }: PageProps<"/admin/tailor-made">) {
   await requireAdmin();
   const p = parsePrivateParams(await searchParams);
   const { rows, total, pages } = await listPrivateRequests(p);
   const P = t.privateRequests;
-  const filtered = Boolean(p.q) || p.status !== "all";
+  const filtered = Boolean(p.q) || p.status !== "all" || p.type !== "all";
   const tabs: Array<["all" | (typeof PRIVATE_STATUSES)[number], string]> = [["all", t.common.all], ...PRIVATE_STATUSES.map((s) => [s, P.statuses[s]] as [typeof s, string])];
 
   return (
@@ -47,20 +50,48 @@ export default async function PrivateRequestsPage({ searchParams }: PageProps<"/
             </Link>
           ))}
         </nav>
-        <form method="get" action="/admin/private-requests" className="flex flex-col gap-2 sm:flex-row">
+        <form method="get" action="/admin/tailor-made" className="flex flex-col gap-2 lg:flex-row">
           {p.status !== "all" && <input type="hidden" name="status" value={p.status} />}
           <div className="relative flex-1">
             <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-bark" />
-            <label htmlFor="pq" className="sr-only">
+            <label htmlFor="tq" className="sr-only">
               {t.common.search}
             </label>
-            <input id="pq" name="q" type="search" defaultValue={p.q} placeholder={P.searchPlaceholder} className="admin-input pl-9" />
+            <input id="tq" name="q" type="search" defaultValue={p.q} placeholder={P.searchPlaceholder} className="admin-input pl-9" />
+          </div>
+          <div className="grid grid-cols-2 gap-2 lg:flex">
+            <label htmlFor="ttype" className="sr-only">
+              {P.category}
+            </label>
+            <select id="ttype" name="type" defaultValue={p.type} className="admin-input lg:w-52">
+              <option value="all">{P.allTypes}</option>
+              {EXPERIENCE_TYPES.map((x) => (
+                <option key={x} value={x}>
+                  {P.types[x]}
+                </option>
+              ))}
+            </select>
+            <label htmlFor="tsort" className="sr-only">
+              {t.common.sortBy}
+            </label>
+            <select id="tsort" name="sort" defaultValue={p.sort} className="admin-input lg:w-48">
+              <option value="newest">{P.sortNewest}</option>
+              <option value="oldest">{P.sortOldest}</option>
+              <option value="status">{`${t.common.sortBy}: ${P.sortStatus}`}</option>
+            </select>
           </div>
           <button type="submit" className="min-h-10 rounded-lg bg-forest px-4 text-sm font-semibold text-bone hover:bg-moss">
-            {t.common.search}
+            {P.filter}
           </button>
         </form>
-        <p className="text-xs text-bark">{fmt(t.common.results, { count: total })}</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs text-bark">{fmt(t.common.results, { count: total })}</p>
+          {filtered && (
+            <Link href={href({ sort: p.sort })} className="text-xs font-medium text-lagoon hover:underline">
+              {P.clear}
+            </Link>
+          )}
+        </div>
       </div>
 
       {rows.length === 0 ? (
@@ -69,7 +100,7 @@ export default async function PrivateRequestsPage({ searchParams }: PageProps<"/
         <ul className="admin-card divide-y divide-ink/8">
           {rows.map((r) => (
             <li key={r.id}>
-              <Link href={`/admin/private-requests/${r.id}`} className="flex flex-col gap-2 p-4 hover:bg-stone/30 sm:flex-row sm:items-center sm:justify-between">
+              <Link href={`/admin/tailor-made/${r.id}`} className="flex flex-col gap-2 p-4 hover:bg-stone/30 sm:flex-row sm:items-center sm:justify-between">
                 <span className="min-w-0">
                   <span className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-sm font-semibold text-lagoon">{r.reference}</span>
@@ -77,13 +108,14 @@ export default async function PrivateRequestsPage({ searchParams }: PageProps<"/
                       {r.first_name} {r.last_name}
                     </span>
                     <PrivateStatusBadge status={r.status} />
+                    {r.experience_type && <span className="rounded-full bg-stone px-2.5 py-0.5 text-xs font-medium text-bark">{P.types[r.experience_type]}</span>}
                   </span>
                   <span className="mt-1 block text-xs text-bark">
                     {fmt(P.people, { count: r.participants })}
                     {r.destination && ` · ${r.destination}`}
-                    {r.destination_flexible && ` (${P.flexible})`}
-                    {r.date_from && ` · ${formatDay(r.date_from)}${r.date_to ? ` – ${formatDay(r.date_to)}` : ""}`}
-                    {r.dates_flexible && ` · ${P.dates}: ${P.flexible}`}
+                    {r.date_from && ` · ${formatDay(r.date_from)}${r.date_to && r.date_to !== r.date_from ? ` – ${formatDay(r.date_to)}` : ""}`}
+                    {r.dates_flexible && ` (${P.flexible})`}
+                    {r.budget_per_person && ` · ${r.budget_per_person}`}
                   </span>
                 </span>
                 <span className="shrink-0 text-xs text-bark">{formatDate(r.created_at, true)}</span>

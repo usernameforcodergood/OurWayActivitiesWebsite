@@ -24,7 +24,7 @@ const NAV = [
   { href: "/admin", label: t.nav.dashboard, icon: LayoutDashboard, exact: true },
   { href: "/admin/excursions", label: t.nav.excursions, icon: CalendarRange },
   { href: "/admin/bookings", label: t.nav.bookings, icon: ClipboardList },
-  { href: "/admin/private-requests", label: t.nav.privateRequests, icon: Users },
+  { href: "/admin/tailor-made", label: t.nav.privateRequests, icon: Users },
   { href: "/admin/announcements", label: t.nav.announcements, icon: Megaphone },
   { href: "/admin/media", label: t.nav.media, icon: ImageIcon },
   { href: "/admin/settings", label: t.nav.settings, icon: Settings },

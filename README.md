@@ -197,7 +197,7 @@ One-time setup (needs the Supabase dashboard; the website code cannot change the
 - **Privacy policy**: interim text, clearly marked. It needs legal review. Nothing on the site claims GDPR compliance.
 - **Experiences / announcements**: none until the administrator publishes them in `/admin`. The pages show an honest "in progress" state meanwhile.
 
-## Bookings, events and private group trips
+## Bookings, events and tailor-made experiences
 
 OurWay takes **requests, not payments**. There is no checkout, card form or payment provider anywhere in the code, and no booking is ever confirmed automatically.
 
@@ -208,9 +208,11 @@ OurWay takes **requests, not payments**. There is no checkout, card form or paym
    - *Εκδήλωση ενδιαφέροντος*: no dates, an «Εκδήλωση Ενδιαφέροντος» form (for announcements or events that aren't final yet).
    - *Μόνο πληροφορίες*: no form, a link to the contact page.
    Departures (date, optional times, price, capacity, minimum group, booking deadline, status open / full / cancelled / completed) are managed under the excursion's edit page. Missing departure prices fall back to the excursion's base price.
-2. **Private group trips.** The homepage section «Σχεδιάζουμε μαζί τη δική σας εκδρομή!» links to `/private-trips`, a form where everything except contact details and group size is optional. Requests land in Admin → Ιδιωτικές εκδρομές (statuses New → Contacted → Planning → Proposal sent → Accepted / Rejected → Completed) with an internal proposal (itinerary, dates, indicative price) that is never sent automatically.
+2. **Tailor-Made Experiences.** «Δημιουργήστε τη Δική σας Εμπειρία» (`/tailor-made`, in the main menu and on the homepage) explains the service and holds the request form: full name, email, phone, type of experience, desired date or range, participants and a description are required; destination, budget and extra requirements are optional. Requests land in Admin → **Tailor-Made Requests**, kept apart from excursion bookings (statuses New → In review → Contacted → Quotation sent → Confirmed → Completed, or Rejected). Admins can search, filter by status and category, sort by date or status, edit the details, keep an internal proposal (never sent automatically) and delete spam or test requests. The old `/private-trips` and `/admin/private-requests` links redirect here.
 
-**Request lifecycle (Admin → Κρατήσεις).** Every submission is saved as *Σε αναμονή* (pending) with a reference like `OW-7K3M9Q` (private trips: `PG-…`). The admin confirms, rejects or cancels it, optionally with a message to the customer; completed bookings can be marked as such. Each change is written to the status history, and the customer email for it is sent only after the change succeeds. Internal notes are visible only in the admin.
+**«Ενδιαφέρομαι».** The button in the header, mobile menu and footer opens a dialog with two paths: design your own experience (→ the tailor-made form) or discover the organised experiences (→ `/activities`, then the normal booking flow).
+
+**Request lifecycle (Admin → Κρατήσεις).** Every submission is saved as *Σε αναμονή* (pending) with a reference like `OW-7K3M9Q` (tailor-made: `TM-…`; older requests keep `PG-…`). The admin confirms, rejects or cancels it, optionally with a message to the customer; completed bookings can be marked as such. Each change is written to the status history, and the customer email for it is sent only after the change succeeds. Internal notes are visible only in the admin.
 
 **Capacity and the hold policy.** Places are counted in the database, never in the browser:
 - *Held places* = confirmed participants + pending participants whose **72-hour hold** has not expired (the hold never extends past the departure itself).
@@ -221,6 +223,8 @@ OurWay takes **requests, not payments**. There is no checkout, card form or paym
 **Emails** (Resend, `src/lib/bookings/emails.ts`, Greek + English): new-request notification to `BOOKINGS_EMAIL` (or `CONTACT_EMAIL`), receipt to the customer (it says plainly that the booking is *not* confirmed yet), then confirmation / rejection / cancellation emails sent by admin actions. Every attempt is recorded with its real result. Failures appear on the dashboard and on the request page (with a resend button for bookings), and nothing is ever reported as sent unless Resend accepted it. If email isn't configured, requests are still saved and the visitor is told no receipt email could be sent.
 
 **Security.** Visitors can't read any booking or personal data: they can only call `submit_booking_request()` / `submit_private_request()` (security-definer functions that validate everything again) and `public_departures()` (counts only). Bookings, private requests, notes, history and the email log are readable only by admins (RLS), and statuses change only through `admin_*` functions that check `is_admin()`.
+
+**Tailor-made setup:** apply `supabase/migrations/0004_tailor_made.sql` **before deploying** the version that contains it. It reuses the `private_requests` table (no parallel table), adds the category and extra-requirements fields, maps the old statuses (Planning → In review, Proposal sent → Quotation sent, Accepted → Confirmed) and lets admins edit and delete requests. Safe to re-run.
 
 **Setup:** apply `supabase/migrations/0003_bookings.sql` (`npm run db:setup`, or paste it into Supabase → SQL Editor). It is safe to re-run, and it copies any dates in the old "Available dates" list into departures (the old list is kept, so the previously deployed site keeps working until you deploy). **Apply it before deploying this version**: the site's excursion queries depend on the new `departures` table.
 

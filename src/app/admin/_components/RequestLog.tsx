@@ -5,12 +5,13 @@ import { Card, formatDate } from "./ui";
 
 const B = t.bookings;
 
-function statusLabel(s: string | null): string {
+function statusLabel(s: string | null, kind: "booking" | "private"): string {
   if (!s) return "—";
-  return (B.statuses as Record<string, string>)[s] ?? (t.privateRequests.statuses as Record<string, string>)[s] ?? s;
+  const [first, second] = kind === "private" ? [t.privateRequests.statuses, B.statuses] : [B.statuses, t.privateRequests.statuses];
+  return (first as Record<string, string>)[s] ?? (second as Record<string, string>)[s] ?? s;
 }
 
-export function HistoryCard({ history }: { history: HistoryRow[] }) {
+export function HistoryCard({ history, kind = "booking" }: { history: HistoryRow[]; kind?: "booking" | "private" }) {
   return (
     <Card>
       <h2 className="mb-4 text-lg font-semibold">{B.history}</h2>
@@ -20,10 +21,10 @@ export function HistoryCard({ history }: { history: HistoryRow[] }) {
             <p>
               {h.from_status ? (
                 <>
-                  {statusLabel(h.from_status)} → <strong>{statusLabel(h.to_status)}</strong>
+                  {statusLabel(h.from_status, kind)} → <strong>{statusLabel(h.to_status, kind)}</strong>
                 </>
               ) : (
-                <strong>{statusLabel(h.to_status)}</strong>
+                <strong>{statusLabel(h.to_status, kind)}</strong>
               )}
             </p>
             <p className="text-xs text-bark">

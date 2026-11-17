@@ -8,8 +8,12 @@ import { z } from "zod";
 export const BOOKING_STATUSES = ["pending", "confirmed", "rejected", "cancelled", "completed"] as const;
 export type BookingStatus = (typeof BOOKING_STATUSES)[number];
 
-export const PRIVATE_STATUSES = ["new", "contacted", "planning", "proposal_sent", "accepted", "rejected", "completed"] as const;
+/** Tailor-made request statuses (table public.private_requests). */
+export const PRIVATE_STATUSES = ["new", "in_review", "contacted", "quotation_sent", "confirmed", "completed", "rejected"] as const;
 export type PrivateStatus = (typeof PRIVATE_STATUSES)[number];
+
+export const EXPERIENCE_TYPES = ["hiking", "adventure", "nature", "culture", "gastronomy", "multi_day", "other"] as const;
+export type ExperienceType = (typeof EXPERIENCE_TYPES)[number];
 
 export const DEPARTURE_STATUSES = ["open", "full", "cancelled", "completed"] as const;
 export type DepartureStatus = (typeof DEPARTURE_STATUSES)[number];
@@ -78,34 +82,56 @@ const isoDate = z
   .transform((v) => (v ? v : undefined))
   .refine((v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v), "date");
 
-export const privateRequestSchema = z
+/** "Name Surname" → first / last (the surname is the last word). */
+export function splitFullName(full: string): { first: string; last: string } | null {
+  const parts = full.trim().split(/\s+/).filter(Boolean);
+  if (parts.length < 2) return null;
+  return { first: parts.slice(0, -1).join(" "), last: parts[parts.length - 1] };
+}
+
+/** Today's date in Athens as YYYY-MM-DD (dates are Greek calendar days). */
+export function athensToday(now = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+}
+
+const fullName = z
+  .string()
+  .trim()
+  .min(1, "required")
+  .max(160, "tooLong")
+  .refine((v) => {
+    const n = splitFullName(v);
+    return Boolean(n && n.first.length <= 80 && n.last.length <= 80);
+  }, "fullName");
+
+/** Tailor-made experience request (stored in public.private_requests). */
+export const tailorMadeRequestSchema = z
   .object({
-    firstName: name,
-    lastName: name,
+    fullName,
     email,
     phone,
-    participants: intIn(1, MAX_GROUP),
     destination: optText(300),
-    destinationFlexible: z.boolean(),
-    excursionType: optText(200),
-    dateFrom: isoDate,
+    dateFrom: z
+      .string()
+      .trim()
+      .min(1, "required")
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "date")
+      // One day of slack so a visitor in another time zone is never rejected unfairly.
+      .refine((v) => v >= athensToday(new Date(Date.now() - 86_400_000)), "datePast"),
     dateTo: isoDate,
     datesFlexible: z.boolean(),
-    duration: optText(120),
-    difficulty: optText(120),
-    transport: optText(500),
-    activities: optText(2000),
+    participants: intIn(1, MAX_GROUP),
+    experienceType: z.enum(EXPERIENCE_TYPES, "experienceType"),
     budgetPerPerson: optText(120),
-    message: optText(3000),
+    description: z.string().trim().min(1, "required").min(20, "descriptionShort").max(3000, "tooLong"),
+    additionalRequirements: optText(2000),
     ...antiSpam,
   })
   .superRefine((v, ctx) => {
-    if (v.dateFrom && v.dateTo && v.dateTo < v.dateFrom) {
-      ctx.addIssue({ code: "custom", path: ["dateTo"], message: "dateOrder" });
-    }
+    if (v.dateTo && v.dateTo < v.dateFrom) ctx.addIssue({ code: "custom", path: ["dateTo"], message: "dateOrder" });
   });
-export type PrivateRequestInput = z.input<typeof privateRequestSchema>;
-export type PrivateRequestData = z.output<typeof privateRequestSchema>;
+export type TailorMadeRequestInput = z.input<typeof tailorMadeRequestSchema>;
+export type TailorMadeRequestData = z.output<typeof tailorMadeRequestSchema>;
 
 export type SubmitError =
   | "invalid"
