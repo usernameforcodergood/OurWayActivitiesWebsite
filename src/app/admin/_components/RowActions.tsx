@@ -76,7 +76,7 @@ export function RowActions({ kind, id, status, name, editHref, publicHref }: Pro
           setDeleting(false);
           setConfirm(false);
           if (!res.ok) {
-            toast("error", t.common.error);
+            toast("error", errorMessage(res.error) ?? t.common.error);
             return;
           }
           toast("success", t.common.deleted);

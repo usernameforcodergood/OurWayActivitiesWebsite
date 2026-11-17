@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     routes.news,
     routes.about,
     routes.gallery,
+    routes.privateTrips,
     routes.contact,
     routes.privacy,
   ].map((path) => ({ path, langs: locales, priority: path === "" ? 1 : 0.7 }));

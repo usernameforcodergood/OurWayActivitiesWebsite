@@ -40,6 +40,10 @@
       "news": {
         "title": "News",
         "description": "News and announcements from OurWay: new experiences, dates and what we're preparing."
+      },
+      "privateTrips": {
+        "title": "Private group trips",
+        "description": "Have your own group? Together we design a trip just for you, with the destination, dates and activities you choose."
       }
     }
   },
@@ -197,6 +201,24 @@
       "label": "News",
       "title": "Latest from OurWay",
       "all": "All news"
+    },
+    "events": {
+      "label": "Events",
+      "title": "Upcoming events",
+      "datesTbd": "Dates coming soon",
+      "view": "View the event"
+    },
+    "private": {
+      "label": "Private group trips",
+      "tagline": "We plan it together. You experience it together.",
+      "title": "Let's design your own trip together!",
+      "body": "Have your own group and want something special? Together we design a trip just for you, tailored to your group, with the destination, dates and activities you choose.",
+      "points": [
+        "Exclusively for your group",
+        "Destination, dates and pace that suit you",
+        "No need to have it all figured out — we'll help"
+      ],
+      "cta": "Design your own trip"
     }
   },
   "activities": {
@@ -233,7 +255,10 @@
       "participants": "Participants",
       "price": "Price",
       "dates": "Available dates",
-      "info": "Information"
+      "info": "Information",
+      "meetingPoint": "Meeting point",
+      "cancellation": "Cancellation policy",
+      "eventLabel": "Event"
     }
   },
   "destinations": {
@@ -450,5 +475,151 @@
     "readMore": "Read more",
     "back": "All news",
     "validUntil": "Valid until {date}"
+  },
+  "booking": {
+    "ctaBook": "Reserve a place",
+    "ctaRequest": "Booking request",
+    "ctaInterest": "Express interest",
+    "departuresTitle": "Departures",
+    "interestTitle": "Interested?",
+    "interestBody": "Details are still being finalised. Register your interest with no commitment and we'll let you know first.",
+    "bookTitle": "Reserve your place",
+    "bookBody": "Choose a date and send a booking request. Our team confirms every request personally.",
+    "noDepartures": "There are no departures available right now.",
+    "noDeparturesCta": "Ask us about new dates",
+    "infoTitle": "Interested in this experience?",
+    "infoBody": "Send us a message and we'll get back to you with all the details.",
+    "infoCta": "Contact us",
+    "loading": "Checking availability…",
+    "availabilityError": "Availability could not be updated. Please try again shortly.",
+    "retry": "Try again",
+    "states": {
+      "open": "Available",
+      "full": "Fully booked",
+      "closed": "Booking closed",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "past": "Completed"
+    },
+    "remaining": "{count} places left",
+    "remainingOne": "1 place left",
+    "perPerson": "per person",
+    "returnAt": "Return {time}",
+    "deadline": "Book by {date}",
+    "minParticipants": "Minimum group: {count} people",
+    "noPayment": "No payment is taken on the website. A request is not a confirmed booking — we will contact you.",
+    "previewDisabled": "In preview the form does not send requests.",
+    "form": {
+      "titleBooking": "Booking request",
+      "titleInterest": "Expression of interest",
+      "requiredNote": "Fields marked * are required.",
+      "optional": "optional",
+      "departure": "Departure date",
+      "participants": "Number of participants",
+      "participantsHint": "Up to {count} people on this departure.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message",
+      "specialRequests": "Special requests",
+      "specialPlaceholder": "e.g. dietary needs, accessibility",
+      "pricePerPerson": "Price per person",
+      "total": "Indicative total",
+      "totalNote": "Indicative amount. No payment is taken on the website.",
+      "privacy": "Your details are used only to handle this request and to contact you. We do not share them with third parties for advertising.",
+      "consent": "I agree that my details are used to handle my request, in line with the",
+      "consentLink": "privacy policy",
+      "honeypot": "Leave this field empty",
+      "submit": "Send request",
+      "sending": "Sending…",
+      "close": "Close",
+      "successTitle": "Your request has been registered",
+      "successBody": "Your request has been registered successfully. Your booking is not confirmed yet. We will contact you soon to finalise it.",
+      "reference": "Request reference",
+      "emailSent": "We've emailed you the details of your request.",
+      "emailFailed": "We couldn't send you a receipt email, but your request has been registered. Please keep your reference.",
+      "errorTitle": "Your request was not sent",
+      "errors": {
+        "required": "This field is required.",
+        "email": "Enter a valid email, e.g. name@example.com.",
+        "phone": "This phone number doesn't look valid.",
+        "participants": "Enter a valid number of people.",
+        "tooMany": "Only {count} places are left.",
+        "consent": "We need your consent to handle the request.",
+        "tooLong": "This text is too long.",
+        "departure": "Choose a departure date.",
+        "date": "Invalid date.",
+        "dateOrder": "The end date must be after the start date.",
+        "capacity": "Not enough places left. Places available: {count}.",
+        "full": "This departure has just filled up. Please choose another date.",
+        "departureClosed": "This departure no longer accepts requests.",
+        "deadlinePassed": "The booking deadline for this departure has passed.",
+        "unavailable": "This experience no longer accepts requests.",
+        "departureRequired": "Choose a departure date.",
+        "duplicate": "We've recently received a request from this email for the same thing. We'll be in touch soon.",
+        "rateLimited": "You've sent several requests in a short time. Please try again in a few minutes.",
+        "notConfigured": "Requests are not enabled on the website yet. Your request was not sent.",
+        "network": "Can't reach the server. Check your connection and try again.",
+        "invalid": "Please check the form and try again.",
+        "generic": "Something went wrong. Your request was not sent. Please try again shortly."
+      }
+    }
+  },
+  "privateTrips": {
+    "hero": {
+      "eyebrow": "Private group trips",
+      "title": "Let's design your own trip together",
+      "lead": "We plan it together. You experience it together. A trip exclusively for your group, made to measure."
+    },
+    "stepsTitle": "How it works",
+    "steps": [
+      {
+        "title": "Tell us what you imagine",
+        "body": "Whatever you already know — or simply that you want to get away together. Nothing needs to be decided yet."
+      },
+      {
+        "title": "We plan it together",
+        "body": "We suggest a destination, itinerary and activities and shape them with you."
+      },
+      {
+        "title": "You experience it together",
+        "body": "Once everything is agreed, we take care of the rest."
+      }
+    ],
+    "notBooking": "A request is not a booking or a binding quote, and no payment is taken on the website. The itinerary, availability and price are shaped together with you.",
+    "form": {
+      "title": "Tell us about your group",
+      "contactLegend": "Contact details",
+      "tripLegend": "The trip you have in mind",
+      "tripHint": "All optional. Fill in what you know — we'll work out the rest together.",
+      "participants": "Number of people",
+      "destination": "Preferred destination or region",
+      "destinationPlaceholder": "e.g. Pelion, Zagori, somewhere near Thessaloniki",
+      "destinationFlexible": "We haven't decided — suggest something",
+      "excursionType": "Type of trip",
+      "excursionTypePlaceholder": "e.g. hiking, culture, food, family",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "datesLegend": "Preferred dates",
+      "datesFlexible": "We're flexible with dates",
+      "duration": "Duration",
+      "durationPlaceholder": "e.g. one day, a weekend",
+      "difficulty": "Difficulty level",
+      "difficultyAny": "No preference",
+      "difficultyEasy": "Easy",
+      "difficultyModerate": "Moderate",
+      "difficultyDemanding": "Demanding",
+      "transport": "Transport",
+      "transportPlaceholder": "e.g. we need transport from Thessaloniki",
+      "activities": "Activities or special requests",
+      "budget": "Indicative budget per person",
+      "budgetPlaceholder": "e.g. €40–60",
+      "message": "Anything else you'd like to tell us",
+      "submit": "Send request",
+      "successTitle": "We've received your request!",
+      "successBody": "The OurWay team will contact you soon so we can plan your trip together. A request is not a booking or a binding quote.",
+      "another": "New request"
+    }
   }
 }

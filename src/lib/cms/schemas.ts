@@ -18,6 +18,67 @@ export const slugSchema = z
   .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "slugInvalid");
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "dateInvalid");
+const timeOpt = z
+  .string()
+  .optional()
+  .nullable()
+  .transform((v) => (v ? v : null))
+  .refine((v) => !v || /^\d{2}:\d{2}(:\d{2})?$/.test(v), "timeInvalid");
+const intOpt = (min: number, max: number, code: string) =>
+  z
+    .union([z.number(), z.string()])
+    .nullable()
+    .optional()
+    .transform((v, ctx) => {
+      if (v === null || v === undefined || v === "") return null;
+      const n = typeof v === "number" ? v : Number(v);
+      if (!Number.isInteger(n) || n < min || n > max) {
+        ctx.addIssue({ code: "custom", message: code });
+        return z.NEVER;
+      }
+      return n;
+    });
+const priceOpt = z
+  .union([z.number(), z.string()])
+  .nullable()
+  .optional()
+  .transform((v, ctx) => {
+    if (v === null || v === undefined || v === "") return null;
+    const n = typeof v === "number" ? v : Number(String(v).replace(",", "."));
+    if (!Number.isFinite(n) || n < 0 || n > 1_000_000) {
+      ctx.addIssue({ code: "custom", message: "priceInvalid" });
+      return z.NEVER;
+    }
+    return Math.round(n * 100) / 100;
+  });
+
+export const departureSchema = z
+  .object({
+    id: z.uuid().optional(),
+    excursion_id: z.uuid(),
+    departure_date: isoDate,
+    departure_time: timeOpt,
+    return_time: timeOpt,
+    price_eur: priceOpt,
+    capacity: intOpt(1, 10000, "capacityInvalid"),
+    min_participants: intOpt(1, 10000, "minInvalid"),
+    /** Greek local date-time "YYYY-MM-DDTHH:mm", converted on the server. */
+    booking_deadline: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((v) => (v ? v : null))
+      .refine((v) => !v || /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v), "dateInvalid"),
+    status: z.enum(["open", "full", "cancelled", "completed"]),
+    note_el: optText(400),
+    note_en: optText(400),
+  })
+  .superRefine((v, ctx) => {
+    if (v.capacity && v.min_participants && v.min_participants > v.capacity) {
+      ctx.addIssue({ code: "custom", path: ["min_participants"], message: "minAboveCapacity" });
+    }
+  });
+export type DepartureInput = z.input<typeof departureSchema>;
 
 export const excursionSchema = z
   .object({
@@ -56,7 +117,14 @@ export const excursionSchema = z
       }),
     price_note_el: optText(200),
     price_note_en: optText(200),
-    available_dates: z.array(isoDate).max(200),
+    kind: z.enum(["excursion", "event"]),
+    booking_mode: z.enum(["departures", "interest", "none"]),
+    meeting_point_el: optText(300),
+    meeting_point_en: optText(300),
+    included_el: optText(4000),
+    included_en: optText(4000),
+    cancellation_policy_el: optText(4000),
+    cancellation_policy_en: optText(4000),
     availability_note_el: optText(400),
     availability_note_en: optText(400),
     info_el: optText(),

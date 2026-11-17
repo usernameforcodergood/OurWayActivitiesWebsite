@@ -10,15 +10,16 @@ import { ExcursionForm } from "../../../_components/ExcursionForm";
 export const instant = false;
 export const metadata: Metadata = { title: t.excursions.new };
 
-export default async function NewExcursionPage() {
+export default async function NewExcursionPage({ searchParams }: PageProps<"/admin/excursions/new">) {
   await requireAdmin();
+  const kind = (await searchParams).kind === "event" ? "event" : "excursion";
   return (
     <>
       <Link href="/admin/excursions" className="mb-4 inline-flex items-center gap-1.5 text-sm text-bark hover:text-ink">
         <ArrowLeft aria-hidden className="size-4" /> {t.excursions.title}
       </Link>
-      <PageHeader title={t.excursions.new} />
-      <ExcursionForm row={null} />
+      <PageHeader title={kind === "event" ? t.dashboard.newEvent : t.excursions.new} />
+      <ExcursionForm row={null} initialKind={kind} />
     </>
   );
 }

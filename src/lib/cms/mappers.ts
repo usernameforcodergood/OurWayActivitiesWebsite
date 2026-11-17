@@ -6,8 +6,44 @@ import type {
   ExcursionRow,
   MediaRow,
   PublicAnnouncement,
+  PublicDeparture,
   PublicExcursion,
 } from "./types";
+
+/** Row returned by the public_departures() database function. */
+export type DepartureAvailabilityRow = {
+  id: string;
+  departure_date: string;
+  departure_time: string | null;
+  return_time: string | null;
+  price_eur: number | string | null;
+  capacity: number | null;
+  min_participants: number | null;
+  remaining: number | null;
+  booking_deadline: string | null;
+  state: PublicDeparture["state"];
+  note_el: string | null;
+  note_en: string | null;
+};
+
+const num = (v: number | string | null | undefined) => (v === null || v === undefined || v === "" ? null : Number(v));
+
+export function toPublicDeparture(r: DepartureAvailabilityRow): PublicDeparture {
+  return {
+    id: r.id,
+    date: r.departure_date,
+    time: r.departure_time,
+    returnTime: r.return_time,
+    priceEur: num(r.price_eur),
+    capacity: r.capacity,
+    minParticipants: r.min_participants,
+    remaining: r.remaining,
+    deadline: r.booking_deadline,
+    state: r.state,
+    noteEl: r.note_el,
+    noteEn: r.note_en,
+  };
+}
 
 const text = (v: string | null | undefined) => (v && v.trim() ? v.trim() : undefined);
 
@@ -50,7 +86,23 @@ export function toPublicExcursion(row: ExcursionRow, locale: Locale): PublicExcu
   const title = pick(row, "title", locale) ?? "";
   const price = row.price_eur === null || row.price_eur === "" ? undefined : Number(row.price_eur);
   return {
+    id: row.id,
     slug: row.slug,
+    kind: row.kind ?? "excursion",
+    bookingMode: row.booking_mode ?? "departures",
+    meetingPoint: pick(row, "meeting_point", locale),
+    included: paragraphs(locale === "el" ? row.included_el : row.included_en),
+    cancellationPolicy: paragraphs(locale === "el" ? row.cancellation_policy_el : row.cancellation_policy_en),
+    departures: (row.departures ?? [])
+      .slice()
+      .sort((a, b) => (a.departure_date + (a.departure_time ?? "")).localeCompare(b.departure_date + (b.departure_time ?? "")))
+      .map((d) => ({
+        id: d.id,
+        date: d.departure_date,
+        time: d.departure_time,
+        priceEur: num(d.price_eur) ?? (Number.isFinite(price) ? (price as number) : null),
+        status: d.status,
+      })),
     featured: row.featured,
     locales: availableLocales(row),
     title,
@@ -63,7 +115,6 @@ export function toPublicExcursion(row: ExcursionRow, locale: Locale): PublicExcu
     participants: text(row.participants),
     priceEur: Number.isFinite(price) ? price : undefined,
     priceNote: pick(row, "price_note", locale),
-    availableDates: [...(row.available_dates ?? [])].sort(),
     availabilityNote: pick(row, "availability_note", locale),
     info: paragraphs(locale === "el" ? row.info_el : row.info_en),
     cover: toImage(row.cover, locale, title),

@@ -76,3 +76,52 @@ export function formatDate(iso: string | null | undefined, withTime = false): st
     timeZone: "Europe/Athens",
   }).format(d);
 }
+
+const BOOKING_BADGE: Record<string, string> = {
+  pending: "bg-amber-100 text-amber-900",
+  confirmed: "bg-emerald-100 text-emerald-900",
+  rejected: "bg-red-100 text-red-900",
+  cancelled: "bg-stone text-bark",
+  completed: "bg-sky-100 text-sky-900",
+};
+
+export function BookingStatusBadge({ status }: { status: keyof typeof t.bookings.statuses }) {
+  return (
+    <span className={cn("inline-flex whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold", BOOKING_BADGE[status])}>
+      {t.bookings.statuses[status]}
+    </span>
+  );
+}
+
+const PRIVATE_BADGE: Record<string, string> = {
+  new: "bg-amber-100 text-amber-900",
+  contacted: "bg-sky-100 text-sky-900",
+  planning: "bg-indigo-100 text-indigo-900",
+  proposal_sent: "bg-violet-100 text-violet-900",
+  accepted: "bg-emerald-100 text-emerald-900",
+  rejected: "bg-red-100 text-red-900",
+  completed: "bg-stone text-bark",
+};
+
+export function PrivateStatusBadge({ status }: { status: keyof typeof t.privateRequests.statuses }) {
+  return (
+    <span className={cn("inline-flex whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold", PRIVATE_BADGE[status])}>
+      {t.privateRequests.statuses[status]}
+    </span>
+  );
+}
+
+/** "12 Απρ 2027" for a calendar day (no timezone shift). */
+export function formatDay(iso: string | null | undefined, time?: string | null): string {
+  if (!iso) return "—";
+  const d = new Intl.DateTimeFormat("el-GR", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(
+    new Date(`${iso}T00:00:00Z`),
+  );
+  return time ? `${d} ${time.slice(0, 5)}` : d;
+}
+
+export function formatEurAdmin(v: string | number | null | undefined): string {
+  if (v === null || v === undefined || v === "") return "—";
+  const n = Number(v);
+  return new Intl.NumberFormat("el-GR", { style: "currency", currency: "EUR", maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
+}

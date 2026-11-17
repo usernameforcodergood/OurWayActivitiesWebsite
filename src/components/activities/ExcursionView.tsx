@@ -5,8 +5,8 @@ import type { Dictionary } from "@/i18n/dictionaries";
 import { localePath, routes } from "@/i18n/routes";
 import type { PublicExcursion } from "@/lib/cms/types";
 import { PageHero } from "@/components/ui/PageHero";
-import { ButtonLink } from "@/components/ui/Button";
 import { ImageReveal } from "@/components/animations/ImageReveal";
+import { BookingPanel } from "@/components/booking/BookingPanel";
 
 function formatPrice(eur: number, locale: Locale) {
   return new Intl.NumberFormat(locale === "el" ? "el-GR" : "en-GB", {
@@ -14,16 +14,6 @@ function formatPrice(eur: number, locale: Locale) {
     currency: "EUR",
     maximumFractionDigits: eur % 1 ? 2 : 0,
   }).format(eur);
-}
-
-function formatDay(iso: string, locale: Locale) {
-  return new Intl.DateTimeFormat(locale === "el" ? "el-GR" : "en-GB", {
-    weekday: "short",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${iso}T00:00:00Z`));
 }
 
 /**
@@ -35,13 +25,13 @@ export function ExcursionView({
   excursion,
   locale,
   t,
-  today,
+  preview,
 }: {
   excursion: PublicExcursion;
   locale: Locale;
   t: Dictionary;
-  /** YYYY-MM-DD; past dates are hidden. Omit to show all dates. */
-  today?: string;
+  /** Admin preview: the booking form is shown but never submits. */
+  preview?: boolean;
 }) {
   const d = t.activities.detail;
   const facts = (
@@ -49,6 +39,7 @@ export function ExcursionView({
       [d.destination, excursion.destination],
       [d.category, excursion.category],
       [d.duration, excursion.duration],
+      [d.meetingPoint, excursion.meetingPoint],
       [d.difficulty, excursion.difficulty],
       [d.participants, excursion.participants],
       [
@@ -60,12 +51,11 @@ export function ExcursionView({
       [d.availability, excursion.availabilityNote],
     ] as const
   ).filter((f): f is readonly [string, string] => Boolean(f[1]));
-  const dates = today ? excursion.availableDates.filter((x) => x >= today) : excursion.availableDates;
   const contactHref = `${localePath(locale, routes.contact)}?interest=${encodeURIComponent(excursion.title)}`;
 
   return (
     <>
-      <PageHero locale={locale} eyebrow={excursion.category ?? t.activities.hero.eyebrow} title={excursion.title} lead={excursion.summary} image={excursion.cover} />
+      <PageHero locale={locale} eyebrow={excursion.category ?? (excursion.kind === "event" ? d.eventLabel : t.activities.hero.eyebrow)} title={excursion.title} lead={excursion.summary} image={excursion.cover} />
 
       <section className="section-y bg-ink text-bone">
         <div className="container-x grid gap-16 md:grid-cols-12">
@@ -89,11 +79,35 @@ export function ExcursionView({
                 </div>
               </>
             )}
+            {excursion.included.length > 0 && (
+              <div className="mt-14">
+                <h2 className="text-eyebrow mb-5 font-sans text-lichen">{d.included}</h2>
+                <div className="space-y-4 text-bone/80">
+                  {excursion.included.map((p, i) => (
+                    <p key={i} className="whitespace-pre-line">
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
             {excursion.info.length > 0 && (
               <div className="mt-14">
                 <h2 className="text-eyebrow mb-5 font-sans text-lichen">{d.important}</h2>
                 <div className="space-y-4 text-bone/80">
                   {excursion.info.map((p, i) => (
+                    <p key={i} className="whitespace-pre-line">
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+            {excursion.cancellationPolicy.length > 0 && (
+              <div className="mt-14">
+                <h2 className="text-eyebrow mb-5 font-sans text-lichen">{d.cancellation}</h2>
+                <div className="space-y-4 text-sm text-bone/70">
+                  {excursion.cancellationPolicy.map((p, i) => (
                     <p key={i} className="whitespace-pre-line">
                       {p}
                     </p>
@@ -118,24 +132,15 @@ export function ExcursionView({
                   </dl>
                 </>
               )}
-              {dates.length > 0 && (
-                <div className="mt-10">
-                  <h2 className="text-eyebrow mb-4 font-sans text-fog">{d.dates}</h2>
-                  <ul className="flex flex-wrap gap-2">
-                    {dates.map((x) => (
-                      <li key={x} className="rounded-full border border-bone/20 px-3.5 py-1.5 text-sm">
-                        <time dateTime={x}>{formatDay(x, locale)}</time>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              <div className="mt-10 rounded-sm bg-forest p-8">
-                <p className="text-display-sm">{d.inquireTitle}</p>
-                <p className="mt-3 text-fog">{d.inquireBody}</p>
-                <ButtonLink href={contactHref} className="mt-6">
-                  {d.inquireCta}
-                </ButtonLink>
+              <div className="mt-10">
+                <BookingPanel
+                  excursion={excursion}
+                  locale={locale}
+                  t={t.booking}
+                  privacyHref={localePath(locale, routes.privacy)}
+                  contactHref={contactHref}
+                  preview={preview}
+                />
               </div>
             </div>
           </aside>

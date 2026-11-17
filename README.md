@@ -197,6 +197,33 @@ One-time setup (needs the Supabase dashboard; the website code cannot change the
 - **Privacy policy**: interim text, clearly marked. It needs legal review. Nothing on the site claims GDPR compliance.
 - **Experiences / announcements**: none until the administrator publishes them in `/admin`. The pages show an honest "in progress" state meanwhile.
 
+## Bookings, events and private group trips
+
+OurWay takes **requests, not payments**. There is no checkout, card form or payment provider anywhere in the code, and no booking is ever confirmed automatically.
+
+**Two ways to travel**
+
+1. **Scheduled excursions and events.** Each excursion (Admin → Εκδρομές) has a *type* (excursion / event) and a *booking mode*:
+   - *Αίτηση κράτησης με ημερομηνίες*: the page lists the upcoming departures with live free places and a «Κράτηση Θέσης» / «Αίτηση Κράτησης» button. The visitor picks a departure and the number of people, sees the indicative total, and sends a request.
+   - *Εκδήλωση ενδιαφέροντος*: no dates, an «Εκδήλωση Ενδιαφέροντος» form (for announcements or events that aren't final yet).
+   - *Μόνο πληροφορίες*: no form, a link to the contact page.
+   Departures (date, optional times, price, capacity, minimum group, booking deadline, status open / full / cancelled / completed) are managed under the excursion's edit page. Missing departure prices fall back to the excursion's base price.
+2. **Private group trips.** The homepage section «Σχεδιάζουμε μαζί τη δική σας εκδρομή!» links to `/private-trips`, a form where everything except contact details and group size is optional. Requests land in Admin → Ιδιωτικές εκδρομές (statuses New → Contacted → Planning → Proposal sent → Accepted / Rejected → Completed) with an internal proposal (itinerary, dates, indicative price) that is never sent automatically.
+
+**Request lifecycle (Admin → Κρατήσεις).** Every submission is saved as *Σε αναμονή* (pending) with a reference like `OW-7K3M9Q` (private trips: `PG-…`). The admin confirms, rejects or cancels it, optionally with a message to the customer; completed bookings can be marked as such. Each change is written to the status history, and the customer email for it is sent only after the change succeeds. Internal notes are visible only in the admin.
+
+**Capacity and the hold policy.** Places are counted in the database, never in the browser:
+- *Held places* = confirmed participants + pending participants whose **72-hour hold** has not expired (the hold never extends past the departure itself).
+- Rejected, cancelled and expired-hold requests release their places. An expired request stays pending (the admin can still confirm it if places are free, or renew the hold); confirming never counts the same people twice.
+- `submit_booking_request()` locks the departure row while it checks and inserts, so simultaneous requests can't overbook. The admin can't lower a departure's capacity below its held places, or delete departures/excursions that have requests (cancel or unpublish them instead).
+- Requests are refused for full, cancelled, completed or past departures and after the booking deadline. Repeat submissions of the same form return the same reference, and the same email can't request the same departure twice within 30 minutes.
+
+**Emails** (Resend, `src/lib/bookings/emails.ts`, Greek + English): new-request notification to `BOOKINGS_EMAIL` (or `CONTACT_EMAIL`), receipt to the customer (it says plainly that the booking is *not* confirmed yet), then confirmation / rejection / cancellation emails sent by admin actions. Every attempt is recorded with its real result. Failures appear on the dashboard and on the request page (with a resend button for bookings), and nothing is ever reported as sent unless Resend accepted it. If email isn't configured, requests are still saved and the visitor is told no receipt email could be sent.
+
+**Security.** Visitors can't read any booking or personal data: they can only call `submit_booking_request()` / `submit_private_request()` (security-definer functions that validate everything again) and `public_departures()` (counts only). Bookings, private requests, notes, history and the email log are readable only by admins (RLS), and statuses change only through `admin_*` functions that check `is_admin()`.
+
+**Setup:** apply `supabase/migrations/0003_bookings.sql` (`npm run db:setup`, or paste it into Supabase → SQL Editor). It is safe to re-run, and it copies any dates in the old "Available dates" list into departures (the old list is kept, so the previously deployed site keeps working until you deploy). **Apply it before deploying this version**: the site's excursion queries depend on the new `departures` table.
+
 ## Contact form and email setup
 
 The form validates on the client and again on the server (`src/app/api/contact/route.ts`). Spam is blocked by a honeypot field, a minimum fill time and a per-IP rate limit (best effort, in memory). Success appears **only** after the email provider confirms delivery. Without credentials, the API returns `503 notConfigured` and the visitor is told the message was **not** sent. Submissions are never stored or logged.
@@ -211,7 +238,7 @@ To change provider, implement `EmailProvider` in `src/lib/email.ts`.
 
 1. Push this repository to GitHub.
 2. In Vercel: **Add New → Project → Import** the repository. The framework is detected as Next.js; keep the default build settings.
-3. Under **Settings → Environment Variables**, add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `ADMIN_RECOVERY_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`, optionally `CONTACT_FROM_EMAIL`, and `NEXT_PUBLIC_SITE_URL` (the final domain, e.g. `https://www.ourway.gr`). Do **not** add `SUPABASE_DB_URL`.
+3. Under **Settings → Environment Variables**, add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `ADMIN_RECOVERY_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`, optionally `CONTACT_FROM_EMAIL` and `BOOKINGS_EMAIL`, and `NEXT_PUBLIC_SITE_URL` (the final domain, e.g. `https://www.ourway.gr`). Do **not** add `SUPABASE_DB_URL`.
 4. Deploy. Every push to `main` deploys to production; other branches get preview URLs.
 
 ## Connecting the domain

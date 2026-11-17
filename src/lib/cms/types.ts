@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/config";
+import type { BookingMode, DepartureStatus } from "@/lib/bookings/validation";
 
 export type ContentStatus = "draft" | "published";
 
@@ -45,11 +46,61 @@ export type ExcursionRow = {
   availability_note_en: string | null;
   info_el: string | null;
   info_en: string | null;
+  kind: ExcursionKind;
+  booking_mode: BookingMode;
+  meeting_point_el: string | null;
+  meeting_point_en: string | null;
+  included_el: string | null;
+  included_en: string | null;
+  cancellation_policy_el: string | null;
+  cancellation_policy_en: string | null;
   published_at: string | null;
   created_at: string;
   updated_at: string;
   cover?: MediaRow | null;
   images?: Array<{ position: number; media: MediaRow | null }>;
+  departures?: DepartureRow[];
+};
+
+export type ExcursionKind = "excursion" | "event";
+export type { BookingMode, DepartureStatus };
+
+/** Row of public.departures */
+export type DepartureRow = {
+  id: string;
+  excursion_id: string;
+  departure_date: string;
+  departure_time: string | null;
+  return_time: string | null;
+  price_eur: number | string | null;
+  capacity: number | null;
+  min_participants: number | null;
+  booking_deadline: string | null;
+  status: DepartureStatus;
+  note_el: string | null;
+  note_en: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Effective, visitor-facing state of a departure. */
+export type DepartureState = "open" | "full" | "closed" | "cancelled" | "completed" | "past";
+
+/** One departure as the public booking form sees it (live counts, no personal data). */
+export type PublicDeparture = {
+  id: string;
+  date: string;
+  time: string | null;
+  returnTime: string | null;
+  priceEur: number | null;
+  capacity: number | null;
+  minParticipants: number | null;
+  /** null = no capacity limit */
+  remaining: number | null;
+  deadline: string | null;
+  state: DepartureState;
+  noteEl: string | null;
+  noteEn: string | null;
 };
 
 /** Row of public.announcements (+ optional joined image) */
@@ -89,7 +140,15 @@ export type SiteSettingsRow = {
 export type CmsImage = { src: string; width: number; height: number; alt: string };
 
 export type PublicExcursion = {
+  id: string;
   slug: string;
+  kind: ExcursionKind;
+  bookingMode: BookingMode;
+  meetingPoint?: string;
+  included: string[];
+  cancellationPolicy: string[];
+  /** Upcoming departures (dates, times, prices). Live places come from /api/availability. */
+  departures: Array<{ id: string; date: string; time: string | null; priceEur: number | null; status: DepartureStatus }>;
   featured: boolean;
   /** Languages in which this excursion is complete (title + summary). */
   locales: Locale[];
@@ -103,7 +162,6 @@ export type PublicExcursion = {
   participants?: string;
   priceEur?: number;
   priceNote?: string;
-  availableDates: string[];
   availabilityNote?: string;
   info: string[];
   cover: CmsImage | null;
