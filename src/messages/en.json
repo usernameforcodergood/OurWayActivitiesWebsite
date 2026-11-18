@@ -256,6 +256,21 @@
     "themesTitle": "What they'll include",
     "listTitle": "Available experiences",
     "viewExperience": "View experience",
+    "filters": {
+      "label": "Experience filters",
+      "all": "All",
+      "categories": {
+        "day_trip": "Day Trips",
+        "two_day": "Two-Day Trips",
+        "package": "Packages"
+      },
+      "search": "Search",
+      "searchPlaceholder": "Destination, trip or keyword",
+      "results": "{count} experiences",
+      "resultsOne": "1 experience",
+      "noResults": "No experiences match these filters.",
+      "reset": "Show all experiences"
+    },
     "detail": {
       "overview": "The experience",
       "details": "Details",
@@ -440,24 +455,32 @@
     "updated": "Last updated: pending",
     "sections": [
       {
+        "title": "Data controller",
+        "body": "OurWay is responsible for your data. [Legal name, address, VAT number and contact email for data-protection questions — to be completed by OurWay.]"
+      },
+      {
         "title": "What we collect",
-        "body": "Through the contact form we collect only what you give us: your name, email, your message and — if you choose — phone number, interest, date and number of people."
+        "body": "Only what you give us in our forms. Contact form: name, email, message and — if you choose — phone, interest, date and number of people. Booking request or registration of interest: first and last name, email, phone, number of people, the date you chose and any message or special request you write. Tailor-Made request: the same contact details, plus destination, dates, budget and the preferences you describe. Please don't send us health information in free-text fields unless it is necessary for your safety on the activity."
       },
       {
         "title": "Why we use it",
-        "body": "Solely to respond to your request. We don't use it for advertising and we don't sell it."
+        "body": "To answer your request, check availability and organise the experience you asked for (steps prior to entering into a contract, at your request — Article 6(1)(b) GDPR). A booking request is not a confirmed booking: the OurWay team reviews it and contacts you. We don't use your data for advertising and we never sell it."
       },
       {
-        "title": "How it is transmitted",
-        "body": "Your message is sent securely (HTTPS) and delivered to the OurWay team through an email delivery service. The website does not store messages in a database."
+        "title": "Where it is stored",
+        "body": "Booking requests and Tailor-Made requests are stored in a database that only OurWay administrators can access. Contact-form messages are not stored on the website; they are delivered by email to the team. To run the website we use the processors Vercel (hosting), Supabase (database) and Resend (email delivery). [Data location and safeguards for any transfers outside the EU to be confirmed.]"
+      },
+      {
+        "title": "How long we keep it",
+        "body": "[The retention period for requests will be set by OurWay.] You can always ask us to delete your data sooner."
       },
       {
         "title": "Cookies and tracking",
-        "body": "This website does not use advertising cookies or third-party tracking tools."
+        "body": "The public website uses no advertising or analytics cookies and no third-party tracking tools. Only the private admin area uses a strictly necessary sign-in cookie for administrators."
       },
       {
         "title": "Your rights",
-        "body": "You can ask to access, correct or delete your details. [Data controller contact details will be added here.]"
+        "body": "You have the right to access, rectify, erase, restrict, port and object to the processing of your data. To exercise them, contact us through the contact page. You can also lodge a complaint with the Hellenic Data Protection Authority (www.dpa.gr)."
       }
     ]
   },

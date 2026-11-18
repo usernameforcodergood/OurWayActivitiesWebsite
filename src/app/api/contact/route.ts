@@ -1,23 +1,7 @@
 import { NextResponse } from "next/server";
 import { contactSchema, type ContactData, type ContactResponse, type FieldErrorCode } from "@/lib/validation";
 import { getEmailConfig } from "@/lib/email";
-
-/* -------------------------------------------------------------------------- */
-/* Best-effort in-memory rate limit (per serverless instance).                 */
-/* For stronger protection add Vercel Firewall rules or an Upstash limiter.    */
-/* -------------------------------------------------------------------------- */
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX_PER_WINDOW = 5;
-const hits = new Map<string, number[]>();
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-  if (hits.size > 5000) hits.clear();
-  return recent.length > MAX_PER_WINDOW;
-}
+import { clientIp, rateLimited } from "@/lib/rate-limit";
 
 const MIN_FILL_MS = 2500;
 
@@ -70,8 +54,8 @@ export async function POST(request: Request) {
   const data = parsed.data;
   if (Date.now() - data.startedAt < MIN_FILL_MS) return json({ ok: false, error: "invalid" }, 400);
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (rateLimited(ip)) return json({ ok: false, error: "rateLimited" }, 429);
+  // Same best-effort limiter as the booking forms: 5 messages per 10 minutes per IP.
+  if (rateLimited(`contact:${clientIp(request)}`, 5, 10 * 60 * 1000)) return json({ ok: false, error: "rateLimited" }, 429);
 
   const config = getEmailConfig();
   if (!config) {

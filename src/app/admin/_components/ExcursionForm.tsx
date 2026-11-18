@@ -6,7 +6,7 @@ import { Eye, Trash2, Wand2 } from "lucide-react";
 import { deleteExcursion, saveExcursion } from "../_actions/excursions";
 import { errorMessage, fmt, t } from "../_lib/strings";
 import { slugify } from "@/lib/cms/mappers";
-import type { ExcursionRow, MediaRow } from "@/lib/cms/types";
+import { PRIMARY_CATEGORIES, type ExcursionRow, type MediaRow, type PrimaryCategory } from "@/lib/cms/types";
 import type { ExcursionInput } from "@/lib/cms/schemas";
 import { useToast } from "./Toast";
 import { Field, Toggle } from "./Field";
@@ -39,6 +39,7 @@ type FormState = {
   price_eur: string;
   kind: "excursion" | "event";
   booking_mode: "departures" | "interest" | "none";
+  primary_category: PrimaryCategory | "";
   cover: MediaRow | null;
   gallery: MediaRow[];
 } & Record<LocalizedKey, string>;
@@ -59,6 +60,7 @@ function fromRow(row: ExcursionRow | null): FormState {
     price_eur: row?.price_eur === null || row?.price_eur === undefined ? "" : String(row.price_eur),
     kind: row?.kind ?? "excursion",
     booking_mode: row?.booking_mode ?? "departures",
+    primary_category: row?.primary_category ?? "",
     cover: row?.cover ?? null,
     gallery: (row?.images ?? [])
       .slice()
@@ -126,6 +128,7 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
       price_eur: form.price_eur.trim() === "" ? null : form.price_eur,
       kind: form.kind,
       booking_mode: form.booking_mode,
+      primary_category: form.primary_category || null,
       ...Object.fromEntries(LOCALIZED.flatMap((k) => (["el", "en"] as const).map((l) => [`${k}_${l}`, form[`${k}_${l}`]]))),
     };
     startTransition(async () => {
@@ -164,6 +167,24 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
             <h2 className="text-lg font-semibold">{t.excursions.sections.content}</h2>
             <LangTabs value={lang} onChange={setLang} complete={complete} />
           </div>
+          <div className="mb-5 grid gap-5 sm:grid-cols-2">
+            <Field id="primary_category" label={L.primaryCategory} hint={L.primaryCategoryHint} error={err("primary_category")}>
+              <select
+                id="primary_category"
+                value={form.primary_category}
+                onChange={(e) => set("primary_category", e.target.value as FormState["primary_category"])}
+                className="admin-input"
+                aria-invalid={Boolean(errors.primary_category) || undefined}
+              >
+                <option value="">{L.primaryCategoryNone}</option>
+                {PRIMARY_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {L.primaryCategories[c]}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
           <p className="mb-5 rounded-lg bg-sky-50 p-3 text-xs text-sky-950">{t.excursions.languageNote}</p>
           <div role="tabpanel" id={`panel-${lang}`} aria-labelledby={`tab-${lang}`} lang={lang} className="grid gap-5">
             <Field id={lf("title")} label={L.title} error={err(lf("title"))}>
@@ -200,7 +221,7 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
               <Field id={lf("destination")} label={L.destination} optional>
                 <input id={lf("destination")} value={form[lf("destination")]} onChange={(e) => set(lf("destination"), e.target.value)} className="admin-input" />
               </Field>
-              <Field id={lf("category")} label={L.category} optional>
+              <Field id={lf("category")} label={L.category} hint={L.categoryHint} optional>
                 <input id={lf("category")} value={form[lf("category")]} onChange={(e) => set(lf("category"), e.target.value)} className="admin-input" />
               </Field>
               <Field id={lf("duration")} label={L.duration} optional>
