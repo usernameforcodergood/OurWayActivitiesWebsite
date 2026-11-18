@@ -2,14 +2,15 @@ import { NextResponse } from "next/server";
 import { getSubmissionSupabase } from "@/lib/supabase/server-secret";
 import { siteConfig } from "@/lib/site";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
-import { MIN_FILL_MS, bookingRequestSchema, mapDbError, type SubmitResponse } from "@/lib/bookings/validation";
+import { MIN_FILL_MS, bookingRequestSchema, mapDbError, splitFullName, type SubmitResponse } from "@/lib/bookings/validation";
 import { renderAdminNewBooking, renderCustomerBookingEmail, type BookingEmailData } from "@/lib/bookings/emails";
 import { adminInbox, deliver, type EmailKind } from "@/lib/bookings/notify";
 
 /**
- * Booking request / expression of interest. The request is validated here and
- * again by the database function submit_booking_request(), which checks
- * capacity atomically, saves the request as "pending" and returns a
+ * Scheduled-excursion participation request or general-experience inquiry.
+ * Validated here and again by the database function submit_booking_request(),
+ * which checks capacity atomically for scheduled excursions (inquiries never
+ * touch capacity), saves the request ("pending" / "new") and returns a
  * reference. This endpoint never confirms anything and takes no payment.
  */
 function json(body: SubmitResponse, status: number) {
@@ -42,19 +43,21 @@ export async function POST(request: Request) {
 
   const db = getSubmissionSupabase();
   if (!db) return json({ ok: false, error: "notConfigured" }, 503);
+  const name = splitFullName(d.fullName)!; // guaranteed by the schema
 
   const { data, error } = await db.rpc("submit_booking_request", {
     p: {
       idempotency_key: d.idempotencyKey,
       excursion_id: d.excursionId,
       departure_id: d.departureId,
-      first_name: d.firstName,
-      last_name: d.lastName,
+      first_name: name.first,
+      last_name: name.last,
       email: d.email,
       phone: d.phone,
       participants: d.participants,
       message: d.message ?? null,
-      special_requests: d.specialRequests ?? null,
+      // Stored only for general-experience inquiries (the database ignores it otherwise).
+      preferred_period: d.preferredPeriod ?? null,
       locale: d.locale,
       consent: d.consent,
     },
@@ -82,8 +85,8 @@ export async function POST(request: Request) {
   const emailData: BookingEmailData = {
     reference: result.reference,
     locale: d.locale,
-    firstName: d.firstName,
-    lastName: d.lastName,
+    firstName: name.first,
+    lastName: name.last,
     email: d.email,
     phone: d.phone,
     participants: d.participants,
@@ -94,7 +97,7 @@ export async function POST(request: Request) {
     unitPriceEur: result.unit_price_eur != null ? Number(result.unit_price_eur) : null,
     totalEur: result.total_eur != null ? Number(result.total_eur) : null,
     message: d.message,
-    specialRequests: d.specialRequests,
+    preferredPeriod: d.preferredPeriod,
     kind: result.kind ?? (d.departureId ? "booking" : "interest"),
   };
 

@@ -83,6 +83,11 @@ const BOOKING_BADGE: Record<string, string> = {
   rejected: "bg-red-100 text-red-900",
   cancelled: "bg-stone text-bark",
   completed: "bg-sky-100 text-sky-900",
+  // General-experience inquiries
+  new: "bg-amber-100 text-amber-900",
+  contacted: "bg-sky-100 text-sky-900",
+  in_progress: "bg-indigo-100 text-indigo-900",
+  closed: "bg-stone text-bark",
 };
 
 export function BookingStatusBadge({ status }: { status: keyof typeof t.bookings.statuses }) {

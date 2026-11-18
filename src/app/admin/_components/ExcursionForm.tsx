@@ -161,14 +161,11 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
       <div className="space-y-6">
-        {/* Language-specific content */}
+        {/* Step 1 + Step 2: what the experience is, and which form visitors get */}
         <Card>
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold">{t.excursions.sections.content}</h2>
-            <LangTabs value={lang} onChange={setLang} complete={complete} />
-          </div>
-          <div className="mb-5 grid gap-5 sm:grid-cols-2">
-            <Field id="primary_category" label={L.primaryCategory} hint={L.primaryCategoryHint} error={err("primary_category")}>
+          <h2 className="mb-5 text-lg font-semibold">{t.excursions.sections.setup}</h2>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field id="primary_category" label={t.excursions.sections.step1} hint={L.primaryCategoryHint} error={err("primary_category")}>
               <select
                 id="primary_category"
                 value={form.primary_category}
@@ -184,6 +181,61 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
                 ))}
               </select>
             </Field>
+            <Field id="kind" label={L.kind}>
+              <select id="kind" value={form.kind} onChange={(e) => set("kind", e.target.value as FormState["kind"])} className="admin-input">
+                <option value="excursion">{L.kindExcursion}</option>
+                <option value="event">{L.kindEventOption}</option>
+              </select>
+            </Field>
+          </div>
+
+          <fieldset className="mt-6">
+            <legend className="mb-2 text-sm font-semibold">{t.excursions.sections.step2}</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {(
+                [
+                  ["departures", L.modeDepartures, L.modeDeparturesHint],
+                  ["interest", L.modeInterest, L.modeInterestHint],
+                  // Legacy only: offered just so an existing "information only" page keeps its setting.
+                  ...(form.booking_mode === "none" ? ([["none", L.modeNone, L.modeNoneHint]] as const) : []),
+                ] as const
+              ).map(([value, label, hint]) => (
+                <label key={value} className="flex cursor-pointer items-start gap-3 rounded-lg p-3 ring-1 ring-ink/10 has-[:checked]:bg-emerald-50 has-[:checked]:ring-emerald-600/40">
+                  <input type="radio" name="booking_mode" value={value} checked={form.booking_mode === value} onChange={() => set("booking_mode", value)} className="mt-1 accent-emerald-700" />
+                  <span>
+                    <span className="block text-sm font-semibold">{label}</span>
+                    <span className="block text-xs text-bark">{hint}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          {form.booking_mode !== "none" && (
+            <div className="mt-5 rounded-lg border border-dashed border-ink/20 bg-stone/40 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-bark">{L.formPreview}</p>
+              <p className="mt-2 font-semibold">{form.booking_mode === "departures" ? L.previewScheduledTitle : L.previewGeneralTitle}</p>
+              <ul className="mt-2 grid gap-1 text-sm text-bark sm:grid-cols-2">
+                {(form.booking_mode === "departures" ? L.previewScheduledFields : L.previewGeneralFields).map((f) => (
+                  <li key={f} className="flex gap-2">
+                    <span aria-hidden>•</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-xs text-bark">{form.booking_mode === "departures" ? L.previewScheduledNote : L.previewGeneralNote}</p>
+            </div>
+          )}
+          <p className="mt-4 rounded-lg bg-sky-50 p-3 text-xs text-sky-950">
+            {form.booking_mode === "departures" ? (row ? L.departuresBelow : L.departuresAfterSave) : L.noDeparturesForGeneral}
+          </p>
+        </Card>
+
+        {/* Language-specific content */}
+        <Card>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold">{t.excursions.sections.content}</h2>
+            <LangTabs value={lang} onChange={setLang} complete={complete} />
           </div>
           <p className="mb-5 rounded-lg bg-sky-50 p-3 text-xs text-sky-950">{t.excursions.languageNote}</p>
           <div role="tabpanel" id={`panel-${lang}`} aria-labelledby={`tab-${lang}`} lang={lang} className="grid gap-5">
@@ -272,41 +324,6 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
             </Field>
           </div>
           <p className="mt-3 text-xs text-bark">{L.priceDefaultHint}</p>
-        </Card>
-
-        <Card>
-          <h2 className="mb-5 text-lg font-semibold">{t.excursions.sections.booking}</h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field id="kind" label={L.kind}>
-              <select id="kind" value={form.kind} onChange={(e) => set("kind", e.target.value as FormState["kind"])} className="admin-input">
-                <option value="excursion">{L.kindExcursion}</option>
-                <option value="event">{L.kindEvent}</option>
-              </select>
-            </Field>
-          </div>
-          <fieldset className="mt-5">
-            <legend className="mb-2 text-sm font-semibold">{L.bookingMode}</legend>
-            <div className="grid gap-2">
-              {(
-                [
-                  ["departures", L.modeDepartures, L.modeDeparturesHint],
-                  ["interest", L.modeInterest, L.modeInterestHint],
-                  ["none", L.modeNone, L.modeNoneHint],
-                ] as const
-              ).map(([value, label, hint]) => (
-                <label key={value} className="flex cursor-pointer items-start gap-3 rounded-lg p-3 ring-1 ring-ink/10 has-[:checked]:bg-emerald-50 has-[:checked]:ring-emerald-600/40">
-                  <input type="radio" name="booking_mode" value={value} checked={form.booking_mode === value} onChange={() => set("booking_mode", value)} className="mt-1 accent-emerald-700" />
-                  <span>
-                    <span className="block text-sm font-semibold">{label}</span>
-                    <span className="block text-xs text-bark">{hint}</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          {form.booking_mode === "departures" && (
-            <p className="mt-4 rounded-lg bg-sky-50 p-3 text-xs text-sky-950">{row ? L.departuresBelow : L.departuresAfterSave}</p>
-          )}
         </Card>
 
         <Card>

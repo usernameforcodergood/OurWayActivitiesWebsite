@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/site";
 import type { ActionResult } from "@/lib/cms/schemas";
 import { renderCustomerBookingEmail, type BookingEmailData, type CustomerBookingEmail } from "@/lib/bookings/emails";
 import { adminInbox, deliver, type DeliveryResult, type EmailKind } from "@/lib/bookings/notify";
-import { EXPERIENCE_TYPES, MAX_GROUP, PRIVATE_STATUSES } from "@/lib/bookings/validation";
+import { EXPERIENCE_TYPES, INQUIRY_STATUSES, MAX_GROUP, PRIVATE_STATUSES } from "@/lib/bookings/validation";
 
 type Db = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 type EmailOutcome = DeliveryResult["status"] | "skipped";
@@ -48,6 +48,7 @@ async function loadEmailData(db: Db, bookingId: string, adminNote?: string): Pro
     totalEur: o.total_eur != null ? Number(o.total_eur) : null,
     message: b?.message ?? null,
     specialRequests: b?.special_requests ?? null,
+    preferredPeriod: o.preferred_period ?? null,
     adminNote: adminNote || null,
     kind: o.kind,
   };
@@ -118,12 +119,39 @@ export async function resendBookingEmail(id: string): Promise<ActionResult<{ ema
   await requireAdmin();
   if (!uuid.safeParse(id).success) return { ok: false, error: "generic" };
   const db = await createSupabaseServerClient();
-  const { data } = await db.from("bookings").select("status").eq("id", id).maybeSingle();
+  const { data } = await db.from("bookings").select("kind, status").eq("id", id).maybeSingle();
   if (!data) return { ok: false, error: "generic" };
+  // Inquiries only ever get the "received" email; scheduled requests get the one matching their status.
   const template: CustomerBookingEmail | null =
-    data.status === "pending" ? "received" : data.status === "completed" ? null : (data.status as CustomerBookingEmail);
+    data.kind === "interest"
+      ? "received"
+      : data.status === "pending"
+        ? "received"
+        : data.status === "completed"
+          ? null
+          : (data.status as CustomerBookingEmail);
   if (!template) return { ok: false, error: "transition" };
   return { ok: true, data: { email: await sendAndLog(db, id, template) } };
+}
+
+const inquiryStatusInput = z.object({ id: uuid, status: z.enum(INQUIRY_STATUSES), note });
+
+/** General-experience inquiry: any of new / contacted / in_progress / closed (recorded in history). No email, no capacity. */
+export async function setInquiryStatus(input: z.input<typeof inquiryStatusInput>): Promise<ActionResult> {
+  await requireAdmin();
+  const parsed = inquiryStatusInput.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "generic" };
+  const db = await createSupabaseServerClient();
+  const { error } = await db.rpc("admin_set_inquiry_status", {
+    p_booking_id: parsed.data.id,
+    p_status: parsed.data.status,
+    p_note: parsed.data.note ?? null,
+  });
+  if (error) {
+    console.error("[admin] inquiry status:", error.message);
+    return { ok: false, error: "generic" };
+  }
+  return { ok: true };
 }
 
 const noteInput = z.object({ target: z.enum(["booking", "private"]), id: uuid, body: z.string().trim().min(1).max(4000) });

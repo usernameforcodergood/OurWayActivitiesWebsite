@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowDown, ArrowLeft } from "lucide-react";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { localePath, routes } from "@/i18n/routes";
 import type { PublicExcursion } from "@/lib/cms/types";
 import { PageHero } from "@/components/ui/PageHero";
 import { ImageReveal } from "@/components/animations/ImageReveal";
-import { BookingPanel } from "@/components/booking/BookingPanel";
+import { ButtonLink } from "@/components/ui/Button";
+import { ExperienceRequestForm } from "@/components/booking/ExperienceRequestForm";
+import { REQUEST_FORM_ID } from "@/lib/bookings/validation";
 
 function formatPrice(eur: number, locale: Locale) {
   return new Intl.NumberFormat(locale === "el" ? "el-GR" : "en-GB", {
@@ -52,6 +54,8 @@ export function ExcursionView({
     ] as const
   ).filter((f): f is readonly [string, string] => Boolean(f[1]));
   const contactHref = `${localePath(locale, routes.contact)}?interest=${encodeURIComponent(excursion.title)}`;
+  // Scheduled excursion → participation form; general experience → inquiry form.
+  const hasForm = excursion.bookingMode === "departures" || excursion.bookingMode === "interest";
 
   return (
     <>
@@ -138,16 +142,24 @@ export function ExcursionView({
                   </dl>
                 </>
               )}
-              <div className="mt-10">
-                <BookingPanel
-                  excursion={excursion}
-                  locale={locale}
-                  t={t.booking}
-                  privacyHref={localePath(locale, routes.privacy)}
-                  contactHref={contactHref}
-                  preview={preview}
-                />
-              </div>
+              {hasForm ? (
+                <a
+                  href={`#${REQUEST_FORM_ID}`}
+                  className="mt-10 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-sand px-6 font-semibold text-ink transition-colors hover:bg-bone"
+                >
+                  {t.booking.jumpCta}
+                  <ArrowDown aria-hidden className="size-4" />
+                </a>
+              ) : (
+                // Legacy "information only" pages: a contact link instead of a form.
+                <div className="mt-10 rounded-sm bg-forest p-8">
+                  <p className="text-display-sm">{t.booking.infoTitle}</p>
+                  <p className="mt-3 text-fog">{t.booking.infoBody}</p>
+                  <ButtonLink href={contactHref} className="mt-6">
+                    {t.booking.infoCta}
+                  </ButtonLink>
+                </div>
+              )}
             </div>
           </aside>
         </div>
@@ -167,6 +179,20 @@ export function ExcursionView({
                 />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* The one customer action, after all the experience information. */}
+        {hasForm && (
+          <div className="container-x mt-24">
+            <ExperienceRequestForm
+              excursion={excursion}
+              locale={locale}
+              t={t.booking}
+              privacyHref={localePath(locale, routes.privacy)}
+              contactHref={contactHref}
+              preview={preview}
+            />
           </div>
         )}
       </section>

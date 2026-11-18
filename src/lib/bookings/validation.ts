@@ -5,8 +5,12 @@ import { z } from "zod";
  * Messages are codes, mapped to localised text in the UI. The database
  * re-validates everything (see supabase/migrations/0003_bookings.sql).
  */
+/** Scheduled-excursion participation requests (bookings.kind = 'booking'). */
 export const BOOKING_STATUSES = ["pending", "confirmed", "rejected", "cancelled", "completed"] as const;
-export type BookingStatus = (typeof BOOKING_STATUSES)[number];
+/** General-experience inquiries (bookings.kind = 'interest'), migration 0007. */
+export const INQUIRY_STATUSES = ["new", "contacted", "in_progress", "closed"] as const;
+export type InquiryStatus = (typeof INQUIRY_STATUSES)[number];
+export type BookingStatus = (typeof BOOKING_STATUSES)[number] | InquiryStatus;
 
 /** Tailor-made request statuses (table public.private_requests). */
 export const PRIVATE_STATUSES = ["new", "in_review", "contacted", "quotation_sent", "confirmed", "completed", "rejected"] as const;
@@ -21,12 +25,14 @@ export type DepartureStatus = (typeof DEPARTURE_STATUSES)[number];
 export const BOOKING_MODES = ["departures", "interest", "none"] as const;
 export type BookingMode = (typeof BOOKING_MODES)[number];
 
+/** Anchor of the request form on experience pages ("Δηλώστε ενδιαφέρον ↓"). */
+export const REQUEST_FORM_ID = "interest-form";
+
 export const MAX_PARTICIPANTS = 100;
 export const MAX_GROUP = 500;
 /** Rejects instant bot posts. */
 export const MIN_FILL_MS = 2500;
 
-const name = z.string().trim().min(1, "required").max(80, "tooLong");
 const email = z.string().trim().min(1, "required").max(200, "tooLong").pipe(z.email("email"));
 const phone = z
   .string()
@@ -61,21 +67,6 @@ const antiSpam = {
   consent: z.boolean().refine((v) => v === true, "consent"),
 };
 
-export const bookingRequestSchema = z.object({
-  excursionId: z.uuid(),
-  departureId: z.uuid("departure").nullable(),
-  firstName: name,
-  lastName: name,
-  email,
-  phone,
-  participants: intIn(1, MAX_PARTICIPANTS),
-  message: optText(3000),
-  specialRequests: optText(2000),
-  ...antiSpam,
-});
-export type BookingRequestInput = z.input<typeof bookingRequestSchema>;
-export type BookingRequestData = z.output<typeof bookingRequestSchema>;
-
 const isoDate = z
   .string()
   .optional()
@@ -103,6 +94,26 @@ const fullName = z
     const n = splitFullName(v);
     return Boolean(n && n.first.length <= 80 && n.last.length <= 80);
   }, "fullName");
+
+/**
+ * Both experience-page forms (stored in public.bookings):
+ * - Scheduled excursion: departureId required, participation request.
+ * - General experience: no departure; optional preferred date / period.
+ * The database decides which one applies from the experience's booking_mode.
+ */
+export const bookingRequestSchema = z.object({
+  excursionId: z.uuid(),
+  departureId: z.uuid("departure").nullable(),
+  fullName,
+  email,
+  phone,
+  participants: intIn(1, MAX_PARTICIPANTS),
+  preferredPeriod: optText(200),
+  message: optText(3000),
+  ...antiSpam,
+});
+export type BookingRequestInput = z.input<typeof bookingRequestSchema>;
+export type BookingRequestData = z.output<typeof bookingRequestSchema>;
 
 /** Tailor-made experience request (stored in public.private_requests). */
 export const tailorMadeRequestSchema = z
