@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, CalendarClock, CalendarPlus, CalendarRange, CheckCircle2, ClipboardList, Hourglass, Megaphone, Plus, Upload, Users } from "lucide-react";
+import { AlertTriangle, CalendarClock, CalendarRange, CheckCircle2, ClipboardList, Hourglass, Megaphone, Plus, Upload, Users } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { athensToday } from "@/lib/cms/public";
 import { fmt, t } from "../_lib/strings";
@@ -156,10 +156,6 @@ export default async function DashboardPage() {
             <BtnLink href="/admin/excursions/new?kind=event" variant="secondary">
               <Plus aria-hidden className="size-4" />
               {D.newEvent}
-            </BtnLink>
-            <BtnLink href="/admin/excursions" variant="secondary">
-              <CalendarPlus aria-hidden className="size-4" />
-              {D.addDeparture}
             </BtnLink>
             <BtnLink href="/admin/bookings?status=pending" variant="secondary">
               <Hourglass aria-hidden className="size-4" />

@@ -9,7 +9,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { ButtonLink } from "@/components/ui/Button";
 import { TextReveal } from "@/components/animations/TextReveal";
-import { ExperienceCard } from "@/components/activities/ExperienceCard";
+import { ExperienceBrowser } from "@/components/activities/ExperienceBrowser";
 import { CTASection } from "@/components/sections/CTASection";
 import { pad } from "@/lib/utils";
 
@@ -38,11 +38,7 @@ export default async function ActivitiesPage({ params }: PageProps<"/[locale]/ac
             <h2 id="list-title" className="sr-only">
               {a.listTitle}
             </h2>
-            <div className="mt-14 grid gap-x-8 gap-y-20 md:grid-cols-12">
-              {list.map((excursion, i) => (
-                <ExperienceCard key={excursion.slug} excursion={excursion} locale={locale} index={i} cta={a.viewExperience} />
-              ))}
-            </div>
+            <ExperienceBrowser items={list} locale={locale} t={a.filters} cta={a.viewExperience} />
           </div>
         </section>
       )}

@@ -48,6 +48,8 @@ export type ExcursionRow = {
   info_en: string | null;
   kind: ExcursionKind;
   booking_mode: BookingMode;
+  /** Null for rows saved before migration 0006 (or never categorised). */
+  primary_category?: PrimaryCategory | null;
   meeting_point_el: string | null;
   meeting_point_en: string | null;
   included_el: string | null;
@@ -64,6 +66,10 @@ export type ExcursionRow = {
 
 export type ExcursionKind = "excursion" | "event";
 export type { BookingMode, DepartureStatus };
+
+/** Primary format category (migration 0006): Day Trips, Two-Day Trips, Packages. */
+export const PRIMARY_CATEGORIES = ["day_trip", "two_day", "package"] as const;
+export type PrimaryCategory = (typeof PRIMARY_CATEGORIES)[number];
 
 /** Row of public.departures */
 export type DepartureRow = {
@@ -156,6 +162,8 @@ export type PublicExcursion = {
   summary: string;
   description: string[];
   destination?: string;
+  primaryCategory: PrimaryCategory | null;
+  /** Free-text activity type ("Πεζοπορία"), not the primary category. */
   category?: string;
   duration?: string;
   difficulty?: string;

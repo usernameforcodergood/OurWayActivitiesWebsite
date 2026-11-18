@@ -55,7 +55,13 @@ export function ExcursionView({
 
   return (
     <>
-      <PageHero locale={locale} eyebrow={excursion.category ?? (excursion.kind === "event" ? d.eventLabel : t.activities.hero.eyebrow)} title={excursion.title} lead={excursion.summary} image={excursion.cover} />
+      <PageHero
+        locale={locale}
+        eyebrow={
+          excursion.primaryCategory
+            ? t.activities.filters.categories[excursion.primaryCategory]
+            : (excursion.category ?? (excursion.kind === "event" ? d.eventLabel : t.activities.hero.eyebrow))
+        } title={excursion.title} lead={excursion.summary} image={excursion.cover} />
 
       <section className="section-y bg-ink text-bone">
         <div className="container-x grid gap-16 md:grid-cols-12">

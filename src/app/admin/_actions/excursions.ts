@@ -62,12 +62,13 @@ export async function setExcursionStatus(id: string, status: "draft" | "publishe
   if (status === "published") {
     const { data: row } = await supabase
       .from("excursions")
-      .select("title_el, title_en, summary_el, summary_en, published_at")
+      .select("title_el, title_en, summary_el, summary_en, published_at, kind, primary_category")
       .eq("id", id)
       .maybeSingle();
     if (!row) return { ok: false, error: "generic" };
     const complete = (row.title_el && row.summary_el) || (row.title_en && row.summary_en);
     if (!complete) return { ok: false, error: "publishNeedsLanguage" };
+    if (row.kind === "excursion" && !row.primary_category) return { ok: false, error: "categoryRequired" };
     const { error } = await supabase
       .from("excursions")
       .update({ status, published_at: row.published_at ?? new Date().toISOString() })

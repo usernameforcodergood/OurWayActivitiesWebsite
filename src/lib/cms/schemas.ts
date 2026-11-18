@@ -119,6 +119,7 @@ export const excursionSchema = z
     price_note_en: optText(200),
     kind: z.enum(["excursion", "event"]),
     booking_mode: z.enum(["departures", "interest", "none"]),
+    primary_category: z.enum(["day_trip", "two_day", "package"]).nullable(),
     meeting_point_el: optText(300),
     meeting_point_en: optText(300),
     included_el: optText(4000),
@@ -135,6 +136,10 @@ export const excursionSchema = z
     if (v.status === "published") {
       const complete = (v.title_el && v.summary_el) || (v.title_en && v.summary_en);
       if (!complete) ctx.addIssue({ code: "custom", path: ["summary_el"], message: "publishNeedsLanguage" });
+      // Every published excursion appears under one of the three categories.
+      if (v.kind === "excursion" && !v.primary_category) {
+        ctx.addIssue({ code: "custom", path: ["primary_category"], message: "categoryRequired" });
+      }
     }
   });
 

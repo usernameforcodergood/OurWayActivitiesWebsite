@@ -9,7 +9,7 @@ export const t = {
     excursions: "Εκδρομές",
     announcements: "Ανακοινώσεις",
     bookings: "Κρατήσεις",
-    privateRequests: "Tailor-Made Requests",
+    privateRequests: "Αιτήματα Tailor-Made",
     media: "Πολυμέσα",
     settings: "Ρυθμίσεις",
     logout: "Αποσύνδεση",
@@ -348,7 +348,12 @@ export const t = {
       description: "Πλήρης περιγραφή",
       descriptionHint: "Αφήστε μια κενή γραμμή ανάμεσα στις παραγράφους.",
       destination: "Προορισμός",
-      category: "Κατηγορία δραστηριότητας",
+      category: "Είδος δραστηριότητας",
+      categoryHint: "Προαιρετικό, π.χ. Πεζοπορία, Πολιτισμός. Δεν είναι η κύρια κατηγορία.",
+      primaryCategory: "Κύρια κατηγορία",
+      primaryCategoryHint: "Σε ποια κατηγορία εμφανίζεται στη σελίδα «Εμπειρίες». Χρειάζεται για δημοσίευση.",
+      primaryCategoryNone: "— Επιλέξτε κατηγορία —",
+      primaryCategories: { day_trip: "Ημερήσια εκδρομή", two_day: "Διήμερη εκδρομή", package: "Πακέτο" },
       duration: "Διάρκεια",
       durationPlaceholder: "π.χ. 1 ημέρα, 5 ώρες",
       difficulty: "Δυσκολία",
@@ -392,6 +397,8 @@ export const t = {
     publishNeedsLanguage:
       "Για δημοσίευση χρειάζεται τίτλος και σύντομη περιγραφή σε τουλάχιστον μία γλώσσα.",
     titleRequired: "Συμπληρώστε τίτλο σε τουλάχιστον μία γλώσσα.",
+    noCategory: "Χωρίς κατηγορία",
+    categoryRequired: "Επιλέξτε κύρια κατηγορία (Ημερήσια, Διήμερη ή Πακέτο) πριν από τη δημοσίευση.",
     slugTaken: "Αυτή η διεύθυνση χρησιμοποιείται ήδη.",
     slugInvalid: "Μη έγκυρη διεύθυνση. Χρησιμοποιήστε λατινικά πεζά, αριθμούς και παύλες.",
     published: "Η εκδρομή δημοσιεύτηκε και εμφανίζεται στην ιστοσελίδα.",
@@ -474,7 +481,7 @@ export const t = {
     passwordChanged: "Ο κωδικός άλλαξε.",
     adminsTitle: "Διαχειριστές",
     adminsIntro:
-      "Νέοι διαχειριστές προστίθενται με ασφάλεια από τον προγραμματιστή (Supabase + npm run admin:grant). Δεν υπάρχει δημόσια εγγραφή.",
+      "Νέοι διαχειριστές προστίθενται με ασφάλεια από τον προγραμματιστή (Supabase + npm run admin:grant). Η ιστοσελίδα δεν έχει δημόσια εγγραφή.",
   },
 } as const;
 

@@ -62,6 +62,11 @@ export default async function ExcursionsPage({ searchParams }: PageProps<"/admin
                     <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-bark">
                       <StatusBadge status={r.status} />
                       {r.kind === "event" && <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-semibold text-violet-900">{t.excursions.fields.kindEvent}</span>}
+                      {r.primary_category ? (
+                        <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-semibold text-sky-900">{t.excursions.fields.primaryCategories[r.primary_category]}</span>
+                      ) : (
+                        r.kind === "excursion" && <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900">{t.excursions.noCategory}</span>
+                      )}
                       <span className="font-mono">/{r.slug}</span>
                       <span aria-label="languages">
                         {(["el", "en"] as const).map((l) => (
