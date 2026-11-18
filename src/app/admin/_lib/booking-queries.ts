@@ -4,6 +4,7 @@ import type { DepartureRow } from "@/lib/cms/types";
 import {
   BOOKING_STATUSES,
   EXPERIENCE_TYPES,
+  INQUIRY_STATUSES,
   PRIVATE_STATUSES,
   type BookingStatus,
   type ExperienceType,
@@ -39,6 +40,8 @@ export type BookingOverviewRow = {
   excursion_title_en: string | null;
   excursion_slug: string;
   excursion_kind: "excursion" | "event";
+  /** General-experience inquiries only (migration 0007). */
+  preferred_period: string | null;
 };
 
 export type BookingDetail = BookingOverviewRow & {
@@ -53,6 +56,8 @@ export type NoteRow = { id: number; body: string; author_id: string | null; crea
 export type EmailRow = { id: number; kind: string; recipient: string; status: "sent" | "failed" | "not_configured"; error: string | null; created_at: string };
 
 export type BookingListParams = {
+  /** Scheduled participation requests or general-experience inquiries. */
+  kind: "booking" | "interest";
   q: string;
   status: "all" | BookingStatus;
   excursion: string;
@@ -70,9 +75,12 @@ export function parseBookingParams(sp: Record<string, string | string[] | undefi
   const status = one("status");
   const sort = one("sort");
   const page = Number.parseInt(one("page"), 10);
+  const kind = one("kind") === "interest" ? "interest" : "booking";
+  const valid: readonly string[] = kind === "interest" ? INQUIRY_STATUSES : BOOKING_STATUSES;
   return {
+    kind,
     q: one("q").slice(0, 100),
-    status: (BOOKING_STATUSES as readonly string[]).includes(status) ? (status as BookingStatus) : "all",
+    status: valid.includes(status) ? (status as BookingStatus) : "all",
     excursion: isUuid(one("excursion")) ? one("excursion") : "",
     from: isDate(one("from")) ? one("from") : "",
     to: isDate(one("to")) ? one("to") : "",
@@ -83,7 +91,7 @@ export function parseBookingParams(sp: Record<string, string | string[] | undefi
 
 export async function listBookings(p: BookingListParams) {
   const db = await createSupabaseServerClient();
-  let q = db.from("booking_overview").select("*", { count: "exact" });
+  let q = db.from("booking_overview").select("*", { count: "exact" }).eq("kind", p.kind);
   if (p.status !== "all") q = q.eq("status", p.status);
   if (p.excursion) q = q.eq("excursion_id", p.excursion);
   if (p.from) q = q.gte("departure_date", p.from);
@@ -244,7 +252,7 @@ export async function getPrivateRequestDetail(id: string) {
 export async function getBookingDashboard(today: string) {
   const db = await createSupabaseServerClient();
   const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
-  const [pending, confirmed, upcoming, recent, privNew, failures] = await Promise.all([
+  const [pending, confirmed, upcoming, recent, privNew, failures, inquiriesNew] = await Promise.all([
     db.from("bookings").select("participants").eq("status", "pending").limit(5000),
     db.from("bookings").select("participants").eq("status", "confirmed").limit(5000),
     db
@@ -257,6 +265,7 @@ export async function getBookingDashboard(today: string) {
     db.from("booking_overview").select("*").order("status_changed_at", { ascending: false }).limit(8),
     db.from("private_requests").select("id", { count: "exact", head: true }).eq("status", "new"),
     db.from("email_notifications").select("id, kind, recipient, status, created_at, booking_id, private_request_id").neq("status", "sent").gte("created_at", since).order("created_at", { ascending: false }).limit(10),
+    db.from("bookings").select("id", { count: "exact", head: true }).eq("kind", "interest").eq("status", "new"),
   ]);
   const sum = (rows: Array<{ participants: number }> | null) => (rows ?? []).reduce((a, r) => a + r.participants, 0);
   type Up = { id: string; departure_date: string; departure_time: string | null; capacity: number | null; status: string; excursion: { id: string; title_el: string | null; title_en: string | null } | null };
@@ -278,6 +287,7 @@ export async function getBookingDashboard(today: string) {
     upcomingDepartures: ups.length,
     recent: (recent.data ?? []) as BookingOverviewRow[],
     newPrivate: privNew.count ?? 0,
+    newInquiries: inquiriesNew.count ?? 0,
     full,
     failures: (failures.data ?? []) as Array<EmailRow & { booking_id: string | null; private_request_id: string | null }>,
   };

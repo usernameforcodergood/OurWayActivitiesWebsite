@@ -7,6 +7,10 @@ import { fmt, t } from "../../../_lib/strings";
 import { nowMs } from "../../../_lib/queries";
 import { getBookingDetail } from "../../../_lib/booking-queries";
 import { BookingActions } from "../../../_components/BookingActions";
+import { InquiryStatusControl } from "../../../_components/InquiryStatusControl";
+import type { BOOKING_STATUSES, InquiryStatus } from "@/lib/bookings/validation";
+
+type BookingOnlyStatus = (typeof BOOKING_STATUSES)[number];
 import { NotesPanel } from "../../../_components/NotesPanel";
 import { EmailCard, HistoryCard } from "../../../_components/RequestLog";
 import { BookingStatusBadge, Card, PageHeader, formatDate, formatDay, formatEurAdmin } from "../../../_components/ui";
@@ -28,7 +32,9 @@ export default async function BookingDetailPage({ params }: PageProps<"/admin/bo
   const rows: Array<[string, React.ReactNode]> = [
     [B.kind, b.kind === "interest" ? B.kindInterest : B.kindBooking],
     [B.excursion, title],
-    [B.departure, b.kind === "interest" ? B.noDate : formatDay(b.departure_date, b.departure_time)],
+    b.kind === "interest"
+      ? [B.preferredPeriod, b.preferred_period || B.notGiven]
+      : [B.departure, formatDay(b.departure_date, b.departure_time)],
     [B.participants, b.participants],
     ...(b.unit_price_eur != null ? ([[B.unitPrice, formatEurAdmin(b.unit_price_eur)]] as Array<[string, React.ReactNode]>) : []),
     ...(b.total_eur != null ? ([[B.totalLong, <strong key="t">{formatEurAdmin(b.total_eur)}</strong>]] as Array<[string, React.ReactNode]>) : []),
@@ -38,7 +44,7 @@ export default async function BookingDetailPage({ params }: PageProps<"/admin/bo
 
   return (
     <>
-      <Link href="/admin/bookings" className="mb-4 inline-flex items-center gap-1.5 text-sm text-bark hover:text-ink">
+      <Link href={b.kind === "interest" ? "/admin/bookings?kind=interest" : "/admin/bookings"} className="mb-4 inline-flex items-center gap-1.5 text-sm text-bark hover:text-ink">
         <ArrowLeft aria-hidden className="size-4" /> {B.title}
       </Link>
       <PageHeader
@@ -100,14 +106,18 @@ export default async function BookingDetailPage({ params }: PageProps<"/admin/bo
 
           <Card>
             <h2 className="mb-4 text-lg font-semibold">{B.actions}</h2>
-            <BookingActions
-              id={b.id}
-              reference={b.reference}
-              participants={b.participants}
-              status={b.status}
-              holdExpired={holdExpired}
-              canExtend={b.kind === "booking"}
-            />
+            {b.kind === "interest" ? (
+              <InquiryStatusControl id={b.id} status={b.status as InquiryStatus} />
+            ) : (
+              <BookingActions
+                id={b.id}
+                reference={b.reference}
+                participants={b.participants}
+                status={b.status as BookingOnlyStatus}
+                holdExpired={holdExpired}
+                canExtend
+              />
+            )}
             <Link href={`/admin/excursions/${b.excursion_id}`} className="mt-4 inline-flex items-center gap-1.5 text-sm text-bark hover:text-ink">
               <ExternalLink aria-hidden className="size-4" /> {B.viewExcursion}
             </Link>

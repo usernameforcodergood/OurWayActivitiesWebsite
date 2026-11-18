@@ -27,6 +27,8 @@ export type BookingEmailData = {
   totalEur?: number | null;
   message?: string | null;
   specialRequests?: string | null;
+  /** General-experience inquiries: the visitor's preferred date or period. */
+  preferredPeriod?: string | null;
   /** Optional note from the administrator to the customer. */
   adminNote?: string | null;
   kind: "booking" | "interest";
@@ -107,6 +109,7 @@ const C = {
     reference: "Κωδικός αιτήματος",
     experience: "Εμπειρία",
     date: "Ημερομηνία",
+    preferredPeriod: "Επιθυμητή ημερομηνία / διάστημα",
     participants: "Συμμετέχοντες",
     unitPrice: "Τιμή ανά άτομο",
     total: "Ενδεικτικό σύνολο",
@@ -124,6 +127,10 @@ const C = {
       intro: [
         "Γεια σας {name},",
         "Η εκδήλωση ενδιαφέροντος καταχωρήθηκε επιτυχώς. Η κράτησή σας δεν έχει ακόμη επιβεβαιωθεί. Θα επικοινωνήσουμε μαζί σας σύντομα για την οριστικοποίησή της.",
+      ],
+      introInterest: [
+        "Γεια σας {name},",
+        "Σας ευχαριστούμε για το ενδιαφέρον σας! Λάβαμε το αίτημά σας και η ομάδα της OurWay θα επικοινωνήσει μαζί σας με περισσότερες πληροφορίες.",
       ],
     },
     confirmed: {
@@ -152,6 +159,7 @@ const C = {
     reference: "Request reference",
     experience: "Experience",
     date: "Date",
+    preferredPeriod: "Preferred date / period",
     participants: "Participants",
     unitPrice: "Price per person",
     total: "Indicative total",
@@ -169,6 +177,10 @@ const C = {
       intro: [
         "Hello {name},",
         "Your request has been registered successfully. Your booking is not confirmed yet. We will contact you soon to finalise it.",
+      ],
+      introInterest: [
+        "Hello {name},",
+        "Thank you for your interest! We have received your request and the OurWay team will contact you with more information.",
       ],
     },
     confirmed: {
@@ -205,6 +217,7 @@ function bookingRows(d: BookingEmailData, withPrice: boolean): Array<[string, st
     [c.experience, d.excursionTitle],
   ];
   if (d.departureDate) rows.push([c.date, formatDateLong(d.departureDate, d.locale, d.departureTime)]);
+  else if (d.preferredPeriod) rows.push([c.preferredPeriod, d.preferredPeriod]);
   rows.push([c.participants, String(d.participants)]);
   if (withPrice && d.unitPriceEur != null) rows.push([c.unitPrice, formatEur(d.unitPriceEur, d.locale)]);
   if (withPrice && d.totalEur != null) rows.push([c.total, formatEur(d.totalEur, d.locale)]);
@@ -222,7 +235,7 @@ export function renderCustomerBookingEmail(kind: CustomerBookingEmail, d: Bookin
     d,
   );
   const tone: Tone = kind === "received" ? "pending" : kind === "confirmed" ? "confirmed" : "declined";
-  const intro = k.intro.map((s) => fill(s, d));
+  const intro = (kind === "received" && d.kind === "interest" ? c.received.introInterest : k.intro).map((s) => fill(s, d));
   const rows = bookingRows(d, kind === "received" || kind === "confirmed");
   const outro = [...(kind === "rejected" || kind === "cancelled" ? [] : [c.noPayment]), c.replyHint];
   return {
@@ -238,11 +251,12 @@ export function renderCustomerBookingEmail(kind: CustomerBookingEmail, d: Bookin
 
 export function renderAdminNewBooking(d: BookingEmailData, adminUrl: string): Rendered {
   const isInterest = d.kind === "interest";
-  const heading = isInterest ? "Νέα εκδήλωση ενδιαφέροντος" : "Νέο αίτημα κράτησης";
+  const heading = isInterest ? "Νέο ερώτημα για εμπειρία" : "Νέο αίτημα συμμετοχής";
   const rows: Array<[string, string]> = [
     ["Κωδικός", d.reference],
     ["Εμπειρία", d.excursionTitle],
     ...(d.departureDate ? [["Ημερομηνία", formatDateLong(d.departureDate, "el", d.departureTime)] as [string, string]] : []),
+    ...(d.preferredPeriod ? [["Επιθυμητή ημερομηνία / διάστημα", d.preferredPeriod] as [string, string]] : []),
     ["Συμμετέχοντες", String(d.participants)],
     ...(d.totalEur != null ? [["Ενδεικτικό σύνολο", formatEur(d.totalEur, "el")] as [string, string]] : []),
     ["Όνομα", `${d.firstName} ${d.lastName}`],
@@ -252,7 +266,11 @@ export function renderAdminNewBooking(d: BookingEmailData, adminUrl: string): Re
     ...(d.message ? [["Μήνυμα", d.message] as [string, string]] : []),
     ...(d.specialRequests ? [["Ειδικά αιτήματα", d.specialRequests] as [string, string]] : []),
   ];
-  const intro = ["Το αίτημα είναι σε κατάσταση «Σε αναμονή». Δεν έχει σταλεί επιβεβαίωση στον πελάτη."];
+  const intro = [
+    isInterest
+      ? "Γενική εμπειρία χωρίς προκαθορισμένη ημερομηνία: δεν δεσμεύει θέσεις. Κατάσταση «Νέο»."
+      : "Το αίτημα είναι σε κατάσταση «Σε αναμονή». Δεν έχει σταλεί επιβεβαίωση στον πελάτη.",
+  ];
   const outro = [`Διαχείριση: ${adminUrl}`];
   return {
     subject: `${heading} ${d.reference} — ${d.excursionTitle}`,

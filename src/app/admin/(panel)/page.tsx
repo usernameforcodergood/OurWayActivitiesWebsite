@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, CalendarClock, CalendarRange, CheckCircle2, ClipboardList, Hourglass, Megaphone, Plus, Upload, Users } from "lucide-react";
+import { AlertTriangle, CalendarClock, CalendarRange, CheckCircle2, ClipboardList, Hourglass, Megaphone, MessageCircleQuestionMark, Plus, Upload, Users } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { athensToday } from "@/lib/cms/public";
 import { fmt, t } from "../_lib/strings";
@@ -23,6 +23,7 @@ export default async function DashboardPage() {
     { label: D.upcomingDepartures, value: b.upcomingDepartures, icon: CalendarClock, href: "/admin/bookings?sort=departure" },
     { label: D.pendingRequests, value: b.pendingCount, icon: Hourglass, href: "/admin/bookings?status=pending", sub: fmt(D.pendingPeople, { count: b.pendingPeople }), highlight: b.pendingCount > 0 },
     { label: D.confirmedBookings, value: b.confirmedCount, icon: ClipboardList, href: "/admin/bookings?status=confirmed", sub: fmt(D.confirmedPeople, { count: b.confirmedPeople }) },
+    { label: D.newInquiries, value: b.newInquiries, icon: MessageCircleQuestionMark, href: "/admin/bookings?kind=interest&status=new", highlight: b.newInquiries > 0 },
     { label: D.newPrivate, value: b.newPrivate, icon: Users, href: "/admin/tailor-made?status=new", highlight: b.newPrivate > 0 },
     { label: D.totalAnnouncements, value: d.annTotal, icon: Megaphone, href: "/admin/announcements", sub: fmt(D.activeAnnouncements, { count: d.annActive }) },
   ];
