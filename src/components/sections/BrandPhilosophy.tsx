@@ -28,7 +28,7 @@ export function BrandPhilosophy({ locale, t, values }: Props) {
           <SectionLabel index="01" className="text-fog md:col-span-4">
             <span id="philosophy-title">{t.label}</span>
           </SectionLabel>
-          <p className="max-w-md font-display text-lg italic leading-snug text-sand md:col-span-6 md:col-start-7 md:text-xl">
+          <p className="max-w-md font-display text-lg italic leading-snug text-turquoise md:col-span-6 md:col-start-7 md:text-xl">
             {t.intro}
           </p>
         </div>
@@ -49,7 +49,7 @@ export function BrandPhilosophy({ locale, t, values }: Props) {
           />
           <div className="md:col-span-5 md:col-start-7 md:pb-4">
             <p className="text-lead text-bone/80">{t.aside}</p>
-            <ButtonLink href={localePath(locale, routes.about)} variant="text" className="mt-8 text-lichen">
+            <ButtonLink href={localePath(locale, routes.about)} variant="text" className="mt-8 text-turquoise">
               {t.link}
             </ButtonLink>
           </div>
@@ -62,7 +62,7 @@ export function BrandPhilosophy({ locale, t, values }: Props) {
           <ol className="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
             {values.map((v, i) => (
               <li key={v.title} className={i % 2 ? "lg:mt-12" : ""}>
-                <p aria-hidden className="font-display text-5xl text-sand/50">
+                <p aria-hidden className="font-display text-5xl text-mint/50">
                   {pad(i + 1)}
                 </p>
                 <h4 className="text-display-sm mt-5 font-display border-t border-bone/15 pt-5">{v.title}</h4>

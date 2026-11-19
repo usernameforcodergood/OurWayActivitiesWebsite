@@ -89,7 +89,7 @@ export function PinnedStorySection({ locale, t }: Props) {
             <div className="relative h-[52%]">
               {chapters.map((c, i) => (
                 <article key={c.kicker} data-chapter className="absolute inset-x-0 bottom-0">
-                  <p className="text-eyebrow mb-6 text-lichen">{c.kicker}</p>
+                  <p className="text-eyebrow mb-6 text-mint">{c.kicker}</p>
                   <h3 className="text-display-md max-w-[13ch]">{c.title}</h3>
                   <p className="text-lead mt-6 max-w-md text-bone/75">{c.body}</p>
                   <span className="sr-only">
@@ -109,7 +109,7 @@ export function PinnedStorySection({ locale, t }: Props) {
 
           <div className="relative col-span-6 col-start-7 flex">
             <div aria-hidden className="absolute -left-8 top-0 h-full w-px bg-bone/15">
-              <div data-progress className="h-full w-full origin-top scale-y-0 bg-lichen" />
+              <div data-progress className="h-full w-full origin-top scale-y-0 bg-turquoise" />
             </div>
             <div className="relative w-full overflow-hidden rounded-sm bg-moss">
               {CHAPTER_IMAGES.map((key, i) => (
@@ -145,7 +145,7 @@ export function PinnedStorySection({ locale, t }: Props) {
                 direction={i % 2 ? "left" : "right"}
                 className="aspect-[4/5]"
               />
-              <p className="text-eyebrow mb-4 mt-8 flex items-center gap-3 text-lichen">
+              <p className="text-eyebrow mb-4 mt-8 flex items-center gap-3 text-mint">
                 <span className="tabular-nums text-fog">{pad(i + 1)}</span>
                 {c.kicker}
               </p>

@@ -22,7 +22,7 @@ export function FeaturedExcursions({ items, locale, t }: { items: PublicExcursio
               {f.title}
             </TextReveal>
           </div>
-          <Link href={localePath(locale, routes.activities)} className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-lichen">
+          <Link href={localePath(locale, routes.activities)} className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-turquoise">
             {f.all}
             <ArrowUpRight aria-hidden className="size-4 transition-transform duration-500 group-hover:rotate-45" />
           </Link>

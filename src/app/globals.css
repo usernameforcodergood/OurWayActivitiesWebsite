@@ -73,11 +73,11 @@
     overflow-x: clip;
   }
   ::selection {
-    background: var(--color-lichen);
+    background: var(--color-turquoise);
     color: var(--color-ink);
   }
   :focus-visible {
-    outline: 2px solid var(--color-lichen);
+    outline: 2px solid var(--color-turquoise);
     outline-offset: 3px;
     border-radius: 2px;
   }

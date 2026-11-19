@@ -60,7 +60,7 @@ export function Toggle({
       />
       <span
         aria-hidden
-        className="relative mt-0.5 inline-block h-6 w-11 shrink-0 rounded-full bg-ink/20 transition peer-checked:bg-emerald-600 peer-focus-visible:ring-2 peer-focus-visible:ring-lagoon after:absolute after:left-0.5 after:top-0.5 after:size-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"
+        className="relative mt-0.5 inline-block h-6 w-11 shrink-0 rounded-full bg-ink/20 transition peer-checked:bg-emerald-600 peer-focus-visible:ring-2 peer-focus-visible:ring-turquoise after:absolute after:left-0.5 after:top-0.5 after:size-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"
       />
       <span>
         <span className="block text-sm font-semibold">{label}</span>

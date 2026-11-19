@@ -49,8 +49,8 @@ export function ExperienceBrowser({
 
   const chip = (active: boolean) =>
     cn(
-      "min-h-11 rounded-full px-5 text-sm font-semibold ring-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sand",
-      active ? "bg-sand text-ink ring-sand" : "text-bone/85 ring-bone/25 hover:bg-bone/10 hover:text-bone",
+      "min-h-11 rounded-full px-5 text-sm font-semibold ring-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-turquoise",
+      active ? "bg-turquoise text-ink ring-turquoise" : "text-bone/85 ring-bone/25 hover:bg-bone/10 hover:text-bone",
     );
 
   return (
@@ -81,7 +81,7 @@ export function ExperienceBrowser({
             placeholder={t.searchPlaceholder}
             maxLength={100}
             autoComplete="off"
-            className="min-h-11 w-full rounded-full bg-bone/5 py-2 pl-11 pr-4 text-bone ring-1 ring-bone/25 placeholder:text-fog focus:outline-none focus:ring-2 focus:ring-sand"
+            className="min-h-11 w-full rounded-full bg-bone/5 py-2 pl-11 pr-4 text-bone ring-1 ring-bone/25 placeholder:text-fog focus:outline-none focus:ring-2 focus:ring-turquoise"
           />
         </div>
       </div>

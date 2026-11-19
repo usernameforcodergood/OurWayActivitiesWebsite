@@ -397,7 +397,7 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
               </>
             )}
             {previewHref && (
-              <a href={previewHref} target="_blank" rel="noopener" className="mt-1 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg text-sm font-semibold text-lagoon hover:bg-lagoon/5">
+              <a href={previewHref} target="_blank" rel="noopener" className="mt-1 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg text-sm font-semibold text-deep-teal hover:bg-turquoise/5">
                 <Eye aria-hidden className="size-4" />
                 {t.common.preview}
               </a>

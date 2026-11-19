@@ -87,7 +87,7 @@ export default async function TailorMadeRequestsPage({ searchParams }: PageProps
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs text-bark">{fmt(t.common.results, { count: total })}</p>
           {filtered && (
-            <Link href={href({ sort: p.sort })} className="text-xs font-medium text-lagoon hover:underline">
+            <Link href={href({ sort: p.sort })} className="text-xs font-medium text-deep-teal hover:underline">
               {P.clear}
             </Link>
           )}
@@ -103,7 +103,7 @@ export default async function TailorMadeRequestsPage({ searchParams }: PageProps
               <Link href={`/admin/tailor-made/${r.id}`} className="flex flex-col gap-2 p-4 hover:bg-stone/30 sm:flex-row sm:items-center sm:justify-between">
                 <span className="min-w-0">
                   <span className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-sm font-semibold text-lagoon">{r.reference}</span>
+                    <span className="font-mono text-sm font-semibold text-deep-teal">{r.reference}</span>
                     <span className="font-semibold">
                       {r.first_name} {r.last_name}
                     </span>

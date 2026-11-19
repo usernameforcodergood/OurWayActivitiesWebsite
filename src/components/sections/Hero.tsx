@@ -91,7 +91,7 @@ export function Hero({ locale, t }: Props) {
         </p>
         <h1 id="hero-title" data-hero-title data-anim="hide" className="text-[clamp(2.75rem,min(8.4vw,13svh),9.5rem)] leading-[0.95] tracking-[-0.03em] text-bone">
           {t.titleLines.map((line, i) => (
-            <span key={i} className={i === 1 ? "block italic text-sand" : "block"}>
+            <span key={i} className={i === 1 ? "block italic text-turquoise" : "block"}>
               {line}
             </span>
           ))}

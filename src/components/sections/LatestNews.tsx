@@ -31,7 +31,7 @@ export function LatestNews({ items, locale, t }: { items: PublicAnnouncement[]; 
                 <time dateTime={a.publishAt} className="text-eyebrow text-bark">
                   {formatNewsDate(a.publishAt, locale)}
                 </time>
-                <p className="text-display-sm mt-3 transition-colors duration-500 group-hover:text-clay">{a.title}</p>
+                <p className="text-display-sm mt-3 transition-colors duration-500 group-hover:text-deep-teal">{a.title}</p>
                 <p className="mt-2 text-bark">{a.summary}</p>
               </Link>
             </li>

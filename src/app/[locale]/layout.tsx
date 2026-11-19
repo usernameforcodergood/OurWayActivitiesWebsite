@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0c1311",
+  themeColor: "#0b1718",
   colorScheme: "dark",
 };
 
@@ -65,7 +65,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         </Script>
         <a
           href="#main"
-          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-sand px-5 py-3 text-sm font-semibold text-ink transition-transform focus:translate-y-0"
+          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-turquoise px-5 py-3 text-sm font-semibold text-ink transition-transform focus:translate-y-0"
         >
           {t.nav.skip}
         </a>

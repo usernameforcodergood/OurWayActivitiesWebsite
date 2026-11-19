@@ -88,7 +88,7 @@ export default async function TailorMadeDetailPage({ params }: PageProps<"/admin
             )}
 
             <details className="group mt-6 border-t border-ink/8 pt-4">
-              <summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-lg px-1 py-1 text-sm font-semibold text-lagoon hover:underline [&::-webkit-details-marker]:hidden">
+              <summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-lg px-1 py-1 text-sm font-semibold text-deep-teal hover:underline [&::-webkit-details-marker]:hidden">
                 <Pencil aria-hidden className="size-4" /> {P.editDetails}
               </summary>
               <div className="mt-4">
@@ -106,10 +106,10 @@ export default async function TailorMadeDetailPage({ params }: PageProps<"/admin
             <h2 className="mb-4 text-lg font-semibold">{t.bookings.contact}</h2>
             <p className="font-semibold">{name}</p>
             <div className="mt-3 flex flex-col gap-2 text-sm">
-              <a href={`mailto:${r.email}?subject=${encodeURIComponent(`OurWay ${r.reference}`)}`} className="inline-flex items-center gap-2 break-all text-lagoon hover:underline">
+              <a href={`mailto:${r.email}?subject=${encodeURIComponent(`OurWay ${r.reference}`)}`} className="inline-flex items-center gap-2 break-all text-deep-teal hover:underline">
                 <Mail aria-hidden className="size-4 shrink-0" /> {r.email}
               </a>
-              <a href={`tel:${r.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-lagoon hover:underline">
+              <a href={`tel:${r.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-deep-teal hover:underline">
                 <Phone aria-hidden className="size-4 shrink-0" /> {r.phone}
               </a>
             </div>

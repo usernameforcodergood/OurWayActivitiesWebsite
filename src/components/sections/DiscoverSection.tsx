@@ -70,7 +70,7 @@ export function DiscoverSection({ locale, t }: { locale: Locale; t: Dictionary["
                   </span>
                 </div>
                 <div className="mt-6 flex items-baseline justify-between gap-6 border-b border-ink/15 pb-5">
-                  <h3 className="text-display-sm transition-colors duration-500 group-hover:text-clay">
+                  <h3 className="text-display-sm transition-colors duration-500 group-hover:text-deep-teal">
                     {t.tiles[tile.key].title}
                   </h3>
                   <p className="max-w-[16rem] text-right text-sm text-bark">{t.tiles[tile.key].body}</p>

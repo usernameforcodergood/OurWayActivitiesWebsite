@@ -1,21 +1,25 @@
 /* OurWay design tokens — shared by the public site (globals.css) and the admin (admin.css). */
 
 @theme {
-  /* Colour — dark natural base */
-  --color-ink: #0c1311; /* page background, near-black forest (leans to logo green) */
-  --color-forest: #12211d; /* secondary dark surface — from the logo tree green */
-  --color-moss: #1e3530; /* raised dark surface */
-  /* Colour — light natural neutrals */
-  --color-stone: #ebe6da; /* light section background */
-  --color-limestone: #f5f2ea; /* lightest surface */
-  --color-bone: #f2efe7; /* foreground on dark */
-  --color-fog: #a9afa4; /* muted text on dark (7.9:1 on ink) */
-  --color-bark: #4a4a3f; /* muted text on light (8.2:1 on stone) */
-  /* Colour — accents */
-  --color-lichen: #8ccbb8; /* muted mint-teal accent, derived from the logo path/arrow */
-  --color-lagoon: #2fa3b0; /* logo arrow teal — use sparingly */
-  --color-sand: #dcc8a2; /* warm CTA */
-  --color-clay: #b98458; /* earthy accent */
+  /* Colour — brand palette, taken from the OurWay Alternative Experiences logo */
+  --color-turquoise: #20afc0; /* logo arrow — primary: CTAs, links, interactive + selected states */
+  --color-deep-teal: #104447; /* logo forest + hiker — depth: brand surfaces, headings/accents on light */
+  --color-mint: #3db99f; /* logo river — secondary accent: icons, numbers, decorative details (sparingly) */
+  --color-off-white: #f7faf9; /* clean light surface */
+  --color-white: #ffffff;
+
+  /* Colour — dark base (near-black, tinted toward the deep teal) */
+  --color-ink: #0b1718; /* page background; also text on light (17:1 on off-white) */
+  --color-forest: #0f2a2c; /* secondary dark surface */
+  --color-moss: var(--color-deep-teal); /* raised dark surface / brand panel */
+  /* Colour — light neutrals */
+  --color-stone: var(--color-off-white); /* light section background */
+  --color-limestone: var(--color-white); /* lightest surface (form panels) */
+  --color-bone: var(--color-off-white); /* foreground on dark */
+  --color-fog: #a6b8b6; /* muted text on dark (8.8:1 on ink, 5.2:1 on deep teal) */
+  --color-bark: #3e5456; /* muted text on light (7.7:1 on off-white) */
+  /* Colour — tints */
+  --color-lichen: #77cebc; /* mint lightened for small accent text on deep-teal panels (5.9:1) */
 
   /* Typography */
   --font-display: var(--font-noto-serif-display), "Noto Serif", Georgia, serif;

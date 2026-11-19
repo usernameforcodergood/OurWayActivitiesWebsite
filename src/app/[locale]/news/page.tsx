@@ -39,9 +39,9 @@ export default async function NewsPage({ params }: PageProps<"/[locale]/news">) 
                       {formatNewsDate(a.publishAt, locale)}
                     </time>
                     <div className="md:col-span-6">
-                      <h2 className="text-display-sm transition-colors duration-500 group-hover:text-sand">{a.title}</h2>
+                      <h2 className="text-display-sm transition-colors duration-500 group-hover:text-turquoise">{a.title}</h2>
                       <p className="mt-3 text-fog">{a.summary}</p>
-                      <span className="text-eyebrow mt-5 inline-flex items-center gap-3 text-lichen">
+                      <span className="text-eyebrow mt-5 inline-flex items-center gap-3 text-turquoise">
                         <span aria-hidden className="h-px w-8 bg-current transition-[width] duration-500 group-hover:w-14" />
                         {t.news.readMore}
                       </span>

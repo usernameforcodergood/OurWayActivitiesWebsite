@@ -19,7 +19,7 @@ export function FormField({ id, label, required, optionalLabel, error, className
         <span>
           {label}
           {required && (
-            <span aria-hidden className="text-clay">
+            <span aria-hidden className="text-deep-teal">
               {" "}*
             </span>
           )}

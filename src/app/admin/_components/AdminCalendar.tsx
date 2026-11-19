@@ -64,7 +64,7 @@ export async function AdminCalendar({ view, anchor, today, addDate }: { view: Ca
         <Card>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 id="calendar-title" className="flex items-center gap-2 text-lg font-semibold">
-              <CalendarDays aria-hidden className="size-5 text-lagoon" />
+              <CalendarDays aria-hidden className="size-5 text-deep-teal" />
               {C.title}
             </h2>
             <div className="flex flex-wrap items-center gap-2">
@@ -115,7 +115,7 @@ export async function AdminCalendar({ view, anchor, today, addDate }: { view: Ca
                       <span
                         className={cn(
                           "inline-flex size-6 items-center justify-center rounded-full text-xs tabular-nums",
-                          isToday ? "bg-lagoon font-semibold text-white" : inMonth(day) ? "text-ink" : "text-bark/60",
+                          isToday ? "bg-turquoise font-semibold text-ink" : inMonth(day) ? "text-ink" : "text-bark/60",
                         )}
                       >
                         <span className="sr-only">{formatDay(day)}</span>
@@ -153,7 +153,7 @@ export async function AdminCalendar({ view, anchor, today, addDate }: { view: Ca
               <ol className="divide-y divide-ink/8">
                 {visibleDays.map((day) => (
                   <li key={day} className="py-2.5">
-                    <p className={cn("mb-1.5 text-xs font-semibold", day === today ? "text-lagoon" : "text-bark")}>{formatDay(day)}</p>
+                    <p className={cn("mb-1.5 text-xs font-semibold", day === today ? "text-deep-teal" : "text-bark")}>{formatDay(day)}</p>
                     <ul className="space-y-1">
                       {on(day).map((r) => (
                         <li key={r.id}>

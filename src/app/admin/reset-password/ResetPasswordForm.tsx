@@ -53,7 +53,7 @@ function PasswordInput({
           aria-label={visible ? hideLabel : showLabel}
           aria-pressed={visible}
           aria-controls={id}
-          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-bark hover:text-forest focus-visible:outline-2 focus-visible:outline-lagoon"
+          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-bark hover:text-forest focus-visible:outline-2 focus-visible:outline-turquoise"
         >
           {visible ? <EyeOff aria-hidden className="size-4" /> : <Eye aria-hidden className="size-4" />}
         </button>

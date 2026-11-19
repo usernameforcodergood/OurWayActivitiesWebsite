@@ -61,7 +61,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
           <ul className="mt-14 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
             {a.values.map((v, i) => (
               <li key={v.title} className={i % 2 ? "lg:mt-20" : ""}>
-                <p className="font-display text-6xl text-clay/70">{pad(i + 1)}</p>
+                <p className="font-display text-6xl text-deep-teal/80">{pad(i + 1)}</p>
                 <h3 className="text-display-sm mt-6 border-t border-ink/15 pt-6">{v.title}</h3>
                 <p className="mt-3 text-bark">{v.body}</p>
               </li>

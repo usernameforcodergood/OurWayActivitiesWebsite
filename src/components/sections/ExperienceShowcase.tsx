@@ -96,7 +96,7 @@ export function ExperienceShowcase({ locale, t }: Props) {
                 <h3
                   data-row-content
                   className={`font-display text-display-md transition-[color,translate] duration-700 ease-out-expo md:col-span-6 ${
-                    active === i ? "md:translate-x-4 md:text-sand" : ""
+                    active === i ? "md:translate-x-4 md:text-turquoise" : ""
                   } ${active !== null && active !== i ? "md:text-bone/35" : ""}`}
                 >
                   {item.title}
@@ -159,7 +159,7 @@ export function ExperienceShowcase({ locale, t }: Props) {
             <ButtonLink href={localePath(locale, routes.contact)}>{t.cta}</ButtonLink>
             <Link
               href={localePath(locale, routes.activities)}
-              className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-lichen"
+              className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-turquoise"
             >
               {t.allLink}
               <ArrowUpRight aria-hidden className="size-4 transition-transform duration-500 group-hover:rotate-45" />

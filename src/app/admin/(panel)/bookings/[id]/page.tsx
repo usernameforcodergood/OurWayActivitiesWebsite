@@ -33,7 +33,7 @@ export default async function BookingDetailPage({ params }: PageProps<"/admin/bo
     [B.kind, b.kind === "interest" ? B.kindInterest : B.kindBooking],
     [
       B.excursion,
-      <Link key="ex" href={`/admin/excursions/${b.excursion_id}#requests`} className="font-semibold text-lagoon underline-offset-2 hover:underline">
+      <Link key="ex" href={`/admin/excursions/${b.excursion_id}#requests`} className="font-semibold text-deep-teal underline-offset-2 hover:underline">
         {title}
       </Link>,
     ],
@@ -99,10 +99,10 @@ export default async function BookingDetailPage({ params }: PageProps<"/admin/bo
             <h2 className="mb-4 text-lg font-semibold">{B.contact}</h2>
             <p className="font-semibold">{b.full_name}</p>
             <div className="mt-3 flex flex-col gap-2 text-sm">
-              <a href={`mailto:${b.email}?subject=${encodeURIComponent(`OurWay ${b.reference}`)}`} className="inline-flex items-center gap-2 break-all text-lagoon hover:underline">
+              <a href={`mailto:${b.email}?subject=${encodeURIComponent(`OurWay ${b.reference}`)}`} className="inline-flex items-center gap-2 break-all text-deep-teal hover:underline">
                 <Mail aria-hidden className="size-4 shrink-0" /> {b.email}
               </a>
-              <a href={`tel:${b.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-lagoon hover:underline">
+              <a href={`tel:${b.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-deep-teal hover:underline">
                 <Phone aria-hidden className="size-4 shrink-0" /> {b.phone}
               </a>
             </div>

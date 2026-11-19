@@ -9,7 +9,7 @@ import { ButtonLink } from "@/components/ui/Button";
 
 /**
  * "Design your own trip" — the second way to travel with OurWay. Uses the
- * lagoon accent and a full-height photo so it reads differently from the
+ * turquoise accent and a full-height photo so it reads differently from the
  * scheduled-excursions section.
  */
 export function PrivateTripsSection({ locale, t }: { locale: Locale; t: Dictionary["home"]["private"] }) {
@@ -28,7 +28,7 @@ export function PrivateTripsSection({ locale, t }: { locale: Locale; t: Dictiona
         </div>
         <div className="section-y container-x flex flex-col justify-center md:col-span-7 md:pl-14 lg:pl-20">
           <SectionLabel className="text-lichen">{t.label}</SectionLabel>
-          <p className="text-eyebrow mt-6 text-sand">{t.tagline}</p>
+          <p className="text-eyebrow mt-6 text-lichen">{t.tagline}</p>
           <TextReveal as="h2" id="private-title" by="words" className="text-display-lg mt-4 max-w-[16ch]">
             {t.title}
           </TextReveal>

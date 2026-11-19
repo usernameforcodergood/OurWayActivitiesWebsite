@@ -206,7 +206,7 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
 
       {status.kind === "success" ? (
         <div ref={statusRef} tabIndex={-1} role="status" className="mt-8 border-t border-ink/10 pt-8 outline-none">
-          <CheckCircle2 aria-hidden className="size-10 text-[#2f6f5c]" strokeWidth={1.5} />
+          <CheckCircle2 aria-hidden className="size-10 text-deep-teal" strokeWidth={1.5} />
           <p className="text-lead mt-5 max-w-2xl">{dated ? t.scheduledSuccess : t.generalSuccess}</p>
           <p className="mt-8 text-sm text-bark">{f.reference}</p>
           <p className="mt-1 font-mono text-2xl font-semibold tracking-wider">{status.reference}</p>
@@ -216,13 +216,13 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} noValidate aria-labelledby={`${idPrefix}-title`} className="mt-8 border-t border-ink/10 pt-8">
           <p className="text-sm text-bark">{f.requiredNote}</p>
-          {preview && <p className="mt-3 rounded-sm bg-sand/40 p-3 text-sm">{t.previewDisabled}</p>}
+          {preview && <p className="mt-3 rounded-sm bg-turquoise/15 p-3 text-sm">{t.previewDisabled}</p>}
           {noDates && <p className="mt-3 text-sm text-bark">{t.noDeparturesInterest}</p>}
 
           {dated && (
             <fieldset className="mt-6">
               <legend className="mb-3 text-sm font-semibold">
-                {f.departure} <span aria-hidden className="text-clay">*</span>
+                {f.departure} <span aria-hidden className="text-deep-teal">*</span>
               </legend>
               {load.kind === "loading" && (
                 <p role="status" className="text-sm text-bark">
@@ -250,7 +250,7 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
                       )}
                     >
                       <span className="flex items-start gap-3">
-                        <input type="radio" value={d.id} disabled={!isOpen} {...register("departureId")} className="mt-1 size-4 accent-[#1e3530]" />
+                        <input type="radio" value={d.id} disabled={!isOpen} {...register("departureId")} className="mt-1 size-4 accent-deep-teal" />
                         <span>
                           <span className="block font-semibold">
                             {formatDateLong(d.date, locale, d.time)}
@@ -361,13 +361,13 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
 
           <p className="mt-2 text-xs leading-relaxed text-bark">{f.privacy}</p>
           <div className="mt-4 flex items-start gap-3">
-            <input {...register("consent")} {...field("consent")} type="checkbox" aria-required className="mt-1 size-5 shrink-0 accent-[#1e3530]" />
+            <input {...register("consent")} {...field("consent")} type="checkbox" aria-required className="mt-1 size-5 shrink-0 accent-deep-teal" />
             <label htmlFor={`${idPrefix}-consent`} className="text-sm leading-relaxed text-bark">
               {f.consent}{" "}
               <Link href={privacyHref} target="_blank" className="font-semibold text-ink underline underline-offset-4">
                 {f.consentLink}
               </Link>
-              . <span aria-hidden className="text-clay">*</span>
+              . <span aria-hidden className="text-deep-teal">*</span>
             </label>
           </div>
           <p id={`${idPrefix}-consent-error`} role={errors.consent ? "alert" : undefined} className={errors.consent ? "mt-2 text-sm text-[#9a3b1f]" : "sr-only"}>

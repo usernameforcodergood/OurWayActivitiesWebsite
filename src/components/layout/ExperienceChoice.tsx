@@ -131,7 +131,7 @@ function ChoiceDialog({ locale, t, onClose }: { locale: Locale; t: Dictionary["c
       >
         <div className="flex items-start justify-between gap-6 px-5 pb-6 pt-6 sm:px-10 sm:pt-9 lg:px-12">
           <div className="max-w-3xl">
-            <p className="text-eyebrow flex items-center gap-3 text-lichen">
+            <p className="text-eyebrow flex items-center gap-3 text-mint">
               <span aria-hidden className="h-px w-8 bg-current/60" />
               {t.eyebrow}
             </p>
@@ -178,7 +178,7 @@ function ChoiceDialog({ locale, t, onClose }: { locale: Locale; t: Dictionary["c
                 <span className="absolute left-5 top-5 text-xs tabular-nums text-bone/80 sm:left-7 sm:top-6">{String.fromCharCode(65 + i)}</span>
               </div>
               <div className="relative -mt-8 flex flex-1 flex-col px-5 pb-6 sm:px-7 sm:pb-7">
-                <p className={cn("text-eyebrow", o.key === "tailor" ? "text-sand" : "text-lichen")}>{o.copy.tag}</p>
+                <p className={cn("text-eyebrow", o.key === "tailor" ? "text-lichen" : "text-mint")}>{o.copy.tag}</p>
                 <h3 id={`choice-${o.key}-title`} className="mt-2 font-display text-[clamp(1.5rem,2.3vw,2.1rem)] leading-[1.1]">
                   {o.copy.title}
                 </h3>
@@ -200,7 +200,7 @@ function ChoiceDialog({ locale, t, onClose }: { locale: Locale; t: Dictionary["c
 
         <p className="border-t border-bone/10 px-5 py-4 text-sm text-fog sm:px-10 lg:px-12">
           {t.contactNote}{" "}
-          <Link href={localePath(locale, routes.contact)} onClick={onClose} className="font-semibold text-bone underline decoration-bone/30 underline-offset-4 hover:text-lichen">
+          <Link href={localePath(locale, routes.contact)} onClick={onClose} className="font-semibold text-bone underline decoration-bone/30 underline-offset-4 hover:text-turquoise">
             {t.contactLink}
           </Link>
         </p>
