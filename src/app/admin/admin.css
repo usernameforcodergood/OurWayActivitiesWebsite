@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../../styles/theme.css";
+@import "../../styles/rich-text.css";
 
 /* Admin dashboard base — calm, light, functional. No scroll animations. */
 @layer base {
@@ -51,4 +52,40 @@
 
 dialog::backdrop {
   background: rgb(12 19 17 / 0.45);
+}
+
+/* Rich text editor surface (RichTextEditor.tsx) — light version of .rich-text */
+.rte .rte-content {
+  --rt-heading: var(--color-ink);
+  --rt-strong: var(--color-ink);
+  --rt-accent: #0f7480;
+  --rt-rule: rgb(12 19 17 / 0.18);
+  min-height: 20rem;
+  padding: 1rem 1.125rem 1.5rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgb(12 19 17 / 0.88);
+  outline: none;
+  cursor: text;
+}
+@media (min-width: 640px) {
+  .rte .rte-content {
+    padding-inline: 1.5rem;
+    font-size: 1.0625rem;
+  }
+}
+.rte .rte-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: rgb(74 74 63 / 0.6);
+  pointer-events: none;
+}
+.rte .rte-content hr.ProseMirror-selectednode {
+  border-top-color: var(--color-lagoon);
+  outline: 2px solid rgb(47 163 176 / 0.25);
+  outline-offset: 4px;
+}
+.rte .rte-content a {
+  cursor: text;
 }

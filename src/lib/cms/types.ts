@@ -170,7 +170,8 @@ export type PublicExcursion = {
   locales: Locale[];
   title: string;
   summary: string;
-  description: string[];
+  /** Editor HTML or older plain text — render only through <RichText>, which sanitises it. */
+  description: string;
   destination?: string;
   primaryCategory: PrimaryCategory | null;
   /** Free-text activity type ("Πεζοπορία"), not the primary category. */

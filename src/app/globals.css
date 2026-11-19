@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/theme.css";
+@import "../styles/rich-text.css";
 
 /* ==========================================================================
    Public website base styles. Design tokens live in src/styles/theme.css.
