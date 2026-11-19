@@ -122,7 +122,7 @@ export function TailorMadeForm({ locale, t, common, notBooking, privacyHref }: P
         <p className="text-lead mt-4 max-w-xl text-bark">{t.successBody}</p>
         <p className="mt-8 text-sm text-bark">{common.reference}</p>
         <p className="mt-1 font-mono text-2xl font-semibold tracking-wider text-ink">{status.reference}</p>
-        <p className="mt-6 text-sm text-bark">{status.emailSent ? t.emailSent : t.emailFailed}</p>
+        {status.emailSent && <p className="mt-6 text-sm text-bark">{t.emailSent}</p>}
         <Button
           type="button"
           variant="outline-dark"

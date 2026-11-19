@@ -6,6 +6,8 @@ import {
   EXPERIENCE_TYPES,
   INQUIRY_STATUSES,
   PRIVATE_STATUSES,
+  REQUEST_STAGES,
+  type RequestStage,
   type BookingStatus,
   type ExperienceType,
   type PrivateStatus,
@@ -56,10 +58,12 @@ export type NoteRow = { id: number; body: string; author_id: string | null; crea
 export type EmailRow = { id: number; kind: string; recipient: string; status: "sent" | "failed" | "not_configured"; error: string | null; created_at: string };
 
 export type BookingListParams = {
-  /** Scheduled participation requests or general-experience inquiries. */
-  kind: "booking" | "interest";
+  /** Everything (default), scheduled participation requests, or general-experience inquiries. */
+  kind: "all" | "booking" | "interest";
   q: string;
   status: "all" | BookingStatus;
+  /** Cross-kind stage filter (new / being handled / confirmed / cancelled). */
+  stage: "all" | RequestStage;
   excursion: string;
   from: string;
   to: string;
@@ -75,12 +79,15 @@ export function parseBookingParams(sp: Record<string, string | string[] | undefi
   const status = one("status");
   const sort = one("sort");
   const page = Number.parseInt(one("page"), 10);
-  const kind = one("kind") === "interest" ? "interest" : "booking";
-  const valid: readonly string[] = kind === "interest" ? INQUIRY_STATUSES : BOOKING_STATUSES;
+  const k = one("kind");
+  const kind = k === "interest" || k === "booking" ? k : "all";
+  const valid: readonly string[] = kind === "interest" ? INQUIRY_STATUSES : kind === "booking" ? BOOKING_STATUSES : [...BOOKING_STATUSES, ...INQUIRY_STATUSES];
+  const stage = one("stage");
   return {
     kind,
     q: one("q").slice(0, 100),
     status: valid.includes(status) ? (status as BookingStatus) : "all",
+    stage: stage in REQUEST_STAGES ? (stage as RequestStage) : "all",
     excursion: isUuid(one("excursion")) ? one("excursion") : "",
     from: isDate(one("from")) ? one("from") : "",
     to: isDate(one("to")) ? one("to") : "",
@@ -91,8 +98,10 @@ export function parseBookingParams(sp: Record<string, string | string[] | undefi
 
 export async function listBookings(p: BookingListParams) {
   const db = await createSupabaseServerClient();
-  let q = db.from("booking_overview").select("*", { count: "exact" }).eq("kind", p.kind);
+  let q = db.from("booking_overview").select("*", { count: "exact" });
+  if (p.kind !== "all") q = q.eq("kind", p.kind);
   if (p.status !== "all") q = q.eq("status", p.status);
+  if (p.stage !== "all") q = q.in("status", [...REQUEST_STAGES[p.stage]]);
   if (p.excursion) q = q.eq("excursion_id", p.excursion);
   if (p.from) q = q.gte("departure_date", p.from);
   if (p.to) q = q.lte("departure_date", p.to);

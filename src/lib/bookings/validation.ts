@@ -12,6 +12,18 @@ export const INQUIRY_STATUSES = ["new", "contacted", "in_progress", "closed"] as
 export type InquiryStatus = (typeof INQUIRY_STATUSES)[number];
 export type BookingStatus = (typeof BOOKING_STATUSES)[number] | InquiryStatus;
 
+/**
+ * One admin view across both kinds: every status belongs to one of four stages
+ * (new / being handled / confirmed / cancelled or closed).
+ */
+export const REQUEST_STAGES = {
+  new: ["pending", "new"],
+  processing: ["contacted", "in_progress"],
+  confirmed: ["confirmed", "completed"],
+  cancelled: ["rejected", "cancelled", "closed"],
+} as const satisfies Record<string, readonly BookingStatus[]>;
+export type RequestStage = keyof typeof REQUEST_STAGES;
+
 /** Tailor-made request statuses (table public.private_requests). */
 export const PRIVATE_STATUSES = ["new", "in_review", "contacted", "quotation_sent", "confirmed", "completed", "rejected"] as const;
 export type PrivateStatus = (typeof PRIVATE_STATUSES)[number];

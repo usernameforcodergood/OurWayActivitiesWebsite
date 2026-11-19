@@ -4,7 +4,7 @@ import { siteConfig } from "@/lib/site";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 import { MIN_FILL_MS, bookingRequestSchema, mapDbError, splitFullName, type SubmitResponse } from "@/lib/bookings/validation";
 import { renderAdminNewBooking, renderCustomerBookingEmail, type BookingEmailData } from "@/lib/bookings/emails";
-import { adminInbox, deliver, type EmailKind } from "@/lib/bookings/notify";
+import { adminInbox, deliver, emailNotificationsEnabled, type EmailKind } from "@/lib/bookings/notify";
 
 /**
  * Scheduled-excursion participation request or general-experience inquiry.
@@ -73,6 +73,8 @@ export async function POST(request: Request) {
   // A retried submission: the request already exists and its emails were handled the first time.
   // Report whether the receipt email of the original submission really went out.
   if (result.replayed || !result.notify_token) return json({ ok: true, reference: result.reference, emailSent: result.email_sent === true }, 200);
+  // The request is saved: that alone is success. Emails are optional and off for now.
+  if (!emailNotificationsEnabled()) return json({ ok: true, reference: result.reference, emailSent: false }, 201);
 
   // Details for the emails (public, published data only).
   const [{ data: ex }, dep] = await Promise.all([

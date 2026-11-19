@@ -47,7 +47,7 @@ type Status =
  *   preferred date / period. No departure, no capacity, no reservation.
  * The experience is attached automatically; the visitor never picks it again.
  */
-export function ExperienceRequestForm({ excursion, locale, t, privacyHref, contactHref, preview }: Props) {
+export function ExperienceRequestForm({ excursion, locale, t, privacyHref, preview }: Props) {
   const scheduled = excursion.bookingMode === "departures";
   const f = t.form;
   const idPrefix = `request-${excursion.id.slice(0, 8)}`;
@@ -109,6 +109,10 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
   const departures = useMemo(() => (load.kind === "ready" ? load.departures : []), [load]);
   const open = useMemo(() => departures.filter((d) => d.state === "open"), [departures]);
   const onlyOpenId = open.length === 1 ? open[0].id : null;
+  // Scheduled excursion with no open departure yet: the visitor can still register
+  // interest (saved as an inquiry without a date) instead of being sent away.
+  const noDates = scheduled && load.kind === "ready" && open.length === 0;
+  const dated = scheduled && !noDates;
 
   // One open departure: select it for the visitor.
   useEffect(() => {
@@ -132,7 +136,7 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
   };
 
   const onSubmit = async (data: BookingRequestData) => {
-    if (scheduled && !data.departureId) {
+    if (dated && !data.departureId) {
       setError("departureId", { message: "departure" });
       return;
     }
@@ -152,8 +156,8 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          departureId: scheduled ? data.departureId : null,
-          preferredPeriod: scheduled ? undefined : data.preferredPeriod,
+          departureId: dated ? data.departureId : null,
+          preferredPeriod: dated ? undefined : data.preferredPeriod,
         }),
       });
     } catch {
@@ -189,8 +193,8 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
     "aria-describedby": `${idPrefix}-${name}-error`,
   });
 
-  const title = scheduled ? t.scheduledTitle : t.generalTitle;
-  const intro = scheduled ? t.scheduledBody : t.generalBody;
+  const title = dated ? t.scheduledTitle : t.generalTitle;
+  const intro = dated ? t.scheduledBody : t.generalBody;
 
   return (
     <div id={REQUEST_FORM_ID} className="on-light scroll-mt-28 rounded-sm bg-limestone p-6 text-ink sm:p-10">
@@ -203,25 +207,19 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
       {status.kind === "success" ? (
         <div ref={statusRef} tabIndex={-1} role="status" className="mt-8 border-t border-ink/10 pt-8 outline-none">
           <CheckCircle2 aria-hidden className="size-10 text-[#2f6f5c]" strokeWidth={1.5} />
-          <p className="text-lead mt-5 max-w-2xl">{scheduled ? t.scheduledSuccess : t.generalSuccess}</p>
+          <p className="text-lead mt-5 max-w-2xl">{dated ? t.scheduledSuccess : t.generalSuccess}</p>
           <p className="mt-8 text-sm text-bark">{f.reference}</p>
           <p className="mt-1 font-mono text-2xl font-semibold tracking-wider">{status.reference}</p>
-          <p className="mt-6 text-sm text-bark">{status.emailSent ? f.emailSent : f.emailFailed}</p>
-          <p className="mt-2 text-xs text-bark">{scheduled ? t.noPayment : t.noPaymentGeneral}</p>
-        </div>
-      ) : scheduled && load.kind === "ready" && open.length === 0 ? (
-        <div className="mt-8 border-t border-ink/10 pt-8">
-          <p className="text-bark">{t.noDepartures}</p>
-          <ButtonLink href={contactHref} variant="outline-dark" className="mt-6">
-            {t.noDeparturesCta}
-          </ButtonLink>
+          {status.emailSent && <p className="mt-6 text-sm text-bark">{f.emailSent}</p>}
+          <p className="mt-2 text-xs text-bark">{dated ? t.noPayment : t.noPaymentGeneral}</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} noValidate aria-labelledby={`${idPrefix}-title`} className="mt-8 border-t border-ink/10 pt-8">
           <p className="text-sm text-bark">{f.requiredNote}</p>
           {preview && <p className="mt-3 rounded-sm bg-sand/40 p-3 text-sm">{t.previewDisabled}</p>}
+          {noDates && <p className="mt-3 text-sm text-bark">{t.noDeparturesInterest}</p>}
 
-          {scheduled && (
+          {dated && (
             <fieldset className="mt-6">
               <legend className="mb-3 text-sm font-semibold">
                 {f.departure} <span aria-hidden className="text-clay">*</span>
@@ -296,14 +294,14 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
             <FormField id={`${idPrefix}-phone`} label={f.phone} required error={msg(errors.phone?.message)}>
               <input {...register("phone")} {...field("phone")} type="tel" inputMode="tel" autoComplete="tel" aria-required className={inputClass} />
             </FormField>
-            {!scheduled && (
+            {!dated && (
               <FormField id={`${idPrefix}-preferredPeriod`} label={f.preferredPeriod} optionalLabel={f.optional} error={msg(errors.preferredPeriod?.message)}>
                 <input {...register("preferredPeriod")} {...field("preferredPeriod")} placeholder={f.preferredPeriodPlaceholder} maxLength={200} className={inputClass} />
               </FormField>
             )}
             <FormField
               id={`${idPrefix}-participants`}
-              label={scheduled ? f.participants : f.participantsGeneral}
+              label={dated ? f.participants : f.participantsGeneral}
               required
               error={msg(errors.participants?.message)}
             >
@@ -318,13 +316,13 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
                 className={inputClass}
               />
             </FormField>
-            {scheduled && (
+            {dated && (
               <div className="flex flex-col justify-end pb-6 text-sm text-bark" aria-live="polite">
                 {selected?.remaining != null && <span>{format(f.participantsHint, { count: selected.remaining })}</span>}
               </div>
             )}
 
-            {scheduled && selected?.priceEur != null && (
+            {dated && selected?.priceEur != null && (
               <div className="border border-ink/10 bg-white/60 p-4 sm:col-span-2" aria-live="polite">
                 <dl className="grid grid-cols-2 gap-y-1 text-sm">
                   <dt className="text-bark">{f.pricePerPerson}</dt>
@@ -344,7 +342,7 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
 
             <FormField
               id={`${idPrefix}-message`}
-              label={scheduled ? f.additionalInfo : f.messageQuestions}
+              label={dated ? f.additionalInfo : f.messageQuestions}
               optionalLabel={f.optional}
               error={msg(errors.message?.message)}
               className="sm:col-span-2"
@@ -384,9 +382,9 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
           )}
 
           <div className="mt-8 flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="max-w-sm text-xs text-bark">{scheduled ? t.noPayment : t.noPaymentGeneral}</p>
+            <p className="max-w-sm text-xs text-bark">{dated ? t.noPayment : t.noPaymentGeneral}</p>
             <Button type="submit" disabled={isSubmitting || (scheduled && load.kind !== "ready")} aria-busy={isSubmitting} className="!bg-ink !text-bone">
-              {isSubmitting ? f.sending : scheduled ? f.submitScheduled : f.submitGeneral}
+              {isSubmitting ? f.sending : dated ? f.submitScheduled : f.submitGeneral}
             </Button>
           </div>
         </form>

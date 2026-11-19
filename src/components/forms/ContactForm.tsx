@@ -23,7 +23,8 @@ type Status = { kind: "idle" } | { kind: "success" } | { kind: "error"; code: ke
 
 /**
  * Inquiry form. Validates on the client with the same Zod schema the server
- * uses, and only shows success after the server confirms delivery.
+ * uses, and only shows success after the server confirms the message is
+ * saved in the database (Admin → Μηνύματα).
  */
 export function ContactForm({ locale, t, privacyHref }: Props) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -52,12 +53,14 @@ export function ContactForm({ locale, t, privacyHref }: Props) {
       website: "",
       startedAt: 0,
       locale,
+      idempotencyKey: "00000000-0000-4000-8000-000000000000",
     },
   });
 
-  // Client-only values: render timestamp (anti-spam), today's date, ?interest= prefill.
+  // Client-only values: render timestamp (anti-spam), submission key, today's date, ?interest= prefill.
   useEffect(() => {
     setValue("startedAt", Date.now());
+    setValue("idempotencyKey", crypto.randomUUID());
     dateInput.current?.setAttribute("min", new Date().toISOString().slice(0, 10));
     const interest = new URLSearchParams(window.location.search).get("interest");
     if (interest) setValue("interest", interest.slice(0, 200));
@@ -86,7 +89,19 @@ export function ContactForm({ locale, t, privacyHref }: Props) {
     }
     if (res.ok && body?.ok) {
       setStatus({ kind: "success" });
-      reset({ ...data, name: "", email: "", phone: "", interest: "", date: "", participants: "", message: "", consent: false });
+      // A fresh key: the next message is a new one, not a replay of this one.
+      reset({
+        ...data,
+        name: "",
+        email: "",
+        phone: "",
+        interest: "",
+        date: "",
+        participants: "",
+        message: "",
+        consent: false,
+        idempotencyKey: crypto.randomUUID(),
+      });
     } else if (body && !body.ok) {
       if (body.fields) {
         for (const [field, code] of Object.entries(body.fields)) {
