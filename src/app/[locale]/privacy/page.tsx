@@ -24,7 +24,7 @@ export default async function PrivacyPage({ params }: PageProps<"/[locale]/priva
       <div className="container-x max-w-4xl">
         <SectionLabel className="text-fog">{p.eyebrow}</SectionLabel>
         <h1 className="text-display-lg mt-8">{p.title}</h1>
-        <p role="note" className="mt-8 border-l-2 border-sand bg-sand/10 p-4 text-sm text-bone/90">
+        <p role="note" className="mt-8 border-l-2 border-turquoise bg-turquoise/10 p-4 text-sm text-bone/90">
           {p.draftNotice}
         </p>
         <p className="mt-4 text-sm text-fog">{p.updated}</p>

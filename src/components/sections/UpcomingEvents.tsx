@@ -27,14 +27,14 @@ export function UpcomingEvents({ items, locale, t, today }: { items: PublicExcur
               <li key={ev.slug} className="border-b border-bone/15">
                 <Link href={localePath(locale, `${routes.activities}/${ev.slug}`)} className="group flex items-start justify-between gap-6 py-7">
                   <span>
-                    <span className="text-eyebrow text-lichen">
+                    <span className="text-eyebrow text-mint">
                       {next ? <time dateTime={next.date}>{formatDateShort(next.date, locale)}</time> : e.datesTbd}
                       {ev.destination && ` · ${ev.destination}`}
                     </span>
-                    <span className="text-display-sm mt-3 block transition-colors duration-500 group-hover:text-sand">{ev.title}</span>
+                    <span className="text-display-sm mt-3 block transition-colors duration-500 group-hover:text-turquoise">{ev.title}</span>
                     <span className="mt-2 block text-fog">{ev.summary}</span>
                   </span>
-                  <ArrowUpRight aria-label={e.view} className="mt-1 size-5 shrink-0 text-lichen transition-transform duration-500 group-hover:rotate-45" />
+                  <ArrowUpRight aria-label={e.view} className="mt-1 size-5 shrink-0 text-turquoise transition-transform duration-500 group-hover:rotate-45" />
                 </Link>
               </li>
             );

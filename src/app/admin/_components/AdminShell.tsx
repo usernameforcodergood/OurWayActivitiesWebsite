@@ -103,7 +103,7 @@ export function AdminShell({ email, children }: { email: string; children: React
       <aside className="sticky top-0 hidden h-dvh flex-col justify-between bg-forest p-4 text-bone lg:flex">
         <div>
           <Link href="/admin" className="mb-8 flex items-center gap-2 px-3 pt-2 text-lg font-semibold">
-            Our<span className="text-lichen">Way</span>
+            Our<span className="text-turquoise">Way</span>
             <span className="rounded bg-bone/10 px-1.5 py-0.5 text-[0.65rem] uppercase tracking-wider text-fog">Admin</span>
           </Link>
           <nav aria-label={t.nav.menu}>
@@ -116,7 +116,7 @@ export function AdminShell({ email, children }: { email: string; children: React
       {/* Mobile top bar */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-forest px-4 text-bone lg:hidden">
         <Link href="/admin" className="font-semibold">
-          Our<span className="text-lichen">Way</span> <span className="text-xs text-fog">Admin</span>
+          Our<span className="text-turquoise">Way</span> <span className="text-xs text-fog">Admin</span>
         </Link>
         <button
           type="button"

@@ -134,7 +134,7 @@ export function ContactForm({ locale, t, privacyHref }: Props) {
         animate={{ opacity: 1, y: 0 }}
         className="flex min-h-[28rem] flex-col items-start justify-center outline-none"
       >
-        <CheckCircle2 aria-hidden className="size-10 text-[#2f6f5c]" strokeWidth={1.5} />
+        <CheckCircle2 aria-hidden className="size-10 text-deep-teal" strokeWidth={1.5} />
         <h3 className="text-display-md mt-6 text-ink">{t.successTitle}</h3>
         <p className="text-lead mt-4 text-bark">{t.successBody}</p>
         <Button type="button" variant="outline-dark" className="mt-10" onClick={() => setStatus({ kind: "idle" })} icon={false}>
@@ -209,14 +209,14 @@ export function ContactForm({ locale, t, privacyHref }: Props) {
             {...field("consent")}
             type="checkbox"
             aria-required
-            className="mt-1 size-5 shrink-0 accent-[#1e3530]"
+            className="mt-1 size-5 shrink-0 accent-deep-teal"
           />
           <label htmlFor="contact-consent" className="text-sm leading-relaxed text-bark">
             {t.consent}{" "}
             <Link href={privacyHref} className="font-semibold text-ink underline underline-offset-4">
               {t.consentLink}
             </Link>
-            . <span aria-hidden className="text-clay">*</span>
+            . <span aria-hidden className="text-deep-teal">*</span>
           </label>
         </div>
         <p id="contact-consent-error" role={errors.consent ? "alert" : undefined} className={errors.consent ? "mt-2 text-sm text-[#9a3b1f]" : "sr-only"}>

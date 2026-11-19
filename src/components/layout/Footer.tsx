@@ -32,7 +32,7 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
           <Wordmark useLogo className="mb-8 size-24" />
           <p className="font-display text-display-sm max-w-sm text-bone/90">{f.tagline}</p>
           <div className="mt-8">
-            <ExperienceChoiceLink className="text-eyebrow inline-flex min-h-11 items-center gap-3 text-lichen transition-colors hover:text-bone">
+            <ExperienceChoiceLink className="text-eyebrow inline-flex min-h-11 items-center gap-3 text-turquoise transition-colors hover:text-bone">
               <span aria-hidden className="h-px w-8 bg-current" />
               {t.nav.inquire}
             </ExperienceChoiceLink>
@@ -44,7 +44,7 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
           <ul className="space-y-1">
             {explore.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="inline-flex min-h-10 items-center text-bone/85 transition-colors hover:text-lichen">
+                <Link href={l.href} className="inline-flex min-h-10 items-center text-bone/85 transition-colors hover:text-turquoise">
                   {l.label}
                 </Link>
               </li>
@@ -58,12 +58,12 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
             <ul className="space-y-2 text-bone/85">
               {email && (
                 <li>
-                  <a href={`mailto:${email}`} className="hover:text-lichen">{email}</a>
+                  <a href={`mailto:${email}`} className="hover:text-turquoise">{email}</a>
                 </li>
               )}
               {phone && (
                 <li>
-                  <a href={`tel:${phone.replace(/\s/g, "")}`} className="hover:text-lichen">{phone}</a>
+                  <a href={`tel:${phone.replace(/\s/g, "")}`} className="hover:text-turquoise">{phone}</a>
                 </li>
               )}
               {address && <li>{address}</li>}
@@ -73,7 +73,7 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
           )}
           <Link
             href={localePath(locale, routes.contact)}
-            className="mt-3 inline-flex min-h-10 items-center text-bone/85 underline decoration-bone/30 underline-offset-4 transition-colors hover:text-lichen"
+            className="mt-3 inline-flex min-h-10 items-center text-bone/85 underline decoration-bone/30 underline-offset-4 transition-colors hover:text-turquoise"
           >
             {f.contactForm}
           </Link>
@@ -85,7 +85,7 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
             {contact.social.map((s) => (
               <li key={s.key}>
                 {s.href ? (
-                  <a href={s.href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center text-bone/85 hover:text-lichen">
+                  <a href={s.href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center text-bone/85 hover:text-turquoise">
                     {s.label}
                   </a>
                 ) : (

@@ -184,7 +184,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                     <Link href={`/admin/bookings/${r.id}`} className="block font-semibold text-ink underline-offset-2 hover:underline">
                       {r.full_name}
                     </Link>
-                    <span className="block font-mono text-xs text-lagoon">{r.reference}</span>
+                    <span className="block font-mono text-xs text-deep-teal">{r.reference}</span>
                     <a href={`mailto:${r.email}`} className="block text-xs text-bark hover:text-ink">
                       {r.email}
                     </a>

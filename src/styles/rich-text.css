@@ -5,8 +5,8 @@
 .rich-text {
   --rt-heading: var(--color-bone);
   --rt-strong: var(--color-bone);
-  --rt-accent: var(--color-lichen);
-  --rt-rule: rgb(242 239 231 / 0.18);
+  --rt-accent: var(--color-turquoise);
+  --rt-rule: rgb(247 250 249 / 0.18);
   overflow-wrap: break-word;
   word-break: normal;
   hyphens: manual;

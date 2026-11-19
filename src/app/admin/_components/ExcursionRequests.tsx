@@ -80,7 +80,7 @@ export function ExcursionRequests({ excursionId, rows, today, now }: { excursion
                       {fmt(P.groupSummary, { requests: g.rows.length, people: g.rows.reduce((a, r) => a + r.participants, 0) })}
                       <Link
                         href={`/admin/bookings?excursion=${excursionId}&departure=${g.departureId ?? "none"}`}
-                        className="text-lagoon underline-offset-2 hover:underline"
+                        className="text-deep-teal underline-offset-2 hover:underline"
                       >
                         {P.inList}
                       </Link>
@@ -109,7 +109,7 @@ function RequestRow({ r, now }: { r: BookingOverviewRow; now: number }) {
         <summary className="grid cursor-pointer list-none grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 py-3 hover:bg-stone/30 sm:grid-cols-[minmax(0,1.6fr)_5rem_9rem_9rem_1.25rem] [&::-webkit-details-marker]:hidden">
           <span className="min-w-0">
             <span className="block truncate font-semibold">{r.full_name}</span>
-            <span className="block font-mono text-xs text-lagoon">{r.reference}</span>
+            <span className="block font-mono text-xs text-deep-teal">{r.reference}</span>
           </span>
           <span className="text-sm tabular-nums sm:text-right">
             {r.participants} {B.participants.toLowerCase()}
@@ -124,10 +124,10 @@ function RequestRow({ r, now }: { r: BookingOverviewRow; now: number }) {
         <div className="mb-4 grid gap-5 rounded-lg bg-stone/30 p-4 lg:grid-cols-[1fr_18rem]">
           <div className="space-y-3 text-sm">
             <div className="flex flex-wrap gap-x-5 gap-y-2">
-              <a href={`mailto:${r.email}?subject=${encodeURIComponent(`OurWay ${r.reference}`)}`} className="inline-flex items-center gap-1.5 break-all text-lagoon hover:underline">
+              <a href={`mailto:${r.email}?subject=${encodeURIComponent(`OurWay ${r.reference}`)}`} className="inline-flex items-center gap-1.5 break-all text-deep-teal hover:underline">
                 <Mail aria-hidden className="size-4 shrink-0" /> {r.email}
               </a>
-              <a href={`tel:${r.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-1.5 text-lagoon hover:underline">
+              <a href={`tel:${r.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-1.5 text-deep-teal hover:underline">
                 <Phone aria-hidden className="size-4 shrink-0" /> {r.phone}
               </a>
             </div>

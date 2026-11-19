@@ -37,7 +37,7 @@ export function Wordmark({
   }
   return (
     <span className={cn("font-display tracking-[-0.02em]", className)}>
-      Our<span className={cn("italic", accent && "text-lichen")}>Way</span>
+      Our<span className={cn("italic", accent && "text-turquoise")}>Way</span>
     </span>
   );
 }

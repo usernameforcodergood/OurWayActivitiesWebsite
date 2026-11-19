@@ -68,7 +68,7 @@ export default async function DestinationsPage({ params }: PageProps<"/[locale]/
                     )}
                   />
                   <div className={cn(flip ? "md:order-1 md:col-span-4 md:col-start-1" : "md:col-span-4 md:col-start-9")}>
-                    <p className="text-eyebrow mb-6 tabular-nums text-lichen">{pad(i + 1)}</p>
+                    <p className="text-eyebrow mb-6 tabular-nums text-mint">{pad(i + 1)}</p>
                     <TextReveal as="h2" className="text-display-md">
                       {l.title}
                     </TextReveal>

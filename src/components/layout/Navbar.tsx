@@ -138,7 +138,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
                     <span
                       aria-hidden
                       className={cn(
-                        "absolute inset-x-2.5 bottom-2 h-px xl:inset-x-3.5 origin-left bg-lichen transition-transform duration-500 ease-out-expo",
+                        "absolute inset-x-2.5 bottom-2 h-px xl:inset-x-3.5 origin-left bg-turquoise transition-transform duration-500 ease-out-expo",
                         isActive(key) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
                       )}
                     />
@@ -217,7 +217,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
                         href={localePath(locale, routes[key])}
                         onClick={close}
                         aria-current={isActive(key) ? "page" : undefined}
-                        className="group flex items-baseline gap-4 py-1.5 font-display text-[clamp(2.4rem,9vw,4rem)] leading-[1.05] text-bone/85 transition-colors hover:text-bone aria-[current=page]:text-lichen"
+                        className="group flex items-baseline gap-4 py-1.5 font-display text-[clamp(2.4rem,9vw,4rem)] leading-[1.05] text-bone/85 transition-colors hover:text-bone aria-[current=page]:text-turquoise"
                       >
                         <span className="font-sans text-xs tabular-nums text-fog">{pad(i + 1)}</span>
                         {navLabel(t, key)}

@@ -41,12 +41,12 @@ export function ExperienceCard({
         )}
         <div className={layout === "column" ? "mt-6" : "mt-6 grid gap-3 md:grid-cols-12"}>
           <div className={layout === "column" ? "" : "md:col-span-6"}>
-            {meta && <p className="text-eyebrow mb-3 text-lichen">{meta}</p>}
+            {meta && <p className="text-eyebrow mb-3 text-mint">{meta}</p>}
             <h3 className="text-display-sm">{excursion.title}</h3>
           </div>
           <p className={layout === "column" ? "mt-3 text-fog" : "text-fog md:col-span-5 md:col-start-8"}>{excursion.summary}</p>
         </div>
-        <span className="text-eyebrow mt-5 inline-flex items-center gap-3 text-lichen">
+        <span className="text-eyebrow mt-5 inline-flex items-center gap-3 text-turquoise">
           <span aria-hidden className="h-px w-8 bg-current transition-[width] duration-500 group-hover:w-14" />
           {cta}
         </span>

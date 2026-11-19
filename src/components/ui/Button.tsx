@@ -9,7 +9,7 @@ const base =
   "group group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full font-semibold tracking-tight transition-colors duration-500 ease-out-expo min-h-12 select-none";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-sand text-ink px-7 py-3.5 text-[0.95rem] hover:text-ink",
+  primary: "bg-turquoise text-ink px-7 py-3.5 text-[0.95rem] hover:text-ink",
   outline: "border border-bone/35 text-bone px-7 py-3.5 text-[0.95rem] hover:border-bone hover:text-ink",
   "outline-dark": "border border-ink/30 text-ink px-7 py-3.5 text-[0.95rem] hover:border-ink hover:text-bone",
   text: "text-current px-0 py-2 text-[0.95rem] min-h-11 rounded-none",

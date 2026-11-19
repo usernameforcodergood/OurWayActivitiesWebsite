@@ -270,7 +270,7 @@ export function DeparturesManager({
                   <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_CLS[r.status]}`}>{D.statuses[r.status]}</span>
                 </td>
                 <td className="whitespace-nowrap px-5 py-3 text-right sm:px-6">
-                  <Link href={`/admin/bookings?excursion=${excursionId}&from=${r.departure_date}&to=${r.departure_date}&sort=departure`} className="mr-1 inline-flex min-h-9 items-center rounded-lg px-2 text-xs font-semibold text-lagoon hover:bg-lagoon/5">
+                  <Link href={`/admin/bookings?excursion=${excursionId}&from=${r.departure_date}&to=${r.departure_date}&sort=departure`} className="mr-1 inline-flex min-h-9 items-center rounded-lg px-2 text-xs font-semibold text-deep-teal hover:bg-turquoise/5">
                     {D.viewBookings}
                   </Link>
                   <button
@@ -279,7 +279,7 @@ export function DeparturesManager({
                       setErrors({});
                       setEditing(repeatOf(r));
                     }}
-                    className="mr-1 inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-xs font-semibold text-lagoon hover:bg-lagoon/5"
+                    className="mr-1 inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-xs font-semibold text-deep-teal hover:bg-turquoise/5"
                   >
                     <Copy aria-hidden className="size-3.5" />
                     {D.repeat}
@@ -360,7 +360,7 @@ export function DeparturesManager({
             <h2 id="dep-title" className="mb-2 text-lg font-semibold">
               {editing.id ? D.edit : editing.copiedFrom ? D.repeatTitle : D.add}
             </h2>
-            {editing.copiedFrom && <p className="mb-5 rounded-lg bg-lagoon/5 p-3 text-xs text-ink">{fmt(D.repeatFrom, { date: formatDay(editing.copiedFrom) })}</p>}
+            {editing.copiedFrom && <p className="mb-5 rounded-lg bg-turquoise/5 p-3 text-xs text-ink">{fmt(D.repeatFrom, { date: formatDay(editing.copiedFrom) })}</p>}
             <div className="mt-3 grid gap-4 sm:grid-cols-3">
               <Field id="dep-date" label={D.date} error={errText("departure_date")}>
                 <input id="dep-date" type="date" required value={editing.departure_date} onChange={(e) => set("departure_date", e.target.value)} className="admin-input" />

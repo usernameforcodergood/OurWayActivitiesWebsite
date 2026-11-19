@@ -71,28 +71,28 @@ function layout(opts: {
     admin: ["#e3eef0", "#1b5560"],
   };
   const [bg, fg] = badgeColors[opts.tone];
-  const p = (t: string) => `<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#2b302d">${esc(t)}</p>`;
+  const p = (t: string) => `<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#171717">${esc(t)}</p>`;
   return `<!doctype html><html lang="${opts.locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-<body style="margin:0;padding:0;background:#f2efe7">
+<body style="margin:0;padding:0;background:#f7faf9">
 <span style="display:none;max-height:0;overflow:hidden">${esc(opts.preheader)}</span>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2efe7"><tr><td align="center" style="padding:28px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7faf9"><tr><td align="center" style="padding:28px 12px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;font-family:Manrope,Segoe UI,Helvetica,Arial,sans-serif">
-<tr><td style="background:#12211d;padding:22px 28px;color:#f2efe7;font-size:20px;font-weight:700;letter-spacing:-0.01em">Our<span style="color:#8ccbb8">Way</span></td></tr>
+<tr><td style="background:#104447;padding:22px 28px;color:#f7faf9;font-size:20px;font-weight:700;letter-spacing:-0.01em">Our<span style="color:#20afc0">Way</span></td></tr>
 <tr><td style="padding:28px">
 <span style="display:inline-block;padding:4px 12px;border-radius:999px;background:${bg};color:${fg};font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">${esc(opts.badge)}</span>
-<h1 style="margin:16px 0 18px;font-size:22px;line-height:1.3;color:#0c1311">${esc(opts.heading)}</h1>
+<h1 style="margin:16px 0 18px;font-size:22px;line-height:1.3;color:#0b1718">${esc(opts.heading)}</h1>
 ${opts.intro.map(p).join("")}
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 22px;border-top:1px solid #e6e2d8">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 22px;border-top:1px solid #e3ebe9">
 ${opts.rows
   .map(
     ([k, v]) =>
-      `<tr><td style="padding:10px 12px 10px 0;border-bottom:1px solid #e6e2d8;color:#6a6d63;font-size:14px;vertical-align:top;width:42%">${esc(k)}</td><td style="padding:10px 0;border-bottom:1px solid #e6e2d8;color:#0c1311;font-size:14px;font-weight:600;white-space:pre-wrap">${esc(v)}</td></tr>`,
+      `<tr><td style="padding:10px 12px 10px 0;border-bottom:1px solid #e3ebe9;color:#556a6c;font-size:14px;vertical-align:top;width:42%">${esc(k)}</td><td style="padding:10px 0;border-bottom:1px solid #e3ebe9;color:#0b1718;font-size:14px;font-weight:600;white-space:pre-wrap">${esc(v)}</td></tr>`,
   )
   .join("")}
 </table>
 ${opts.outro.map(p).join("")}
 </td></tr>
-<tr><td style="padding:18px 28px;background:#f5f2ea;color:#6a6d63;font-size:12px;line-height:1.5">OurWay · ${esc(siteConfig.url.replace(/^https?:\/\//, ""))}</td></tr>
+<tr><td style="padding:18px 28px;background:#f7faf9;color:#556a6c;font-size:12px;line-height:1.5">OurWay · ${esc(siteConfig.url.replace(/^https?:\/\//, ""))}</td></tr>
 </table></td></tr></table></body></html>`;
 }
 

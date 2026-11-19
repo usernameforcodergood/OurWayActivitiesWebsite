@@ -79,12 +79,12 @@ function LibraryDialog({
                       aria-label={m.alt_el || m.alt_en || m.path}
                       className={cn(
                         "relative block aspect-square w-full overflow-hidden rounded-lg bg-stone ring-2 transition",
-                        on ? "ring-lagoon" : "ring-transparent hover:ring-ink/20",
+                        on ? "ring-turquoise" : "ring-transparent hover:ring-ink/20",
                       )}
                     >
                       <Image src={mediaUrl(m.path)} alt="" fill sizes="200px" className="object-cover" />
                       {on && (
-                        <span className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-lagoon text-white">
+                        <span className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-turquoise text-white">
                           <Check aria-hidden className="size-4" />
                         </span>
                       )}

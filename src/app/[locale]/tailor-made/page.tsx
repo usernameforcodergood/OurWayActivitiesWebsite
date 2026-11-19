@@ -60,7 +60,7 @@ export default async function TailorMadePage({ params }: PageProps<"/[locale]/ta
               return (
                 <li key={a.title} className="group relative bg-ink p-8 transition-colors duration-500 hover:bg-forest sm:p-10">
                   <div className="flex items-start justify-between">
-                    <Icon aria-hidden className="size-7 text-lichen transition-transform duration-500 ease-out-expo group-hover:-translate-y-1" strokeWidth={1.4} />
+                    <Icon aria-hidden className="size-7 text-mint transition-transform duration-500 ease-out-expo group-hover:-translate-y-1" strokeWidth={1.4} />
                     <span className="text-xs tabular-nums text-fog">{pad(i + 1)}</span>
                   </div>
                   <h3 className="font-display mt-10 text-2xl leading-tight">{a.title}</h3>
@@ -76,14 +76,14 @@ export default async function TailorMadePage({ params }: PageProps<"/[locale]/ta
       <section aria-labelledby="kinds-title" className="relative overflow-hidden bg-moss text-bone">
         <div className="grid md:grid-cols-12">
           <div className="section-y container-x flex flex-col justify-center md:order-1 md:col-span-7 md:pr-14 lg:pr-20">
-            <SectionLabel className="text-lichen">{p.kinds.label}</SectionLabel>
+            <SectionLabel className="text-mint">{p.kinds.label}</SectionLabel>
             <TextReveal as="h2" id="kinds-title" by="words" className="text-display-lg mt-6 max-w-[14ch]">
               {p.kinds.title}
             </TextReveal>
             <p className="text-lead mt-8 max-w-xl text-bone/85">{p.kinds.body}</p>
             <ul className="mt-10 flex max-w-xl flex-wrap gap-2.5">
               {p.kinds.items.map((k) => (
-                <li key={k} className="rounded-full border border-bone/25 px-4 py-2 text-sm text-bone/90 transition-colors duration-500 hover:border-lichen hover:text-lichen">
+                <li key={k} className="rounded-full border border-bone/25 px-4 py-2 text-sm text-bone/90 transition-colors duration-500 hover:border-turquoise hover:text-turquoise">
                   {k}
                 </li>
               ))}
@@ -111,7 +111,7 @@ export default async function TailorMadePage({ params }: PageProps<"/[locale]/ta
             <ol className="mt-6 space-y-6">
               {p.steps.map((s, i) => (
                 <li key={s.title} className="grid grid-cols-[2.5rem_1fr] gap-3 border-t border-bone/15 pt-5">
-                  <span className="text-sm tabular-nums text-lichen">{pad(i + 1)}</span>
+                  <span className="text-sm tabular-nums text-mint">{pad(i + 1)}</span>
                   <div>
                     <p className="font-display text-2xl">{s.title}</p>
                     <p className="mt-1 text-sm text-fog">{s.body}</p>

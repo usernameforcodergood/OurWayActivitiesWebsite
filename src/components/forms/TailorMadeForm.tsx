@@ -117,7 +117,7 @@ export function TailorMadeForm({ locale, t, common, notBooking, privacyHref }: P
   if (status.kind === "success") {
     return (
       <motion.div ref={statusRef} tabIndex={-1} role="status" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="py-10 outline-none">
-        <CheckCircle2 aria-hidden className="size-10 text-[#2f6f5c]" strokeWidth={1.5} />
+        <CheckCircle2 aria-hidden className="size-10 text-deep-teal" strokeWidth={1.5} />
         <h3 className="text-display-md mt-6 max-w-[20ch] text-ink">{t.successTitle}</h3>
         <p className="text-lead mt-4 max-w-xl text-bark">{t.successBody}</p>
         <p className="mt-8 text-sm text-bark">{common.reference}</p>
@@ -168,7 +168,7 @@ export function TailorMadeForm({ locale, t, common, notBooking, privacyHref }: P
         <fieldset aria-describedby="tm-experienceType-error" aria-invalid={errors.experienceType ? true : undefined}>
           <legend className="mb-3 text-sm font-semibold">
             {t.experienceType}
-            <span aria-hidden className="text-clay">
+            <span aria-hidden className="text-deep-teal">
               {" "}*
             </span>
           </legend>
@@ -225,7 +225,7 @@ export function TailorMadeForm({ locale, t, common, notBooking, privacyHref }: P
               {t.datesHint}
             </p>
             <label className="mt-3 flex items-center gap-3 text-sm text-bark">
-              <input type="checkbox" {...register("datesFlexible")} className="size-5 accent-[#1e3530]" />
+              <input type="checkbox" {...register("datesFlexible")} className="size-5 accent-deep-teal" />
               {t.datesFlexible}
             </label>
           </fieldset>
@@ -284,13 +284,13 @@ export function TailorMadeForm({ locale, t, common, notBooking, privacyHref }: P
 
       <p className="mt-6 text-xs leading-relaxed text-bark">{t.privacy}</p>
       <div className="mt-4 flex items-start gap-3">
-        <input {...register("consent")} {...field("consent")} type="checkbox" aria-required className="mt-1 size-5 shrink-0 accent-[#1e3530]" />
+        <input {...register("consent")} {...field("consent")} type="checkbox" aria-required className="mt-1 size-5 shrink-0 accent-deep-teal" />
         <label htmlFor="tm-consent" className="text-sm leading-relaxed text-bark">
           {common.consent}{" "}
           <Link href={privacyHref} className="font-semibold text-ink underline underline-offset-4">
             {common.consentLink}
           </Link>
-          . <span aria-hidden className="text-clay">*</span>
+          . <span aria-hidden className="text-deep-teal">*</span>
         </label>
       </div>
       <p id="tm-consent-error" role={errors.consent ? "alert" : undefined} className={errors.consent ? "mt-2 text-sm text-[#9a3b1f]" : "sr-only"}>

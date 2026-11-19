@@ -157,8 +157,8 @@ export function RichTextEditor({ id, value, onChange, label, describedBy, placeh
   });
 
   return (
-    <div className="rte rounded-lg border border-ink/20 bg-white transition-[border-color,box-shadow] focus-within:border-lagoon focus-within:shadow-[0_0_0_3px_rgb(47_163_176/0.2)]">
-      {editor ? <Toolbar editor={editor} /> : <div className="h-[2.875rem] rounded-t-lg border-b border-ink/10 bg-[#f6f5f1]" />}
+    <div className="rte rounded-lg border border-ink/20 bg-white transition-[border-color,box-shadow] focus-within:border-turquoise focus-within:shadow-[0_0_0_3px_rgb(32_175_192/0.2)]">
+      {editor ? <Toolbar editor={editor} /> : <div className="h-[2.875rem] rounded-t-lg border-b border-ink/10 bg-stone" />}
       <EditorContent editor={editor} />
       {editor && <Footer editor={editor} />}
     </div>
@@ -252,7 +252,7 @@ function Toolbar({ editor }: { editor: Editor }) {
       ref={barRef}
       role="toolbar"
       aria-label={E.toolbar}
-      className="sticky top-14 z-20 flex flex-wrap items-center gap-0.5 rounded-t-lg border-b border-ink/10 bg-[#f6f5f1] px-1.5 py-1.5 lg:top-0"
+      className="sticky top-14 z-20 flex flex-wrap items-center gap-0.5 rounded-t-lg border-b border-ink/10 bg-stone px-1.5 py-1.5 lg:top-0"
     >
       <Tool label={E.undo} shortcut={`${mod}Z`} onClick={() => chain().undo().run()} disabled={!s.canUndo}>
         <Undo2 />
@@ -306,7 +306,7 @@ function Toolbar({ editor }: { editor: Editor }) {
                 onClick={() => setColor(null)}
                 aria-pressed={!s.color}
                 title={E.colorDefault}
-                className={cn("flex size-8 items-center justify-center rounded-md bg-ink text-[10px] font-semibold text-white ring-offset-2", !s.color && "ring-2 ring-lagoon")}
+                className={cn("flex size-8 items-center justify-center rounded-md bg-ink text-[10px] font-semibold text-white ring-offset-2", !s.color && "ring-2 ring-turquoise")}
               >
                 A<span className="sr-only">{E.colorDefault}</span>
               </button>
@@ -318,7 +318,7 @@ function Toolbar({ editor }: { editor: Editor }) {
                   onClick={() => setColor(c.value)}
                   aria-pressed={s.color === c.value}
                   title={c.name}
-                  className={cn("size-8 rounded-md ring-offset-2", s.color === c.value && "ring-2 ring-lagoon")}
+                  className={cn("size-8 rounded-md ring-offset-2", s.color === c.value && "ring-2 ring-turquoise")}
                   style={{ background: c.value }}
                 >
                   <span className="sr-only">{c.name}</span>

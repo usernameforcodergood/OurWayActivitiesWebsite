@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 };
 
-export const viewport: Viewport = { themeColor: "#12211d", colorScheme: "light" };
+export const viewport: Viewport = { themeColor: "#0f2a2c", colorScheme: "light" };
 
 /** Separate root layout: the admin never loads the public site's styles, nav or animations. */
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {

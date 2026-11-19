@@ -8,13 +8,13 @@
     color-scheme: light;
   }
   body {
-    background: #f6f5f1;
+    background: var(--color-off-white);
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
   :focus-visible {
-    outline: 2px solid var(--color-lagoon);
+    outline: 2px solid var(--color-turquoise);
     outline-offset: 2px;
   }
   input,
@@ -27,7 +27,7 @@
 @utility admin-input {
   width: 100%;
   border-radius: 0.5rem;
-  border: 1px solid rgb(12 19 17 / 0.18);
+  border: 1px solid rgb(11 23 24 / 0.18);
   background: white;
   padding: 0.6rem 0.75rem;
   font-size: 0.95rem;
@@ -35,8 +35,8 @@
   transition: border-color 150ms, box-shadow 150ms;
   &:focus {
     outline: none;
-    border-color: var(--color-lagoon);
-    box-shadow: 0 0 0 3px rgb(47 163 176 / 0.2);
+    border-color: var(--color-turquoise);
+    box-shadow: 0 0 0 3px rgb(32 175 192 / 0.2);
   }
   &[aria-invalid="true"] {
     border-color: #b42318;
@@ -45,26 +45,26 @@
 
 @utility admin-card {
   border-radius: 0.875rem;
-  border: 1px solid rgb(12 19 17 / 0.08);
+  border: 1px solid rgb(11 23 24 / 0.08);
   background: white;
-  box-shadow: 0 1px 2px rgb(12 19 17 / 0.04);
+  box-shadow: 0 1px 2px rgb(11 23 24 / 0.04);
 }
 
 dialog::backdrop {
-  background: rgb(12 19 17 / 0.45);
+  background: rgb(11 23 24 / 0.45);
 }
 
 /* Rich text editor surface (RichTextEditor.tsx) — light version of .rich-text */
 .rte .rte-content {
   --rt-heading: var(--color-ink);
   --rt-strong: var(--color-ink);
-  --rt-accent: #0f7480;
-  --rt-rule: rgb(12 19 17 / 0.18);
+  --rt-accent: var(--color-deep-teal);
+  --rt-rule: rgb(11 23 24 / 0.18);
   min-height: 20rem;
   padding: 1rem 1.125rem 1.5rem;
   font-size: 1rem;
   line-height: 1.6;
-  color: rgb(12 19 17 / 0.88);
+  color: rgb(11 23 24 / 0.88);
   outline: none;
   cursor: text;
 }
@@ -78,12 +78,12 @@ dialog::backdrop {
   content: attr(data-placeholder);
   float: left;
   height: 0;
-  color: rgb(74 74 63 / 0.6);
+  color: rgb(62 84 86 / 0.6);
   pointer-events: none;
 }
 .rte .rte-content hr.ProseMirror-selectednode {
-  border-top-color: var(--color-lagoon);
-  outline: 2px solid rgb(47 163 176 / 0.25);
+  border-top-color: var(--color-turquoise);
+  outline: 2px solid rgb(32 175 192 / 0.25);
   outline-offset: 4px;
 }
 .rte .rte-content a {

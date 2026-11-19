@@ -65,11 +65,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/admin"
           <li key={label}>
             <Link
               href={href}
-              className={`admin-card flex h-full flex-col gap-3 p-5 transition hover:ring-2 hover:ring-lagoon/30 ${highlight ? "ring-2 ring-amber-300" : ""}`}
+              className={`admin-card flex h-full flex-col gap-3 p-5 transition hover:ring-2 hover:ring-turquoise/30 ${highlight ? "ring-2 ring-amber-300" : ""}`}
             >
               <span className="flex items-center justify-between text-sm text-bark">
                 {label}
-                <Icon aria-hidden className="size-5 text-lagoon" />
+                <Icon aria-hidden className="size-5 text-deep-teal" />
               </span>
               <span className="text-3xl font-semibold tabular-nums">{value}</span>
               {sub && <span className="text-xs text-bark">{sub}</span>}
@@ -91,7 +91,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/admin"
                     <Link href={`/admin/bookings/${r.id}`} className="-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-3 hover:bg-stone/50">
                       <span className="min-w-0">
                         <span className="block truncate font-medium">
-                          <span className="font-mono text-xs text-lagoon">{r.reference}</span> {r.full_name} · {r.participants}
+                          <span className="font-mono text-xs text-deep-teal">{r.reference}</span> {r.full_name} · {r.participants}
                         </span>
                         <span className="block truncate text-xs text-bark">
                           {r.excursion_title_el || r.excursion_title_en} · {r.kind === "interest" ? t.bookings.interest : formatDay(r.departure_date, r.departure_time)} ·{" "}

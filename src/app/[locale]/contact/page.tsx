@@ -48,7 +48,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
             <ol className="mt-6 space-y-6">
               {c.steps.map((s, i) => (
                 <li key={s.title} className="grid grid-cols-[2.5rem_1fr] gap-3 border-t border-bone/15 pt-5">
-                  <span className="text-sm tabular-nums text-lichen">{pad(i + 1)}</span>
+                  <span className="text-sm tabular-nums text-mint">{pad(i + 1)}</span>
                   <div>
                     <p className="font-display text-2xl">{s.title}</p>
                     <p className="mt-1 text-sm text-fog">{s.body}</p>
@@ -62,10 +62,10 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
               <ul className="mt-5 space-y-3">
                 {details.map(({ icon: Icon, label, value, href }) => (
                   <li key={label} className="flex items-center gap-3">
-                    <Icon aria-hidden className="size-4 text-lichen" />
+                    <Icon aria-hidden className="size-4 text-mint" />
                     <span className="sr-only">{label}:</span>
                     {href ? (
-                      <a href={href} className="inline-flex min-h-10 items-center hover:text-lichen">
+                      <a href={href} className="inline-flex min-h-10 items-center hover:text-turquoise">
                         {value}
                       </a>
                     ) : (

@@ -82,7 +82,7 @@ export function ExcursionView({
             )}
             {excursion.included.length > 0 && (
               <div className="mt-14">
-                <h2 className="text-eyebrow mb-5 font-sans text-lichen">{d.included}</h2>
+                <h2 className="text-eyebrow mb-5 font-sans text-mint">{d.included}</h2>
                 <div className="space-y-4 text-bone/80">
                   {excursion.included.map((p, i) => (
                     <p key={i} className="whitespace-pre-line">
@@ -94,7 +94,7 @@ export function ExcursionView({
             )}
             {excursion.info.length > 0 && (
               <div className="mt-14">
-                <h2 className="text-eyebrow mb-5 font-sans text-lichen">{d.important}</h2>
+                <h2 className="text-eyebrow mb-5 font-sans text-mint">{d.important}</h2>
                 <div className="space-y-4 text-bone/80">
                   {excursion.info.map((p, i) => (
                     <p key={i} className="whitespace-pre-line">
@@ -106,7 +106,7 @@ export function ExcursionView({
             )}
             {excursion.cancellationPolicy.length > 0 && (
               <div className="mt-14">
-                <h2 className="text-eyebrow mb-5 font-sans text-lichen">{d.cancellation}</h2>
+                <h2 className="text-eyebrow mb-5 font-sans text-mint">{d.cancellation}</h2>
                 <div className="space-y-4 text-sm text-bone/70">
                   {excursion.cancellationPolicy.map((p, i) => (
                     <p key={i} className="whitespace-pre-line">
@@ -136,7 +136,7 @@ export function ExcursionView({
               {hasForm ? (
                 <a
                   href={`#${REQUEST_FORM_ID}`}
-                  className="mt-10 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-sand px-6 font-semibold text-ink transition-colors hover:bg-bone"
+                  className="mt-10 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-turquoise px-6 font-semibold text-ink transition-colors hover:bg-bone"
                 >
                   {t.booking.jumpCta}
                   <ArrowDown aria-hidden className="size-4" />
