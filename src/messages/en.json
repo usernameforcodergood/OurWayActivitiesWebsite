@@ -10,7 +10,7 @@
         "description": "Experiences in the Greek outdoors that bring together nature, culture and people. Discover a place from the inside."
       },
       "activities": {
-        "title": "Experiences",
+        "title": "Excursions",
         "description": "OurWay experiences: nature, culture and genuine encounters in Greece. See what we're preparing and tell us what you're looking for."
       },
       "destinations": {
@@ -49,7 +49,7 @@
   },
   "nav": {
     "home": "Home",
-    "activities": "Experiences",
+    "activities": "Excursions",
     "destinations": "Places",
     "about": "Philosophy",
     "gallery": "Gallery",
@@ -108,10 +108,12 @@
       "scroll": "Scroll to continue"
     },
     "philosophy": {
-      "label": "The idea",
+      "label": "Our philosophy",
+      "intro": "The name says almost everything. OurWay: the path we choose, and the way we walk it.",
       "statement": "You can visit a place and leave having seen only the view. Or you can live it: walk its paths, sit at its table, listen to its stories.",
       "aside": "OurWay exists for the second kind of journey. For people who want to get to know a place, not just pass through it.",
-      "link": "Read our philosophy"
+      "link": "Read our philosophy",
+      "valuesLabel": "What guides us"
     },
     "story": {
       "label": "What you discover",
@@ -195,12 +197,12 @@
       "title": "Where would you like to begin?",
       "tiles": {
         "activities": {
-          "title": "Experiences",
+          "title": "Excursions",
           "body": "What we're preparing and how it will feel."
         },
-        "destinations": {
-          "title": "Places",
-          "body": "The landscapes that draw us."
+        "tailorMade": {
+          "title": "Your own experience",
+          "body": "Design something made to measure, with us."
         },
         "gallery": {
           "title": "Gallery",
@@ -245,7 +247,7 @@
   },
   "activities": {
     "hero": {
-      "eyebrow": "Experiences",
+      "eyebrow": "Excursions",
       "title": "Experiences that begin with a place",
       "lead": "Every OurWay experience will be built around somewhere specific: its nature, its people, whatever makes it unlike anywhere else."
     },

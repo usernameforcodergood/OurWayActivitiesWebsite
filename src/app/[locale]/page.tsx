@@ -52,7 +52,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Hero locale={locale} t={t.home.hero} />
-      <BrandPhilosophy locale={locale} t={t.home.philosophy} />
+      <BrandPhilosophy locale={locale} t={t.home.philosophy} values={t.about.values} />
       <StorySection locale={locale} t={t.home.story} />
       <ExperienceShowcase locale={locale} t={t.home.showcase} />
       <FeaturedExcursions items={featured} locale={locale} t={t} />

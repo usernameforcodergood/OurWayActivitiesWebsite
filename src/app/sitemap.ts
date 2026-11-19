@@ -25,7 +25,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages: Entry[] = [
     routes.home,
     routes.activities,
-    routes.destinations,
     routes.news,
     routes.about,
     routes.gallery,
