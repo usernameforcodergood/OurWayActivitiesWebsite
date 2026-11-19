@@ -14,8 +14,9 @@ import { Button } from "@/components/ui/Button";
 import { useExperienceChoice } from "./ExperienceChoice";
 import { cn, pad } from "@/lib/utils";
 
-type NavKey = "activities" | "tailorMade" | "destinations" | "news" | "about" | "gallery" | "contact";
-const NAV_ITEMS: NavKey[] = ["activities", "tailorMade", "destinations", "news", "about", "gallery", "contact"];
+type NavKey = "home" | "activities" | "about" | "news" | "gallery" | "contact";
+/** Main navigation, in order — the same on desktop and in the mobile menu. */
+const NAV_ITEMS: NavKey[] = ["home", "activities", "about", "news", "gallery", "contact"];
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -95,7 +96,10 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
     };
   }, [open]);
 
-  const isActive = (key: NavKey) => pathname?.startsWith(localePath(locale, routes[key])) ?? false;
+  const isActive = (key: NavKey) =>
+    key === "home"
+      ? pathname === localePath(locale)
+      : (pathname?.startsWith(localePath(locale, routes[key])) ?? false);
 
   return (
     <>
@@ -117,7 +121,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
 
           <nav aria-label={t.primary} className="hidden xl:block">
             <ul className="flex items-center gap-1">
-              {NAV_ITEMS.filter((k) => k !== "contact").map((key) => (
+              {NAV_ITEMS.map((key) => (
                 <li key={key}>
                   <Link
                     href={localePath(locale, routes[key])}
@@ -195,7 +199,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
           >
             <nav aria-label={t.primary} className="container-x flex flex-1 flex-col justify-center py-10">
               <ul className="space-y-1">
-                {(["home", ...NAV_ITEMS] as const).map((key, i) => (
+                {NAV_ITEMS.map((key, i) => (
                   <li key={key} className="overflow-hidden">
                     <motion.div
                       initial={{ y: "100%" }}
@@ -206,11 +210,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
                       <Link
                         href={localePath(locale, routes[key])}
                         onClick={close}
-                        aria-current={
-                          (key === "home" ? pathname === localePath(locale) : isActive(key as NavKey))
-                            ? "page"
-                            : undefined
-                        }
+                        aria-current={isActive(key) ? "page" : undefined}
                         className="group flex items-baseline gap-4 py-1.5 font-display text-[clamp(2.4rem,9vw,4rem)] leading-[1.05] text-bone/85 transition-colors hover:text-bone aria-[current=page]:text-lichen"
                       >
                         <span className="font-sans text-xs tabular-nums text-fog">{pad(i + 1)}</span>

@@ -30,6 +30,22 @@ export function useExperienceChoice(): Ctx {
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+type ChoiceOption = {
+  key: "tailor" | "discover";
+  href: string;
+  image: MediaKey;
+  copy: Dictionary["choice"]["tailor"];
+  variant: "primary" | "outline";
+};
+
+/** The single list of choices. Every "Inquire" / "Start your experience" trigger opens these. */
+function choiceOptions(locale: Locale, t: Dictionary["choice"]): ChoiceOption[] {
+  return [
+    { key: "tailor", href: `${localePath(locale, routes.tailorMade)}#plan`, image: "roadPause", copy: t.tailor, variant: "primary" },
+    { key: "discover", href: localePath(locale, routes.activities), image: "valleyVillage", copy: t.discover, variant: "outline" },
+  ];
+}
+
 type Props = { locale: Locale; t: Dictionary["choice"]; children: ReactNode };
 
 export function ExperienceChoiceProvider({ locale, t, children }: Props) {
@@ -88,16 +104,7 @@ function ChoiceDialog({ locale, t, onClose }: { locale: Locale; t: Dictionary["c
     };
   }, [onClose]);
 
-  const options: Array<{
-    key: "tailor" | "discover";
-    href: string;
-    image: MediaKey;
-    copy: Dictionary["choice"]["tailor"];
-    variant: "primary" | "outline";
-  }> = [
-    { key: "tailor", href: `${localePath(locale, routes.tailorMade)}#plan`, image: "roadPause", copy: t.tailor, variant: "primary" },
-    { key: "discover", href: localePath(locale, routes.activities), image: "valleyVillage", copy: t.discover, variant: "outline" },
-  ];
+  const options = choiceOptions(locale, t);
 
   return (
     <motion.div

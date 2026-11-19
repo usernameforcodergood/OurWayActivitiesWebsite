@@ -6,8 +6,8 @@ import { gsap, SplitText, useGSAP, MQ } from "@/lib/gsap";
 import { media } from "@/content/media";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
-import { localePath, routes } from "@/i18n/routes";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
+import { useExperienceChoice } from "@/components/layout/ExperienceChoice";
 
 type Props = { locale: Locale; t: Dictionary["home"]["hero"] };
 
@@ -19,6 +19,8 @@ type Props = { locale: Locale; t: Dictionary["home"]["hero"] };
 export function Hero({ locale, t }: Props) {
   const root = useRef<HTMLElement>(null);
   const image = media.heroWalker;
+  // "Start your experience" opens the same choice as the header's "Inquire".
+  const choice = useExperienceChoice();
 
   useGSAP(
     () => {
@@ -99,7 +101,9 @@ export function Hero({ locale, t }: Props) {
             {t.lead}
           </p>
           <div data-hero-fade data-anim="hide" className="flex flex-wrap gap-3 md:col-span-6 md:justify-end">
-            <ButtonLink href={localePath(locale, routes.contact)}>{t.ctaPrimary}</ButtonLink>
+            <Button type="button" aria-haspopup="dialog" onClick={choice.open}>
+              {t.ctaPrimary}
+            </Button>
             <ButtonLink href="#philosophy" variant="outline" icon={false}>
               {t.ctaSecondary}
             </ButtonLink>

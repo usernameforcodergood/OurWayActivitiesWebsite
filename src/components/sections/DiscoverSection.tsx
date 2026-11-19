@@ -9,7 +9,7 @@ import { TextReveal } from "@/components/animations/TextReveal";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { cn } from "@/lib/utils";
 
-type TileKey = "activities" | "destinations" | "gallery";
+type TileKey = "activities" | "tailorMade" | "gallery";
 
 const TILES: Array<{ key: TileKey; image: MediaKey; frame: string; wrap: string; parallax: number }> = [
   {
@@ -20,7 +20,7 @@ const TILES: Array<{ key: TileKey; image: MediaKey; frame: string; wrap: string;
     parallax: 8,
   },
   {
-    key: "destinations",
+    key: "tailorMade",
     image: "valleyVillage",
     frame: "aspect-[4/3]",
     wrap: "md:col-span-5 md:col-start-8 md:mt-24",
