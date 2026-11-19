@@ -51,6 +51,8 @@ export const contactSchema = z.object({
   /** Time the form was rendered (ms since epoch) — rejects instant bot posts. */
   startedAt: z.number().int().positive(),
   locale: z.enum(["el", "en"]),
+  /** One per form instance: a retried or double-clicked submit maps to the same saved message. */
+  idempotencyKey: z.uuid(),
 });
 
 export type ContactInput = z.input<typeof contactSchema>;
@@ -58,7 +60,7 @@ export type ContactData = z.output<typeof contactSchema>;
 
 /** API response contract. */
 export type ContactResponse =
-  | { ok: true }
+  | { ok: true; reference: string }
   | {
       ok: false;
       error: "invalid" | "notConfigured" | "rateLimited" | "generic";

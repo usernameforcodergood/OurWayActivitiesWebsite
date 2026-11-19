@@ -12,7 +12,7 @@ import {
   type TailorMadeRequestData,
 } from "@/lib/bookings/validation";
 import { formatDateLong, renderAdminNewPrivate, renderPrivateReceived } from "@/lib/bookings/emails";
-import { adminInbox, deliver, type EmailKind } from "@/lib/bookings/notify";
+import { adminInbox, deliver, emailNotificationsEnabled, type EmailKind } from "@/lib/bookings/notify";
 
 /**
  * Tailor-made experience request. Saved as "new" in public.private_requests;
@@ -130,6 +130,8 @@ export async function POST(request: Request) {
   const result = data as { id: string; reference: string; replayed: boolean; email_sent?: boolean; notify_token?: string };
   // Report whether the receipt email of the original submission really went out.
   if (result.replayed || !result.notify_token) return json({ ok: true, reference: result.reference, emailSent: result.email_sent === true }, 200);
+  // The request is saved: that alone is success. Emails are optional and off for now.
+  if (!emailNotificationsEnabled()) return json({ ok: true, reference: result.reference, emailSent: false }, 201);
 
   const base = { reference: result.reference, firstName: name.first, lastName: name.last, email: d.email, phone: d.phone, participants: d.participants };
   const inbox = adminInbox();

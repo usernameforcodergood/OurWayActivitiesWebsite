@@ -13,6 +13,16 @@ export type EmailKind =
 
 export type DeliveryResult = { status: "sent" | "failed" | "not_configured"; error?: string; recipient: string };
 
+/**
+ * Email notifications are OFF until the domain and sender are set up.
+ * Turn them on later with EMAIL_NOTIFICATIONS_ENABLED=true (Vercel + .env.local).
+ * While off, nothing is sent to Resend from any route or admin action, and
+ * saving a request never depends on email.
+ */
+export function emailNotificationsEnabled(): boolean {
+  return process.env.EMAIL_NOTIFICATIONS_ENABLED === "true";
+}
+
 /** Inbox that receives new-request notifications. */
 export function adminInbox(): string | null {
   return process.env.BOOKINGS_EMAIL || process.env.CONTACT_EMAIL || null;
@@ -23,6 +33,7 @@ export function adminInbox(): string | null {
  * reports "sent" unless the provider accepted the message.
  */
 export async function deliver(to: string, replyTo: string | null, email: Rendered): Promise<DeliveryResult> {
+  if (!emailNotificationsEnabled()) return { status: "not_configured", error: "Email notifications are disabled", recipient: to };
   const config = getEmailConfig();
   if (!config) return { status: "not_configured", error: "RESEND_API_KEY / CONTACT_EMAIL not set", recipient: to };
   try {

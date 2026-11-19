@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
-import { BOOKING_STATUSES, INQUIRY_STATUSES, type BookingStatus } from "@/lib/bookings/validation";
+import { BOOKING_STATUSES, INQUIRY_STATUSES, REQUEST_STAGES, type BookingStatus, type RequestStage } from "@/lib/bookings/validation";
 import { cn } from "@/lib/utils";
 import { fmt, t } from "../../_lib/strings";
 import { listBookings, listExcursionOptions, parseBookingParams, type BookingListParams } from "../../_lib/booking-queries";
@@ -13,9 +13,10 @@ export const metadata: Metadata = { title: t.bookings.title };
 
 function href(p: Partial<BookingListParams>) {
   const sp = new URLSearchParams();
-  if (p.kind === "interest") sp.set("kind", "interest");
+  if (p.kind && p.kind !== "all") sp.set("kind", p.kind);
   if (p.q) sp.set("q", p.q);
   if (p.status && p.status !== "all") sp.set("status", p.status);
+  if (p.stage && p.stage !== "all") sp.set("stage", p.stage);
   if (p.excursion) sp.set("excursion", p.excursion);
   if (p.from) sp.set("from", p.from);
   if (p.to) sp.set("to", p.to);
@@ -29,12 +30,28 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
   await requireAdmin();
   const p = parseBookingParams(await searchParams);
   const [{ rows, total, pages }, excursions] = await Promise.all([listBookings(p), listExcursionOptions()]);
-  const filtered = Boolean(p.q || p.excursion || p.from || p.to) || p.status !== "all";
+  const filtered = Boolean(p.q || p.excursion || p.from || p.to) || p.status !== "all" || p.stage !== "all";
   const B = t.bookings;
+  const all = p.kind === "all";
   const inquiries = p.kind === "interest";
   const statuses: readonly BookingStatus[] = inquiries ? INQUIRY_STATUSES : BOOKING_STATUSES;
-  const tabs: Array<["all" | BookingStatus, string]> = [["all", t.common.all], ...statuses.map((s) => [s, B.statuses[s]] as ["all" | BookingStatus, string])];
+  // "All requests": the four stages. Per kind: that kind's own statuses.
+  const tabs: Array<{ key: string; label: string; to: Partial<BookingListParams>; active: boolean }> = all
+    ? [
+        { key: "all", label: t.common.all, to: { ...p, stage: "all", status: "all", page: 1 }, active: p.stage === "all" && p.status === "all" },
+        ...(Object.keys(REQUEST_STAGES) as RequestStage[]).map((s) => ({
+          key: s,
+          label: B.stages[s],
+          to: { ...p, stage: s, status: "all" as const, page: 1 },
+          active: p.stage === s,
+        })),
+      ]
+    : [
+        { key: "all", label: t.common.all, to: { ...p, status: "all", page: 1 }, active: p.status === "all" },
+        ...statuses.map((s) => ({ key: s, label: B.statuses[s], to: { ...p, status: s, page: 1 }, active: p.status === s })),
+      ];
   const kinds = [
+    ["all", B.tabAll],
     ["booking", B.tabBookings],
     ["interest", B.tabInquiries],
   ] as const;
@@ -58,27 +75,28 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
           </Link>
         ))}
       </nav>
-      <p className="mb-4 text-xs text-bark">{inquiries ? B.tabInquiriesHint : B.tabBookingsHint}</p>
+      <p className="mb-4 text-xs text-bark">{all ? B.tabAllHint : inquiries ? B.tabInquiriesHint : B.tabBookingsHint}</p>
 
       <div className="mb-5 space-y-3">
         <nav aria-label={B.status} className="flex flex-wrap gap-1">
-          {tabs.map(([key, label]) => (
+          {tabs.map((tab) => (
             <Link
-              key={key}
-              href={href({ ...p, status: key, page: 1 })}
-              aria-current={p.status === key ? "true" : undefined}
+              key={tab.key}
+              href={href(tab.to)}
+              aria-current={tab.active ? "true" : undefined}
               className={cn(
                 "rounded-full px-3.5 py-1.5 text-sm font-medium",
-                p.status === key ? "bg-forest text-bone" : "bg-white text-ink ring-1 ring-ink/10 hover:bg-stone/60",
+                tab.active ? "bg-forest text-bone" : "bg-white text-ink ring-1 ring-ink/10 hover:bg-stone/60",
               )}
             >
-              {label}
+              {tab.label}
             </Link>
           ))}
         </nav>
         <form method="get" action="/admin/bookings" className="grid gap-2 md:grid-cols-[1fr_14rem] lg:grid-cols-[1fr_14rem_9.5rem_9.5rem_12rem_auto]">
-          {inquiries && <input type="hidden" name="kind" value="interest" />}
+          {!all && <input type="hidden" name="kind" value={p.kind} />}
           {p.status !== "all" && <input type="hidden" name="status" value={p.status} />}
+          {p.stage !== "all" && <input type="hidden" name="stage" value={p.stage} />}
           <div className="relative">
             <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-bark" />
             <label htmlFor="bq" className="sr-only">
@@ -159,7 +177,10 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                       {r.phone}
                     </a>
                   </td>
-                  <td className="px-4 py-3">{r.excursion_title_el || r.excursion_title_en || r.excursion_slug}</td>
+                  <td className="px-4 py-3">
+                    {r.excursion_title_el || r.excursion_title_en || r.excursion_slug}
+                    {all && <span className="mt-0.5 block text-xs text-bark">{r.kind === "interest" ? B.kindShortInterest : B.kindShortBooking}</span>}
+                  </td>
                   <td className="whitespace-nowrap px-4 py-3">
                     {r.kind === "interest" ? <span className="text-bark">{r.preferred_period || B.notGiven}</span> : formatDay(r.departure_date, r.departure_time)}
                   </td>
