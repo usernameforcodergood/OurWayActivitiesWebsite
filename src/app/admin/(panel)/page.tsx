@@ -7,14 +7,19 @@ import { fmt, t } from "../_lib/strings";
 import { getDashboardData } from "../_lib/queries";
 import { getBookingDashboard } from "../_lib/booking-queries";
 import { BookingStatusBadge, BtnLink, Card, PageHeader, StatusBadge, formatDate, formatDay } from "../_components/ui";
+import { AdminCalendar } from "../_components/AdminCalendar";
+import { isIsoDate } from "../_lib/calendar";
 
 // Request-time admin data; navigations may block.
 export const instant = false;
 export const metadata: Metadata = { title: t.dashboard.title };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: PageProps<"/admin">) {
   const admin = await requireAdmin();
-  const today = await athensToday();
+  const [today, sp] = await Promise.all([athensToday(), searchParams]);
+  const view = sp.view === "week" ? "week" : "month";
+  const anchor = isIsoDate(sp.cal) ? sp.cal : today;
+  const addDate = isIsoDate(sp.add) ? sp.add : undefined;
   const [d, b] = await Promise.all([getDashboardData(), getBookingDashboard(today)]);
   const D = t.dashboard;
 
@@ -52,6 +57,8 @@ export default async function DashboardPage() {
           </ul>
         </div>
       )}
+
+      <AdminCalendar view={view} anchor={anchor} today={today} addDate={addDate} />
 
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {stats.map(({ label, value, icon: Icon, href, sub, highlight }) => (

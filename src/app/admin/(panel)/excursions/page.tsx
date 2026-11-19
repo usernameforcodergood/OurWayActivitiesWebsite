@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ImageOff, Plus, Star } from "lucide-react";
+import { CalendarPlus, ImageOff, Plus, Star } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { mediaUrl } from "@/lib/supabase/config";
 import { availableLocales } from "@/lib/cms/mappers";
@@ -79,6 +79,15 @@ export default async function ExcursionsPage({ searchParams }: PageProps<"/admin
                     </span>
                   </span>
                 </Link>
+                {r.booking_mode === "departures" && (
+                  <Link
+                    href={`/admin/excursions/${r.id}?newDate=`}
+                    className="inline-flex min-h-9 shrink-0 items-center gap-1.5 self-start rounded-lg px-3 text-xs font-semibold text-lagoon ring-1 ring-lagoon/30 hover:bg-lagoon/5 sm:self-center"
+                  >
+                    <CalendarPlus aria-hidden className="size-3.5" />
+                    {t.departures.add}
+                  </Link>
+                )}
                 <RowActions
                   kind="excursion"
                   id={r.id}

@@ -42,10 +42,25 @@ async function fetchPublishedExcursionRows(): Promise<ExcursionRow[]> {
   return (data as ExcursionRow[] | null) ?? [];
 }
 
-/** Published excursions that are complete in `locale`. */
+/** A run still ahead: its start date has not arrived (Athens) and it is not archived/cancelled. */
+export const isUpcomingRun = (d: PublicExcursion["departures"][number], today: string) =>
+  d.date > today && d.status !== "cancelled" && d.status !== "completed";
+
+/**
+ * Scheduled excursions whose every run has started are archived: they leave
+ * the public lists (their page and all requests stay). Excursions without any
+ * run yet, and general experiences, stay listed. Filtering by date here means
+ * this holds even before the database job marks the runs "completed".
+ */
+function isListed(e: PublicExcursion, today: string): boolean {
+  if (e.bookingMode !== "departures" || e.departures.length === 0) return true;
+  return e.departures.some((d) => isUpcomingRun(d, today));
+}
+
+/** Published excursions that are complete in `locale` and not archived. */
 export async function getPublishedExcursions(locale: Locale): Promise<PublicExcursion[]> {
-  const rows = await fetchPublishedExcursionRows();
-  return rows.map((r) => toPublicExcursion(r, locale)).filter((e) => e.locales.includes(locale));
+  const [rows, today] = await Promise.all([fetchPublishedExcursionRows(), athensToday()]);
+  return rows.map((r) => toPublicExcursion(r, locale)).filter((e) => e.locales.includes(locale) && isListed(e, today));
 }
 
 export async function getFeaturedExcursions(locale: Locale, limit = 3): Promise<PublicExcursion[]> {
@@ -61,8 +76,7 @@ export async function getFeaturedExcursions(locale: Locale, limit = 3): Promise<
 export async function getUpcomingEvents(locale: Locale, limit = 3): Promise<{ items: PublicExcursion[]; today: string }> {
   const today = await athensToday();
   const events = (await getPublishedExcursions(locale)).filter((e) => e.kind === "event");
-  const next = (e: PublicExcursion) =>
-    e.departures.find((d) => d.date >= today && d.status !== "cancelled" && d.status !== "completed")?.date;
+  const next = (e: PublicExcursion) => e.departures.find((d) => isUpcomingRun(d, today))?.date;
   // Events whose every date has passed are not "upcoming".
   const live = events.filter((e) => next(e) || e.departures.length === 0);
   const items = live
