@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 type Variant = "primary" | "outline" | "outline-dark" | "text";
 
 const base =
-  "group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full font-semibold tracking-tight transition-colors duration-500 ease-out-expo min-h-12 select-none";
+  "group group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full font-semibold tracking-tight transition-colors duration-500 ease-out-expo min-h-12 select-none";
 
 const variants: Record<Variant, string> = {
   primary: "bg-sand text-ink px-7 py-3.5 text-[0.95rem] hover:text-ink",
@@ -33,18 +33,18 @@ function Inner({ variant = "primary", children, icon = true }: Common) {
         <span
           aria-hidden
           className={cn(
-            "absolute inset-0 translate-y-[101%] rounded-[inherit] transition-transform duration-500 ease-out-expo group-hover:translate-y-0",
+            "absolute inset-0 translate-y-[101%] rounded-[inherit] transition-transform duration-500 ease-out-expo group-hover/btn:translate-y-0",
             f,
           )}
         />
       )}
-      <span className={cn("relative", variant === "text" && "bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat pb-0.5 transition-[background-size] duration-500 ease-out-expo group-hover:bg-[length:100%_1px]")}>
+      <span className={cn("relative", variant === "text" && "bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat pb-0.5 transition-[background-size] duration-500 ease-out-expo group-hover/btn:bg-[length:100%_1px]")}>
         {children}
       </span>
       {icon && (
         <ArrowUpRight
           aria-hidden
-          className="relative size-4 shrink-0 transition-transform duration-500 ease-out-expo group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:rotate-45"
+          className="relative size-4 shrink-0 transition-transform duration-500 ease-out-expo group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5 group-hover/btn:rotate-45"
           strokeWidth={1.75}
         />
       )}
