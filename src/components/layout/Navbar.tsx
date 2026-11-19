@@ -14,9 +14,15 @@ import { Button } from "@/components/ui/Button";
 import { useExperienceChoice } from "./ExperienceChoice";
 import { cn, pad } from "@/lib/utils";
 
-type NavKey = "home" | "activities" | "about" | "news" | "gallery" | "contact";
-/** Main navigation, in order — the same on desktop and in the mobile menu. */
-const NAV_ITEMS: NavKey[] = ["home", "activities", "about", "news", "gallery", "contact"];
+type NavKey = "home" | "activities" | "tailorMade" | "gallery" | "contact";
+/**
+ * Main navigation, in order — the same on desktop and in the mobile menu.
+ * Philosophy and News are not listed here; their pages stay (footer links).
+ */
+const NAV_ITEMS: NavKey[] = ["home", "activities", "tailorMade", "gallery", "contact"];
+
+/** The menu's own wording for Tailor-Made; the footer keeps `nav.tailorMade`. */
+const navLabel = (t: Dictionary["nav"], key: NavKey) => (key === "tailorMade" ? t.createOwn : t[key]);
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -128,7 +134,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
                     aria-current={isActive(key) ? "page" : undefined}
                     className="group relative inline-flex min-h-11 items-center whitespace-nowrap px-2.5 text-sm font-medium xl:px-3.5 text-bone/80 transition-colors hover:text-bone aria-[current=page]:text-bone"
                   >
-                    {t[key]}
+                    {navLabel(t, key)}
                     <span
                       aria-hidden
                       className={cn(
@@ -214,7 +220,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
                         className="group flex items-baseline gap-4 py-1.5 font-display text-[clamp(2.4rem,9vw,4rem)] leading-[1.05] text-bone/85 transition-colors hover:text-bone aria-[current=page]:text-lichen"
                       >
                         <span className="font-sans text-xs tabular-nums text-fog">{pad(i + 1)}</span>
-                        {t[key]}
+                        {navLabel(t, key)}
                       </Link>
                     </motion.div>
                   </li>
