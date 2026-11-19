@@ -115,7 +115,7 @@ export function toPublicExcursion(row: ExcursionRow, locale: Locale): PublicExcu
     difficulty: pick(row, "difficulty", locale),
     participants: text(row.participants),
     priceEur: Number.isFinite(price) ? price : undefined,
-    priceNote: pick(row, "price_note", locale),
+    depositEur: num(row.deposit_eur) ?? undefined,
     availabilityNote: pick(row, "availability_note", locale),
     info: paragraphs(locale === "el" ? row.info_el : row.info_en),
     cover: toImage(row.cover, locale, title),

@@ -23,7 +23,7 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  excursion: Pick<PublicExcursion, "id" | "title" | "bookingMode">;
+  excursion: Pick<PublicExcursion, "id" | "title" | "bookingMode" | "depositEur">;
   locale: Locale;
   t: Dictionary["booking"];
   privacyHref: string;
@@ -329,6 +329,12 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, conta
                 <dl className="grid grid-cols-2 gap-y-1 text-sm">
                   <dt className="text-bark">{f.pricePerPerson}</dt>
                   <dd className="text-right">{formatEur(selected.priceEur, locale)}</dd>
+                  {excursion.depositEur !== undefined && (
+                    <>
+                      <dt className="text-bark">{f.depositPerPerson}</dt>
+                      <dd className="text-right">{formatEur(excursion.depositEur, locale)}</dd>
+                    </>
+                  )}
                   <dt className="font-semibold">{f.total}</dt>
                   <dd className="text-right text-lg font-semibold">{total != null ? formatEur(total, locale) : "—"}</dd>
                 </dl>

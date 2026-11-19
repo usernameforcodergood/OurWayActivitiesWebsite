@@ -44,12 +44,8 @@ export function ExcursionView({
       [d.meetingPoint, excursion.meetingPoint],
       [d.difficulty, excursion.difficulty],
       [d.participants, excursion.participants],
-      [
-        d.price,
-        excursion.priceEur !== undefined
-          ? [formatPrice(excursion.priceEur, locale), excursion.priceNote].filter(Boolean).join(" · ")
-          : excursion.priceNote,
-      ],
+      [d.price, excursion.priceEur !== undefined ? formatPrice(excursion.priceEur, locale) : undefined],
+      [d.deposit, excursion.depositEur !== undefined ? formatPrice(excursion.depositEur, locale) : undefined],
       [d.availability, excursion.availabilityNote],
     ] as const
   ).filter((f): f is readonly [string, string] => Boolean(f[1]));
