@@ -13,7 +13,7 @@ import type { BOOKING_STATUSES, InquiryStatus } from "@/lib/bookings/validation"
 type BookingOnlyStatus = (typeof BOOKING_STATUSES)[number];
 import { NotesPanel } from "../../../_components/NotesPanel";
 import { EmailCard, HistoryCard } from "../../../_components/RequestLog";
-import { BookingStatusBadge, Card, PageHeader, formatDate, formatDay, formatEurAdmin } from "../../../_components/ui";
+import { BookingStatusBadge, Card, PageHeader, formatDate, formatEurAdmin, formatRun } from "../../../_components/ui";
 
 export const instant = false;
 export const metadata: Metadata = { title: t.bookings.title };
@@ -31,10 +31,14 @@ export default async function BookingDetailPage({ params }: PageProps<"/admin/bo
 
   const rows: Array<[string, React.ReactNode]> = [
     [B.kind, b.kind === "interest" ? B.kindInterest : B.kindBooking],
-    [B.excursion, title],
-    b.kind === "interest"
-      ? [B.preferredPeriod, b.preferred_period || B.notGiven]
-      : [B.departure, formatDay(b.departure_date, b.departure_time)],
+    [
+      B.excursion,
+      <Link key="ex" href={`/admin/excursions/${b.excursion_id}#requests`} className="font-semibold text-lagoon underline-offset-2 hover:underline">
+        {title}
+      </Link>,
+    ],
+    [B.excursionDate, b.departure_id ? formatRun(b.departure_date, b.return_date, b.departure_time) : B.noDate],
+    ...(b.kind === "interest" ? ([[B.preferredPeriod, b.preferred_period || B.notGiven]] as Array<[string, React.ReactNode]>) : []),
     [B.participants, b.participants],
     ...(b.unit_price_eur != null ? ([[B.unitPrice, formatEurAdmin(b.unit_price_eur)]] as Array<[string, React.ReactNode]>) : []),
     ...(b.total_eur != null ? ([[B.totalLong, <strong key="t">{formatEurAdmin(b.total_eur)}</strong>]] as Array<[string, React.ReactNode]>) : []),
@@ -49,7 +53,7 @@ export default async function BookingDetailPage({ params }: PageProps<"/admin/bo
       </Link>
       <PageHeader
         title={fmt(B.detailTitle, { ref: b.reference })}
-        description={`${b.full_name} · ${title}`}
+        description={`${b.full_name} · ${title}${b.departure_id ? ` · ${formatRun(b.departure_date, b.return_date)}` : ""}`}
         actions={<BookingStatusBadge status={b.status} />}
       />
 

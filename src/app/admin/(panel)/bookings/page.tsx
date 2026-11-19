@@ -5,8 +5,8 @@ import { requireAdmin } from "@/lib/auth";
 import { BOOKING_STATUSES, INQUIRY_STATUSES, REQUEST_STAGES, type BookingStatus, type RequestStage } from "@/lib/bookings/validation";
 import { cn } from "@/lib/utils";
 import { fmt, t } from "../../_lib/strings";
-import { listBookings, listExcursionOptions, parseBookingParams, type BookingListParams } from "../../_lib/booking-queries";
-import { BookingStatusBadge, EmptyState, PageHeader, formatDate, formatDay, formatEurAdmin } from "../../_components/ui";
+import { listBookings, listDepartureOptions, listExcursionOptions, parseBookingParams, type BookingListParams } from "../../_lib/booking-queries";
+import { BookingStatusBadge, EmptyState, PageHeader, formatDate, formatEurAdmin, formatRun } from "../../_components/ui";
 
 export const instant = false;
 export const metadata: Metadata = { title: t.bookings.title };
@@ -18,6 +18,7 @@ function href(p: Partial<BookingListParams>) {
   if (p.status && p.status !== "all") sp.set("status", p.status);
   if (p.stage && p.stage !== "all") sp.set("stage", p.stage);
   if (p.excursion) sp.set("excursion", p.excursion);
+  if (p.excursion && p.departure) sp.set("departure", p.departure);
   if (p.from) sp.set("from", p.from);
   if (p.to) sp.set("to", p.to);
   if (p.sort && p.sort !== "submitted") sp.set("sort", p.sort);
@@ -28,9 +29,13 @@ function href(p: Partial<BookingListParams>) {
 
 export default async function BookingsPage({ searchParams }: PageProps<"/admin/bookings">) {
   await requireAdmin();
-  const p = parseBookingParams(await searchParams);
+  const parsed = parseBookingParams(await searchParams);
+  const departures = await listDepartureOptions(parsed.excursion);
+  // A date left over from a previously chosen excursion is ignored, never matched against another excursion.
+  const p: BookingListParams =
+    parsed.departure && parsed.departure !== "none" && !departures.some((d) => d.id === parsed.departure) ? { ...parsed, departure: "" } : parsed;
   const [{ rows, total, pages }, excursions] = await Promise.all([listBookings(p), listExcursionOptions()]);
-  const filtered = Boolean(p.q || p.excursion || p.from || p.to) || p.status !== "all" || p.stage !== "all";
+  const filtered = Boolean(p.q || p.excursion || p.departure || p.from || p.to) || p.status !== "all" || p.stage !== "all";
   const B = t.bookings;
   const all = p.kind === "all";
   const inquiries = p.kind === "interest";
@@ -93,7 +98,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
             </Link>
           ))}
         </nav>
-        <form method="get" action="/admin/bookings" className="grid gap-2 md:grid-cols-[1fr_14rem] lg:grid-cols-[1fr_14rem_9.5rem_9.5rem_12rem_auto]">
+        <form method="get" action="/admin/bookings" className="grid gap-2 md:grid-cols-[1fr_14rem] lg:grid-cols-[1fr_14rem_14rem_9.5rem_9.5rem_12rem_auto]">
           {!all && <input type="hidden" name="kind" value={p.kind} />}
           {p.status !== "all" && <input type="hidden" name="status" value={p.status} />}
           {p.stage !== "all" && <input type="hidden" name="stage" value={p.stage} />}
@@ -114,6 +119,19 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                 {e.title_el || e.title_en || e.slug}
               </option>
             ))}
+          </select>
+          <label htmlFor="bdep" className="sr-only">
+            {B.runFilter}
+          </label>
+          <select id="bdep" name="departure" defaultValue={p.departure} disabled={!p.excursion} title={p.excursion ? B.runFilter : B.runFilterHint} className="admin-input disabled:opacity-50">
+            <option value="">{p.excursion ? B.allRuns : B.runFilterHint}</option>
+            {departures.map((d) => (
+              <option key={d.id} value={d.id}>
+                {formatRun(d.departure_date, d.return_date, d.departure_time)}
+                {d.status === "cancelled" ? ` (${B.runCancelled})` : d.status === "completed" ? ` (${B.runCompleted})` : ""}
+              </option>
+            ))}
+            {p.excursion && <option value="none">{B.noDateRequests}</option>}
           </select>
           {!inquiries && (
             <>
@@ -150,10 +168,9 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
           <table className="w-full min-w-[60rem] text-left text-sm">
             <thead className="border-b border-ink/10 text-xs uppercase tracking-wide text-bark">
               <tr>
-                <th scope="col" className="px-4 py-3 font-semibold">{B.reference}</th>
                 <th scope="col" className="px-4 py-3 font-semibold">{B.customer}</th>
                 <th scope="col" className="px-4 py-3 font-semibold">{B.excursion}</th>
-                <th scope="col" className="px-4 py-3 font-semibold">{inquiries ? B.preferredPeriod : B.departure}</th>
+                <th scope="col" className="px-4 py-3 font-semibold">{inquiries ? B.preferredPeriod : B.excursionDate}</th>
                 <th scope="col" className="px-4 py-3 text-right font-semibold">{B.participants}</th>
                 <th scope="col" className="px-4 py-3 text-right font-semibold">{B.total}</th>
                 <th scope="col" className="px-4 py-3 font-semibold">{B.status}</th>
@@ -164,12 +181,10 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
               {rows.map((r) => (
                 <tr key={r.id} className="align-top hover:bg-stone/30">
                   <td className="px-4 py-3">
-                    <Link href={`/admin/bookings/${r.id}`} className="font-mono font-semibold text-lagoon underline-offset-2 hover:underline">
-                      {r.reference}
+                    <Link href={`/admin/bookings/${r.id}`} className="block font-semibold text-ink underline-offset-2 hover:underline">
+                      {r.full_name}
                     </Link>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="block font-medium">{r.full_name}</span>
+                    <span className="block font-mono text-xs text-lagoon">{r.reference}</span>
                     <a href={`mailto:${r.email}`} className="block text-xs text-bark hover:text-ink">
                       {r.email}
                     </a>
@@ -178,11 +193,20 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                     </a>
                   </td>
                   <td className="px-4 py-3">
-                    {r.excursion_title_el || r.excursion_title_en || r.excursion_slug}
+                    <Link href={`/admin/excursions/${r.excursion_id}#requests`} className="font-medium underline-offset-2 hover:underline">
+                      {r.excursion_title_el || r.excursion_title_en || r.excursion_slug}
+                    </Link>
                     {all && <span className="mt-0.5 block text-xs text-bark">{r.kind === "interest" ? B.kindShortInterest : B.kindShortBooking}</span>}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
-                    {r.kind === "interest" ? <span className="text-bark">{r.preferred_period || B.notGiven}</span> : formatDay(r.departure_date, r.departure_time)}
+                    {r.departure_id ? (
+                      formatRun(r.departure_date, r.return_date, r.departure_time)
+                    ) : (
+                      <span className="text-bark">
+                        {B.noDate}
+                        {r.preferred_period && <span className="block text-xs">{fmt(B.preferredShort, { period: r.preferred_period })}</span>}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">{r.participants}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums">{formatEurAdmin(r.total_eur)}</td>

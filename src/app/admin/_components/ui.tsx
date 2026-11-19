@@ -125,6 +125,17 @@ export function formatDay(iso: string | null | undefined, time?: string | null):
   return time ? `${d} ${time.slice(0, 5)}` : d;
 }
 
+/** A run's dates: "Σάβ 6 Ιουν – Κυρ 7 Ιουν 2026" for multi-day runs, else formatDay(). */
+export function formatRun(start: string | null | undefined, end?: string | null, time?: string | null): string {
+  if (!start) return "—";
+  if (!end || end <= start) return formatDay(start, time);
+  const sameYear = start.slice(0, 4) === end.slice(0, 4);
+  const first = new Intl.DateTimeFormat("el-GR", { weekday: "short", day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" }), timeZone: "UTC" }).format(
+    new Date(`${start}T00:00:00Z`),
+  );
+  return `${first}${time ? ` ${time.slice(0, 5)}` : ""} – ${formatDay(end)}`;
+}
+
 export function formatEurAdmin(v: string | number | null | undefined): string {
   if (v === null || v === undefined || v === "") return "—";
   const n = Number(v);
