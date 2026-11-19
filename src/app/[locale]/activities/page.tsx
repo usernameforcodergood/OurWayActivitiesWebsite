@@ -10,8 +10,7 @@ import { SectionLabel } from "@/components/ui/SectionLabel";
 import { ButtonLink } from "@/components/ui/Button";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { ExperienceBrowser } from "@/components/activities/ExperienceBrowser";
-import { CTASection } from "@/components/sections/CTASection";
-import { pad } from "@/lib/utils";
+import { CTASection } from "@/components/sections/CTASection";import { pad } from "@/lib/utils";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/activities">): Promise<Metadata> {
   const { locale } = await params;
@@ -29,7 +28,19 @@ export default async function ActivitiesPage({ params }: PageProps<"/[locale]/ac
 
   return (
     <>
-      <PageHero locale={locale} eyebrow={a.hero.eyebrow} title={a.hero.title} lead={a.hero.lead} image="roadPause" />
+      <PageHero
+        locale={locale}
+        eyebrow={a.hero.eyebrow}
+        title={a.hero.title}
+        lead={a.hero.lead}
+        image="roadPause"
+        video={{
+          // Ambient film from a OurWay hike on Kissavos, behind the title
+          src: "/videos/experiences-kissavos-1280.mp4",
+          mobileSrc: "/videos/experiences-kissavos-864.mp4",
+          poster: "/videos/experiences-kissavos-poster.jpg",
+        }}
+      />
 
       {list.length > 0 && (
         <section aria-labelledby="list-title" className="section-y bg-ink text-bone">
