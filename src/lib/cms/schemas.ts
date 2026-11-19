@@ -115,6 +115,22 @@ export const excursionSchema = z
         }
         return Math.round(n * 100) / 100;
       }),
+    /** Deposit per person (€). Optional; never negative or above the price. */
+    deposit_eur: z
+      .union([z.number(), z.string()])
+      .nullable()
+      .optional()
+      .transform((v, ctx) => {
+        if (v === null || v === undefined || String(v).trim() === "") return null;
+        const n = typeof v === "number" ? v : Number(String(v).trim().replace(",", "."));
+        if (!Number.isFinite(n) || n < 0 || n > 1_000_000) {
+          ctx.addIssue({ code: "custom", message: "depositInvalid" });
+          return z.NEVER;
+        }
+        return Math.round(n * 100) / 100;
+      }),
+    // Legacy free-text note: no longer edited in the admin, but passed through
+    // unchanged so saving never erases what is already stored.
     price_note_el: optText(200),
     price_note_en: optText(200),
     kind: z.enum(["excursion", "event"]),
@@ -133,6 +149,9 @@ export const excursionSchema = z
   })
   .superRefine((v, ctx) => {
     if (!v.title_el && !v.title_en) ctx.addIssue({ code: "custom", path: ["title_el"], message: "titleRequired" });
+    if (v.deposit_eur != null && v.price_eur != null && v.deposit_eur > v.price_eur) {
+      ctx.addIssue({ code: "custom", path: ["deposit_eur"], message: "depositAbovePrice" });
+    }
     if (v.status === "published") {
       const complete = (v.title_el && v.summary_el) || (v.title_en && v.summary_en);
       if (!complete) ctx.addIssue({ code: "custom", path: ["summary_el"], message: "publishNeedsLanguage" });

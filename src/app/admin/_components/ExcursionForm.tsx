@@ -37,6 +37,7 @@ type FormState = {
   featured: boolean;
   participants: string;
   price_eur: string;
+  deposit_eur: string;
   kind: "excursion" | "event";
   booking_mode: "departures" | "interest" | "none";
   primary_category: PrimaryCategory | "";
@@ -58,6 +59,7 @@ function fromRow(row: ExcursionRow | null): FormState {
     featured: row?.featured ?? false,
     participants: row?.participants ?? "",
     price_eur: row?.price_eur === null || row?.price_eur === undefined ? "" : String(row.price_eur),
+    deposit_eur: row?.deposit_eur === null || row?.deposit_eur === undefined ? "" : String(row.deposit_eur),
     kind: row?.kind ?? "excursion",
     booking_mode: row?.booking_mode ?? "departures",
     primary_category: row?.primary_category ?? "",
@@ -126,6 +128,7 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
       gallery: form.gallery.map((g) => g.id),
       participants: form.participants,
       price_eur: form.price_eur.trim() === "" ? null : form.price_eur,
+      deposit_eur: form.deposit_eur.trim() === "" ? null : form.deposit_eur,
       kind: form.kind,
       booking_mode: form.booking_mode,
       primary_category: form.primary_category || null,
@@ -282,9 +285,6 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
               <Field id={lf("difficulty")} label={L.difficulty} optional>
                 <input id={lf("difficulty")} value={form[lf("difficulty")]} onChange={(e) => set(lf("difficulty"), e.target.value)} placeholder={L.difficultyPlaceholder} className="admin-input" />
               </Field>
-              <Field id={lf("price_note")} label={L.priceNote} optional>
-                <input id={lf("price_note")} value={form[lf("price_note")]} onChange={(e) => set(lf("price_note"), e.target.value)} placeholder={L.priceNotePlaceholder} className="admin-input" />
-              </Field>
               <Field id={lf("availability_note")} label={L.availabilityNote} optional>
                 <input id={lf("availability_note")} value={form[lf("availability_note")]} onChange={(e) => set(lf("availability_note"), e.target.value)} className="admin-input" />
               </Field>
@@ -308,22 +308,50 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
         <Card>
           <h2 className="mb-5 text-lg font-semibold">{t.excursions.sections.details}</h2>
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field id="participants" label={L.participants} optional>
-              <input id="participants" value={form.participants} onChange={(e) => set("participants", e.target.value)} placeholder={L.participantsPlaceholder} className="admin-input" />
-            </Field>
             <Field id="price_eur" label={L.price} optional error={err("price_eur")}>
               <input
                 id="price_eur"
                 inputMode="decimal"
                 value={form.price_eur}
                 onChange={(e) => set("price_eur", e.target.value)}
-                placeholder="0.00"
+                placeholder="π.χ. 140"
                 className="admin-input"
                 aria-invalid={Boolean(errors.price_eur) || undefined}
               />
             </Field>
+            <Field id="deposit_eur" label={L.deposit} optional error={err("deposit_eur")}>
+              <input
+                id="deposit_eur"
+                inputMode="decimal"
+                value={form.deposit_eur}
+                onChange={(e) => set("deposit_eur", e.target.value)}
+                placeholder="π.χ. 50"
+                className="admin-input"
+                aria-invalid={Boolean(errors.deposit_eur) || undefined}
+              />
+            </Field>
           </div>
           <p className="mt-3 text-xs text-bark">{L.priceDefaultHint}</p>
+          {(form.price_note_el.trim() || form.price_note_en.trim()) && (
+            <div className="mt-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-950">
+              <p className="font-semibold">{L.legacyPriceNote}</p>
+              <ul className="mt-1 space-y-0.5">
+                {(["el", "en"] as const).map((l) =>
+                  form[`price_note_${l}`].trim() ? (
+                    <li key={l}>
+                      {l.toUpperCase()}: «{form[`price_note_${l}`]}»
+                    </li>
+                  ) : null,
+                )}
+              </ul>
+              <p className="mt-1">{L.legacyPriceNoteHint}</p>
+            </div>
+          )}
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            <Field id="participants" label={L.participants} optional>
+              <input id="participants" value={form.participants} onChange={(e) => set("participants", e.target.value)} placeholder={L.participantsPlaceholder} className="admin-input" />
+            </Field>
+          </div>
         </Card>
 
         <Card>

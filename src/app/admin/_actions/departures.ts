@@ -15,6 +15,14 @@ export async function saveDeparture(input: DepartureInput): Promise<ActionResult
   const { id, booking_deadline, ...fields } = parsed.data;
   const row = { ...fields, booking_deadline: booking_deadline ? athensInputToIso(booking_deadline) : null };
   const db = await createSupabaseServerClient();
+  // A departure's own price may not be lower than the excursion's deposit.
+  if (fields.price_eur != null) {
+    const { data: ex } = await db.from("excursions").select("deposit_eur").eq("id", fields.excursion_id).maybeSingle();
+    const deposit = ex?.deposit_eur == null ? null : Number(ex.deposit_eur);
+    if (deposit != null && fields.price_eur < deposit) {
+      return { ok: false, error: "validation", fieldErrors: { price_eur: "depositAboveDeparturePrice" } };
+    }
+  }
   const q = id
     ? db.from("departures").update(row).eq("id", id).eq("excursion_id", fields.excursion_id).select("id").single()
     : db.from("departures").insert(row).select("id").single();

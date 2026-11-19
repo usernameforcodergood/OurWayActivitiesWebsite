@@ -39,6 +39,9 @@ export type ExcursionRow = {
   difficulty_en: string | null;
   participants: string | null;
   price_eur: number | string | null;
+  /** Deposit per person (migration 0009). Undefined on databases without it. */
+  deposit_eur?: number | string | null;
+  /** Legacy free-text note: kept in the DB, no longer edited or shown publicly. */
   price_note_el: string | null;
   price_note_en: string | null;
   available_dates: string[];
@@ -168,8 +171,10 @@ export type PublicExcursion = {
   duration?: string;
   difficulty?: string;
   participants?: string;
+  /** Base price per person (€). */
   priceEur?: number;
-  priceNote?: string;
+  /** Deposit per person (€). */
+  depositEur?: number;
   availabilityNote?: string;
   info: string[];
   cover: CmsImage | null;

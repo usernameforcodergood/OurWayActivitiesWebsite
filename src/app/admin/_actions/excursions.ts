@@ -16,6 +16,18 @@ export async function saveExcursion(input: ExcursionInput): Promise<ActionResult
   const { id, gallery, ...fields } = parsed.data;
   const supabase = await createSupabaseServerClient();
 
+  // A departure with its own price must not end up cheaper than the deposit.
+  if (id && fields.deposit_eur != null) {
+    const { data: priced } = await supabase
+      .from("departures")
+      .select("price_eur")
+      .eq("excursion_id", id)
+      .not("price_eur", "is", null)
+      .lt("price_eur", fields.deposit_eur)
+      .limit(1);
+    if (priced?.length) return { ok: false, error: "validation", fieldErrors: { deposit_eur: "depositAboveDeparturePrice" } };
+  }
+
   let publishedAt: string | null | undefined;
   if (fields.status === "published") {
     if (id) {
