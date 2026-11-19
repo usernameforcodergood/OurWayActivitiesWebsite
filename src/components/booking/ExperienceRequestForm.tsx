@@ -252,7 +252,10 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
                       <span className="flex items-start gap-3">
                         <input type="radio" value={d.id} disabled={!isOpen} {...register("departureId")} className="mt-1 size-4 accent-[#1e3530]" />
                         <span>
-                          <span className="block font-semibold">{formatDateLong(d.date, locale, d.time)}</span>
+                          <span className="block font-semibold">
+                            {formatDateLong(d.date, locale, d.time)}
+                            {d.returnDate && d.returnDate !== d.date && <> – {formatDateLong(d.returnDate, locale)}</>}
+                          </span>
                           <span className="block text-xs text-bark">
                             {isOpen
                               ? [
@@ -327,10 +330,10 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
                 <dl className="grid grid-cols-2 gap-y-1 text-sm">
                   <dt className="text-bark">{f.pricePerPerson}</dt>
                   <dd className="text-right">{formatEur(selected.priceEur, locale)}</dd>
-                  {excursion.depositEur !== undefined && (
+                  {(selected.depositEur ?? excursion.depositEur) != null && (
                     <>
                       <dt className="text-bark">{f.depositPerPerson}</dt>
-                      <dd className="text-right">{formatEur(excursion.depositEur, locale)}</dd>
+                      <dd className="text-right">{formatEur((selected.depositEur ?? excursion.depositEur) as number, locale)}</dd>
                     </>
                   )}
                   <dt className="font-semibold">{f.total}</dt>

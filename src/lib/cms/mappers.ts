@@ -24,6 +24,9 @@ export type DepartureAvailabilityRow = {
   state: PublicDeparture["state"];
   note_el: string | null;
   note_en: string | null;
+  /** Added in 0010; absent until that migration runs. */
+  return_date?: string | null;
+  deposit_eur?: number | string | null;
 };
 
 const num = (v: number | string | null | undefined) => (v === null || v === undefined || v === "" ? null : Number(v));
@@ -34,7 +37,9 @@ export function toPublicDeparture(r: DepartureAvailabilityRow): PublicDeparture 
     date: r.departure_date,
     time: r.departure_time,
     returnTime: r.return_time,
+    returnDate: r.return_date ?? null,
     priceEur: num(r.price_eur),
+    depositEur: num(r.deposit_eur),
     capacity: r.capacity,
     minParticipants: r.min_participants,
     remaining: r.remaining,

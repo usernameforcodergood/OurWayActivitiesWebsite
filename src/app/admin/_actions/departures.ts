@@ -15,12 +15,15 @@ export async function saveDeparture(input: DepartureInput): Promise<ActionResult
   const { id, booking_deadline, ...fields } = parsed.data;
   const row = { ...fields, booking_deadline: booking_deadline ? athensInputToIso(booking_deadline) : null };
   const db = await createSupabaseServerClient();
-  // A departure's own price may not be lower than the excursion's deposit.
-  if (fields.price_eur != null) {
-    const { data: ex } = await db.from("excursions").select("deposit_eur").eq("id", fields.excursion_id).maybeSingle();
-    const deposit = ex?.deposit_eur == null ? null : Number(ex.deposit_eur);
-    if (deposit != null && fields.price_eur < deposit) {
-      return { ok: false, error: "validation", fieldErrors: { price_eur: "depositAboveDeparturePrice" } };
+  // Effective deposit (own, else the excursion's) may not exceed the effective price.
+  if (fields.price_eur == null || fields.deposit_eur == null) {
+    const { data: ex } = await db.from("excursions").select("price_eur, deposit_eur").eq("id", fields.excursion_id).maybeSingle();
+    const n = (v: unknown) => (v == null || v === "" ? null : Number(v));
+    const price = fields.price_eur ?? n(ex?.price_eur);
+    const deposit = fields.deposit_eur ?? n(ex?.deposit_eur);
+    if (price != null && deposit != null && deposit > price) {
+      const field = fields.deposit_eur != null ? "deposit_eur" : "price_eur";
+      return { ok: false, error: "validation", fieldErrors: { [field]: field === "deposit_eur" ? "depositAbovePrice" : "depositAboveDeparturePrice" } };
     }
   }
   const q = id

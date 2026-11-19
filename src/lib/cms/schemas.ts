@@ -57,9 +57,18 @@ export const departureSchema = z
     id: z.uuid().optional(),
     excursion_id: z.uuid(),
     departure_date: isoDate,
+    /** Last day of a multi-day run; empty = same day. */
+    return_date: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((v) => (v ? v : null))
+      .refine((v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v), "dateInvalid"),
     departure_time: timeOpt,
     return_time: timeOpt,
     price_eur: priceOpt,
+    /** Own deposit per person; empty = the excursion's deposit. */
+    deposit_eur: priceOpt,
     capacity: intOpt(1, 10000, "capacityInvalid"),
     min_participants: intOpt(1, 10000, "minInvalid"),
     /** Greek local date-time "YYYY-MM-DDTHH:mm", converted on the server. */
@@ -76,6 +85,12 @@ export const departureSchema = z
   .superRefine((v, ctx) => {
     if (v.capacity && v.min_participants && v.min_participants > v.capacity) {
       ctx.addIssue({ code: "custom", path: ["min_participants"], message: "minAboveCapacity" });
+    }
+    if (v.return_date && v.return_date < v.departure_date) {
+      ctx.addIssue({ code: "custom", path: ["return_date"], message: "returnBeforeStart" });
+    }
+    if (v.deposit_eur != null && v.price_eur != null && v.deposit_eur > v.price_eur) {
+      ctx.addIssue({ code: "custom", path: ["deposit_eur"], message: "depositAbovePrice" });
     }
   });
 export type DepartureInput = z.input<typeof departureSchema>;

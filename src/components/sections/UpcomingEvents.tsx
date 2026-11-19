@@ -22,7 +22,7 @@ export function UpcomingEvents({ items, locale, t, today }: { items: PublicExcur
         </div>
         <ul className="border-t border-bone/15 md:col-span-7 md:col-start-6">
           {items.map((ev) => {
-            const next = ev.departures.find((d) => d.date >= today && d.status !== "cancelled" && d.status !== "completed");
+            const next = ev.departures.find((d) => d.date > today && d.status !== "cancelled" && d.status !== "completed");
             return (
               <li key={ev.slug} className="border-b border-bone/15">
                 <Link href={localePath(locale, `${routes.activities}/${ev.slug}`)} className="group flex items-start justify-between gap-6 py-7">

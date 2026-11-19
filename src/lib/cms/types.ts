@@ -81,7 +81,11 @@ export type DepartureRow = {
   departure_date: string;
   departure_time: string | null;
   return_time: string | null;
+  /** Last day of a multi-day run (migration 0010). Null = same day. */
+  return_date?: string | null;
   price_eur: number | string | null;
+  /** Deposit per person for this run (0010). Null = the excursion's deposit. */
+  deposit_eur?: number | string | null;
   capacity: number | null;
   min_participants: number | null;
   booking_deadline: string | null;
@@ -101,7 +105,10 @@ export type PublicDeparture = {
   date: string;
   time: string | null;
   returnTime: string | null;
+  returnDate: string | null;
   priceEur: number | null;
+  /** Effective deposit per person: the run's own, else the excursion's. */
+  depositEur: number | null;
   capacity: number | null;
   minParticipants: number | null;
   /** null = no capacity limit */
