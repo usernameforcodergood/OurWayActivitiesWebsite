@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { TAGS } from "@/lib/cms/public";
 import { excursionSchema, issuesToFields, type ActionResult, type ExcursionInput } from "@/lib/cms/schemas";
+import { cleanRichText } from "@/lib/cms/richTextSanitize";
 
 /** Create or update an excursion (including its status and gallery). */
 export async function saveExcursion(input: ExcursionInput): Promise<ActionResult<{ id: string; slug: string }>> {
@@ -14,6 +15,9 @@ export async function saveExcursion(input: ExcursionInput): Promise<ActionResult
     return { ok: false, error: "validation", fieldErrors: issuesToFields(parsed.error.issues) };
   }
   const { id, gallery, ...fields } = parsed.data;
+  // Formatted descriptions: only the editor's own safe markup reaches the database.
+  fields.description_el = cleanRichText(fields.description_el);
+  fields.description_en = cleanRichText(fields.description_en);
   const supabase = await createSupabaseServerClient();
 
   // A run with its own price (and no own deposit) must not end up cheaper than this deposit.

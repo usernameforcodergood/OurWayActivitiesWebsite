@@ -7,6 +7,7 @@ import type { PublicExcursion } from "@/lib/cms/types";
 import { PageHero } from "@/components/ui/PageHero";
 import { ImageReveal } from "@/components/animations/ImageReveal";
 import { ButtonLink } from "@/components/ui/Button";
+import { RichText } from "@/components/ui/RichText";
 import { ExperienceRequestForm } from "@/components/booking/ExperienceRequestForm";
 import { REQUEST_FORM_ID } from "@/lib/bookings/validation";
 
@@ -73,16 +74,10 @@ export function ExcursionView({
               <ArrowLeft aria-hidden className="size-4" />
               {d.back}
             </Link>
-            {excursion.description.length > 0 && (
+            {excursion.description && (
               <>
                 <h2 className="text-display-sm mb-8">{d.overview}</h2>
-                <div className="text-lead space-y-6 text-bone/80">
-                  {excursion.description.map((p, i) => (
-                    <p key={i} className="whitespace-pre-line">
-                      {p}
-                    </p>
-                  ))}
-                </div>
+                <RichText value={excursion.description} className="text-lead text-bone/80" />
               </>
             )}
             {excursion.included.length > 0 && (

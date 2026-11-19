@@ -13,6 +13,7 @@ import { Field, Toggle } from "./Field";
 import { LangTabs, type Lang } from "./LangTabs";
 import { GalleryPicker, SingleImagePicker } from "./MediaPicker";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { RichTextEditor } from "./RichTextEditor";
 import { Btn, Card, StatusBadge, formatDate } from "./ui";
 
 const LOCALIZED = [
@@ -264,12 +265,14 @@ export function ExcursionForm({ row, initialKind = "excursion" }: { row: Excursi
               />
             </Field>
             <Field id={lf("description")} label={L.description} hint={L.descriptionHint} optional>
-              <textarea
+              {/* Remounts per language so each version is edited on its own. */}
+              <RichTextEditor
+                key={lang}
                 id={lf("description")}
                 value={form[lf("description")]}
-                onChange={(e) => set(lf("description"), e.target.value)}
-                rows={8}
-                className="admin-input"
+                onChange={(html) => set(lf("description"), html)}
+                label={`${L.description} (${lang.toUpperCase()})`}
+                describedBy={`${lf("description")}-hint`}
               />
             </Field>
             <div className="grid gap-5 sm:grid-cols-2">

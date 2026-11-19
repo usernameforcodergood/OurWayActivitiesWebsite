@@ -1,0 +1,114 @@
+/* Formatted descriptions — shared by the public page (.rich-text) and the admin editor,
+   so what the admin writes looks the same on the website. Colours come from the
+   surrounding surface through --rt-* variables (dark site by default). */
+
+.rich-text {
+  --rt-heading: var(--color-bone);
+  --rt-strong: var(--color-bone);
+  --rt-accent: var(--color-lichen);
+  --rt-rule: rgb(242 239 231 / 0.18);
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: manual;
+}
+
+.rich-text > * + * {
+  margin-top: 1.1em;
+}
+.rich-text p:empty::before {
+  content: "\200b"; /* keeps intentional blank lines visible */
+}
+
+.rich-text h2,
+.rich-text h3,
+.rich-text h4 {
+  color: var(--rt-heading);
+  text-wrap: balance;
+}
+.rich-text h2 {
+  font-family: var(--font-display);
+  font-size: 1.55em;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin-top: 1.8em;
+}
+.rich-text h3 {
+  font-size: 1.2em;
+  line-height: 1.3;
+  font-weight: 650;
+  margin-top: 1.6em;
+}
+.rich-text h4 {
+  font-size: 1em;
+  line-height: 1.4;
+  font-weight: 650;
+  margin-top: 1.4em;
+}
+.rich-text > :first-child {
+  margin-top: 0;
+}
+.rich-text h2 + *,
+.rich-text h3 + *,
+.rich-text h4 + * {
+  margin-top: 0.55em;
+}
+
+.rich-text strong {
+  color: var(--rt-strong);
+  font-weight: 650;
+}
+.rich-text span[style*="color"] strong {
+  color: inherit;
+}
+.rich-text em {
+  font-style: italic;
+}
+.rich-text u {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+.rich-text s {
+  text-decoration: line-through;
+}
+
+.rich-text a {
+  color: var(--rt-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+.rich-text a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.rich-text ul,
+.rich-text ol {
+  padding-left: 1.35em;
+}
+.rich-text ul {
+  list-style: disc;
+}
+.rich-text ol {
+  list-style: decimal;
+}
+.rich-text ul ul {
+  list-style: circle;
+}
+.rich-text li + li,
+.rich-text li > ul,
+.rich-text li > ol {
+  margin-top: 0.4em;
+}
+.rich-text li::marker {
+  color: var(--rt-accent);
+}
+.rich-text li > p {
+  margin: 0;
+}
+
+.rich-text hr {
+  border: 0;
+  border-top: 1px solid var(--rt-rule);
+  margin-block: 2.2em;
+}

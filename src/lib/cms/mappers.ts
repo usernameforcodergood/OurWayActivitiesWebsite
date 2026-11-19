@@ -112,7 +112,7 @@ export function toPublicExcursion(row: ExcursionRow, locale: Locale): PublicExcu
     locales: availableLocales(row),
     title,
     summary: pick(row, "summary", locale) ?? "",
-    description: paragraphs(locale === "el" ? row.description_el : row.description_en),
+    description: (locale === "el" ? row.description_el : row.description_en)?.trim() ?? "",
     destination: pick(row, "destination", locale),
     primaryCategory: row.primary_category ?? null,
     category: pick(row, "category", locale),
