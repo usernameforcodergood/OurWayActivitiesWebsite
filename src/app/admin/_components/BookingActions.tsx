@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Ban, CalendarClock, Check, CheckCheck, Mail, X } from "lucide-react";
 import { extendBookingHold, resendBookingEmail, setBookingStatus } from "../_actions/bookings";
@@ -43,6 +43,7 @@ export function BookingActions({
 }) {
   const router = useRouter();
   const toast = useToast();
+  const uid = useId();
   const [target, setTarget] = useState<Target | null>(null);
   const [note, setNote] = useState("");
   const [notify, setNotify] = useState(true);
@@ -109,17 +110,17 @@ export function BookingActions({
         {holdExpired && status === "pending" && <p className="rounded-lg bg-amber-50 p-2.5 text-xs text-amber-900">{B.holdExpired}</p>}
       </div>
 
-      <dialog ref={ref} onClose={() => setTarget(null)} aria-labelledby="bk-dialog-title" className="m-auto w-[min(30rem,calc(100vw-2rem))] rounded-2xl p-0 shadow-xl">
+      <dialog ref={ref} onClose={() => setTarget(null)} aria-labelledby={`${uid}-title`} className="m-auto w-[min(30rem,calc(100vw-2rem))] rounded-2xl p-0 shadow-xl">
         {target && (
           <div className="p-6">
-            <h2 id="bk-dialog-title" className="text-lg font-semibold">
+            <h2 id={`${uid}-title`} className="text-lg font-semibold">
               {DIALOG[target].title}
             </h2>
             <p className="mt-2 text-sm text-bark">{fmt(DIALOG[target].body, { ref: reference, people: participants })}</p>
-            <label htmlFor="bk-note" className="mt-5 block text-sm font-semibold">
+            <label htmlFor={`${uid}-note`} className="mt-5 block text-sm font-semibold">
               {B.customerNote}
             </label>
-            <textarea id="bk-note" value={note} onChange={(e) => setNote(e.target.value)} rows={3} maxLength={2000} className="admin-input mt-1.5" />
+            <textarea id={`${uid}-note`} value={note} onChange={(e) => setNote(e.target.value)} rows={3} maxLength={2000} className="admin-input mt-1.5" />
             <p className="mt-1 text-xs text-bark">{B.customerNoteHint}</p>
             {DIALOG[target].email && (
               <label className="mt-4 flex items-center gap-2 text-sm">

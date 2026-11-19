@@ -44,6 +44,11 @@ export type BookingOverviewRow = {
   excursion_kind: "excursion" | "event";
   /** General-experience inquiries only (migration 0007). */
   preferred_period: string | null;
+  /** Migration 0011: the run's last day / status, and the customer's own text. */
+  return_date?: string | null;
+  departure_status?: string | null;
+  message?: string | null;
+  special_requests?: string | null;
 };
 
 export type BookingDetail = BookingOverviewRow & {
@@ -65,6 +70,8 @@ export type BookingListParams = {
   /** Cross-kind stage filter (new / being handled / confirmed / cancelled). */
   stage: "all" | RequestStage;
   excursion: string;
+  /** One run of the chosen excursion (uuid), "none" = requests without a date, "" = all. */
+  departure: string;
   from: string;
   to: string;
   sort: "submitted" | "submitted_asc" | "departure";
@@ -89,6 +96,8 @@ export function parseBookingParams(sp: Record<string, string | string[] | undefi
     status: valid.includes(status) ? (status as BookingStatus) : "all",
     stage: stage in REQUEST_STAGES ? (stage as RequestStage) : "all",
     excursion: isUuid(one("excursion")) ? one("excursion") : "",
+    // A run only makes sense inside its excursion.
+    departure: isUuid(one("excursion")) && (isUuid(one("departure")) || one("departure") === "none") ? one("departure") : "",
     from: isDate(one("from")) ? one("from") : "",
     to: isDate(one("to")) ? one("to") : "",
     sort: sort === "submitted_asc" || sort === "departure" ? sort : "submitted",
@@ -103,6 +112,8 @@ export async function listBookings(p: BookingListParams) {
   if (p.status !== "all") q = q.eq("status", p.status);
   if (p.stage !== "all") q = q.in("status", [...REQUEST_STAGES[p.stage]]);
   if (p.excursion) q = q.eq("excursion_id", p.excursion);
+  if (p.departure === "none") q = q.is("departure_id", null);
+  else if (p.departure) q = q.eq("departure_id", p.departure);
   if (p.from) q = q.gte("departure_date", p.from);
   if (p.to) q = q.lte("departure_date", p.to);
   if (p.q) {
@@ -122,6 +133,34 @@ export async function listExcursionOptions() {
   const db = await createSupabaseServerClient();
   const { data } = await db.from("excursions").select("id, title_el, title_en, slug").order("updated_at", { ascending: false }).limit(300);
   return (data ?? []) as Array<{ id: string; title_el: string | null; title_en: string | null; slug: string }>;
+}
+
+/** Runs of one excursion for the date filter (newest first). */
+export async function listDepartureOptions(excursionId: string) {
+  if (!isUuid(excursionId)) return [];
+  const db = await createSupabaseServerClient();
+  const { data } = await db
+    .from("departures")
+    .select("id, departure_date, return_date, departure_time, status")
+    .eq("excursion_id", excursionId)
+    .order("departure_date", { ascending: false })
+    .limit(200);
+  return (data ?? []) as DepartureOption[];
+}
+export type DepartureOption = { id: string; departure_date: string; return_date: string | null; departure_time: string | null; status: string };
+
+/** Every request of one excursion (all runs + requests without a date), for its admin page. */
+export async function listExcursionRequests(excursionId: string) {
+  if (!isUuid(excursionId)) return [];
+  const db = await createSupabaseServerClient();
+  const { data, error } = await db
+    .from("booking_overview")
+    .select("*")
+    .eq("excursion_id", excursionId)
+    .order("created_at", { ascending: false })
+    .limit(1000);
+  if (error) console.error("[admin] excursion requests:", error.message);
+  return (data ?? []) as BookingOverviewRow[];
 }
 
 export async function getBookingDetail(id: string) {
