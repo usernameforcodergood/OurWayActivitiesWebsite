@@ -6,14 +6,13 @@ import {
   EXPERIENCE_TYPES,
   INQUIRY_STATUSES,
   PRIVATE_STATUSES,
-  REQUEST_STAGES,
-  type RequestStage,
   type BookingStatus,
   type ExperienceType,
   type PrivateStatus,
 } from "@/lib/bookings/validation";
 import { ilikePattern } from "../_components/ListToolbar";
 import { PAGE_SIZE } from "./queries";
+import { athensInputToIso } from "./athens-time";
 import { PAYMENT_FILTERS, num, type BookingMoney, type PaymentFilter, type PaymentRow } from "./payments";
 
 /** Admin reads use the admin's session; RLS hides everything from anyone else. */
@@ -63,21 +62,39 @@ export type HistoryRow = { id: number; from_status: string | null; to_status: st
 export type NoteRow = { id: number; body: string; author_id: string | null; created_at: string };
 export type EmailRow = { id: number; kind: string; recipient: string; status: "sent" | "failed" | "not_configured"; error: string | null; created_at: string };
 
+/* --------------------------- Bookings admin page ---------------------------- */
+
+export const BOOKING_SECTIONS = ["bookings", "inquiries"] as const;
+export type BookingSection = (typeof BOOKING_SECTIONS)[number];
+export const DEPARTURE_WINDOWS = ["upcoming", "past", "all"] as const;
+export type DepartureWindow = (typeof DEPARTURE_WINDOWS)[number];
+export const INQUIRY_SORTS = ["submitted", "submitted_asc"] as const;
+export const DATE_SORTS = ["date_asc", "date_desc"] as const;
+
 export type BookingListParams = {
-  /** Everything (default), scheduled participation requests, or general-experience inquiries. */
-  kind: "all" | "booking" | "interest";
+  /** «Κρατήσεις εκδρομών» (kind = booking, grouped by date) or «Ερωτήματα εμπειριών» (kind = interest). */
+  section: BookingSection;
   q: string;
   status: "all" | BookingStatus;
-  /** Cross-kind stage filter (new / being handled / confirmed / cancelled). */
-  stage: "all" | RequestStage;
+  /** Upcoming / past / all dates. null = not chosen (upcoming, or all while a filter is active). */
+  when: DepartureWindow | null;
+  /** Also list dates that have no requests. */
+  showEmpty: boolean;
+  // "Περισσότερα φίλτρα" — always optional.
   excursion: string;
-  /** One run of the chosen excursion (uuid), "none" = requests without a date, "" = all. */
+  /** One date (departure uuid), e.g. from an excursion's page. */
   departure: string;
+  /** Departure date range. */
   from: string;
   to: string;
-  sort: "submitted" | "submitted_asc" | "departure";
+  /** Submission date range. */
+  sfrom: string;
+  sto: string;
+  /** Bookings: date order. Inquiries: submission order. "" = section default. */
+  sort: "" | (typeof DATE_SORTS)[number] | (typeof INQUIRY_SORTS)[number];
   /** Money still owed ("open") or money to give back ("refund"); "all" = no filter. */
   payment: "all" | PaymentFilter;
+  /** Inquiries only (the bookings view is grouped, not paged). */
   page: number;
 };
 
@@ -86,52 +103,231 @@ const isUuid = (v: string) => /^[0-9a-f-]{36}$/i.test(v);
 
 export function parseBookingParams(sp: Record<string, string | string[] | undefined>): BookingListParams {
   const one = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : "");
-  const status = one("status");
-  const sort = one("sort");
+  // Old links: ?kind=interest and ?departure=none (requests without a date) meant inquiries.
+  const section: BookingSection =
+    one("section") === "inquiries" || (one("section") === "" && (one("kind") === "interest" || one("departure") === "none")) ? "inquiries" : "bookings";
+  const statuses: readonly string[] = section === "inquiries" ? INQUIRY_STATUSES : BOOKING_STATUSES;
+  const sorts: readonly string[] = section === "inquiries" ? INQUIRY_SORTS : DATE_SORTS;
   const page = Number.parseInt(one("page"), 10);
-  const k = one("kind");
-  const kind = k === "interest" || k === "booking" ? k : "all";
-  const valid: readonly string[] = kind === "interest" ? INQUIRY_STATUSES : kind === "booking" ? BOOKING_STATUSES : [...BOOKING_STATUSES, ...INQUIRY_STATUSES];
-  const stage = one("stage");
   return {
-    kind,
-    q: one("q").slice(0, 100),
-    status: valid.includes(status) ? (status as BookingStatus) : "all",
-    stage: stage in REQUEST_STAGES ? (stage as RequestStage) : "all",
+    section,
+    q: one("q").trim().slice(0, 100),
+    status: statuses.includes(one("status")) ? (one("status") as BookingStatus) : "all",
+    when: (DEPARTURE_WINDOWS as readonly string[]).includes(one("when")) ? (one("when") as DepartureWindow) : null,
+    showEmpty: one("empty") === "1",
     excursion: isUuid(one("excursion")) ? one("excursion") : "",
-    // A run only makes sense inside its excursion.
-    departure: isUuid(one("excursion")) && (isUuid(one("departure")) || one("departure") === "none") ? one("departure") : "",
+    departure: section === "bookings" && isUuid(one("departure")) ? one("departure") : "",
     from: isDate(one("from")) ? one("from") : "",
     to: isDate(one("to")) ? one("to") : "",
-    sort: sort === "submitted_asc" || sort === "departure" ? sort : "submitted",
+    sfrom: isDate(one("sfrom")) ? one("sfrom") : "",
+    sto: isDate(one("sto")) ? one("sto") : "",
+    sort: sorts.includes(one("sort")) ? (one("sort") as BookingListParams["sort"]) : "",
     payment: (PAYMENT_FILTERS as readonly string[]).includes(one("payment")) ? (one("payment") as PaymentFilter) : "all",
     page: Number.isFinite(page) && page > 0 ? page : 1,
   };
 }
 
-export async function listBookings(p: BookingListParams) {
+/** Filters that narrow the requests themselves (not just which dates are shown). */
+export function hasRequestFilters(p: BookingListParams): boolean {
+  return Boolean(p.q || p.sfrom || p.sto) || p.status !== "all" || p.payment !== "all";
+}
+
+/** Any filter at all (anything beyond the default view). */
+export function hasAnyFilter(p: BookingListParams): boolean {
+  return hasRequestFilters(p) || Boolean(p.excursion || p.departure || p.from || p.to);
+}
+
+/** Upcoming by default; while searching / filtering, every date unless one was chosen. */
+export function effectiveWindow(p: BookingListParams): DepartureWindow {
+  return p.when ?? (hasAnyFilter(p) ? "all" : "upcoming");
+}
+
+/** Submission-date filter bounds: Athens days → UTC instants (DST-aware). [start, next day start). */
+function athensDayRange(from: string, to: string): { gte: string | null; lt: string | null } {
+  const next = (d: string) => new Date(Date.parse(`${d}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+  return { gte: from ? athensInputToIso(`${from}T00:00`) : null, lt: to ? athensInputToIso(`${next(to)}T00:00`) : null };
+}
+
+/** Search across customer, contact, reference and excursion title. */
+function searchOr(q: string) {
+  const pat = ilikePattern(q);
+  return `full_name.ilike.${pat},email.ilike.${pat},reference.ilike.${pat},phone.ilike.${pat},excursion_title_el.ilike.${pat},excursion_title_en.ilike.${pat}`;
+}
+
+export type DepartureGroupRow = {
+  id: string;
+  departure_date: string;
+  return_date: string | null;
+  departure_time: string | null;
+  capacity: number | null;
+  status: "open" | "full" | "cancelled" | "completed";
+  /** All requests of this date, whatever the filters. */
+  summary: { requests: number; pending: number; confirmedPeople: number; heldPeople: number };
+  /** The requests to list (filtered when a filter is active). */
+  requests: BookingOverviewRow[];
+};
+export type ExcursionGroup = { excursionId: string; title: string; slug: string; dates: DepartureGroupRow[] };
+
+type DepartureWithExcursion = Omit<DepartureGroupRow, "summary" | "requests"> & {
+  excursion_id: string;
+  excursion: { id: string; title_el: string | null; title_en: string | null; slug: string } | null;
+};
+
+/**
+ * «Κρατήσεις εκδρομών»: Excursion → date → requests, nearest date first.
+ * Dates come from public.departures (so dates without requests can be shown);
+ * requests from booking_overview; capacity from admin_departure_stats — the
+ * same sources the rest of the admin uses.
+ */
+export async function listDepartureGroups(p: BookingListParams, today: string) {
   const db = await createSupabaseServerClient();
-  let q = db.from("booking_overview").select("*", { count: "exact" });
-  if (p.kind !== "all") q = q.eq("kind", p.kind);
+  const win = effectiveWindow(p);
+  const ascending = p.sort ? p.sort === "date_asc" : win !== "past";
+  const filtered = hasRequestFilters(p);
+
+  // Shared "which dates" conditions, applied to departures and to the view alike.
+  type Q = { or(f: string): Q; gte(c: string, v: string): Q; lte(c: string, v: string): Q; lt(c: string, v: string): Q; eq(c: string, v: string): Q };
+  // (Unconstrained generic: checking the Supabase builder against Q overflows TS.)
+  const dateScope = <T,>(q: T, excursionCol: string, idCol: string): T => {
+    let r = q as unknown as Q;
+    if (win === "upcoming") r = r.or(`departure_date.gte.${today},return_date.gte.${today}`);
+    if (win === "past") r = r.lt("departure_date", today).or(`return_date.is.null,return_date.lt.${today}`);
+    if (p.excursion) r = r.eq(excursionCol, p.excursion);
+    if (p.departure) r = r.eq(idCol, p.departure);
+    if (p.from) r = r.gte("departure_date", p.from);
+    if (p.to) r = r.lte("departure_date", p.to);
+    return r as unknown as T;
+  };
+
+  const depQuery = dateScope(
+    db
+      .from("departures")
+      .select("id, excursion_id, departure_date, return_date, departure_time, capacity, status, excursion:excursions(id, title_el, title_en, slug)"),
+    "excursion_id",
+    "id",
+  )
+    .order("departure_date", { ascending })
+    .order("departure_time", { ascending })
+    .limit(500);
+
+  // Every request of the dates in scope (for the per-date summary)…
+  const allQuery = dateScope(db.from("booking_overview").select("*").eq("kind", "booking"), "excursion_id", "departure_id")
+    .order("created_at", { ascending: true })
+    .limit(5000);
+
+  // …and, when filtering, only the matching ones (to list).
+  let matchQuery = filtered ? dateScope(db.from("booking_overview").select("*").eq("kind", "booking"), "excursion_id", "departure_id") : null;
+  if (matchQuery) {
+    if (p.status !== "all") matchQuery = matchQuery.eq("status", p.status);
+    if (p.payment === "open") matchQuery = matchQuery.eq("payment_open", true);
+    else if (p.payment === "refund") matchQuery = matchQuery.eq("refund_due", true);
+    const sub = athensDayRange(p.sfrom, p.sto);
+    if (sub.gte) matchQuery = matchQuery.gte("created_at", sub.gte);
+    if (sub.lt) matchQuery = matchQuery.lt("created_at", sub.lt);
+    if (p.q) matchQuery = matchQuery.or(searchOr(p.q));
+  }
+
+  const [deps, all, match] = await Promise.all([
+    depQuery,
+    allQuery,
+    matchQuery ? matchQuery.order("created_at", { ascending: true }).limit(5000) : Promise.resolve(null),
+  ]);
+  if (deps.error) console.error("[admin] departure groups:", deps.error.message);
+  if (all.error) console.error("[admin] departure requests:", all.error.message);
+  if (match?.error) console.error("[admin] departure requests (filtered):", match.error.message);
+
+  const departures = (deps.data ?? []) as unknown as DepartureWithExcursion[];
+  const allRows = (all.data ?? []) as BookingOverviewRow[];
+  const listRows = match ? ((match.data ?? []) as BookingOverviewRow[]) : allRows;
+  const stats = await getDepartureStats(departures.map((d) => d.id));
+
+  const byDeparture = (rows: BookingOverviewRow[]) => {
+    const m = new Map<string, BookingOverviewRow[]>();
+    for (const r of rows) if (r.departure_id) m.set(r.departure_id, [...(m.get(r.departure_id) ?? []), r]);
+    return m;
+  };
+  const allBy = byDeparture(allRows);
+  const listBy = byDeparture(listRows);
+
+  const groups = new Map<string, ExcursionGroup>();
+  let shownDates = 0;
+  for (const d of departures) {
+    const every = allBy.get(d.id) ?? [];
+    // Requests waiting for an answer first; otherwise first come, first listed (stable sort).
+    const listed = [...(listBy.get(d.id) ?? [])].sort((x, y) => Number(y.status === "pending") - Number(x.status === "pending"));
+    // With a filter: only dates with matches. Otherwise: dates with requests (+ empty ones on request, or the one date asked for).
+    const visible = filtered ? listed.length > 0 : every.length > 0 || p.showEmpty || p.departure === d.id;
+    if (!visible) continue;
+    const s = stats.get(d.id);
+    const row: DepartureGroupRow = {
+      id: d.id,
+      departure_date: d.departure_date,
+      return_date: d.return_date,
+      departure_time: d.departure_time,
+      capacity: d.capacity,
+      status: d.status,
+      summary: {
+        requests: every.length,
+        pending: every.filter((r) => r.status === "pending").length,
+        // Confirmed or already completed (a past run's bookings are "completed").
+        confirmedPeople: every.filter((r) => r.status === "confirmed" || r.status === "completed").reduce((a, r) => a + r.participants, 0),
+        heldPeople: (s?.confirmed ?? 0) + (s?.pending_held ?? 0),
+      },
+      requests: listed,
+    };
+    const ex = d.excursion;
+    const g = groups.get(d.excursion_id) ?? {
+      excursionId: d.excursion_id,
+      title: ex?.title_el || ex?.title_en || ex?.slug || "—",
+      slug: ex?.slug ?? "",
+      dates: [],
+    };
+    g.dates.push(row);
+    groups.set(d.excursion_id, g);
+    shownDates++;
+  }
+  // Map keeps first-seen order = the excursion's nearest (or latest) date first.
+  return { window: win, groups: [...groups.values()], shownDates, truncated: departures.length >= 500 || allRows.length >= 5000 };
+}
+
+/** «Ερωτήματα εμπειριών»: general-experience inquiries (no scheduled date), newest first. */
+export async function listInquiries(p: BookingListParams) {
+  const db = await createSupabaseServerClient();
+  let q = db.from("booking_overview").select("*", { count: "exact" }).eq("kind", "interest");
   if (p.status !== "all") q = q.eq("status", p.status);
-  if (p.stage !== "all") q = q.in("status", [...REQUEST_STAGES[p.stage]]);
   if (p.excursion) q = q.eq("excursion_id", p.excursion);
-  if (p.departure === "none") q = q.is("departure_id", null);
-  else if (p.departure) q = q.eq("departure_id", p.departure);
-  if (p.from) q = q.gte("departure_date", p.from);
-  if (p.to) q = q.lte("departure_date", p.to);
   if (p.payment === "open") q = q.eq("payment_open", true);
   else if (p.payment === "refund") q = q.eq("refund_due", true);
-  if (p.q) {
-    const pat = ilikePattern(p.q);
-    q = q.or(`full_name.ilike.${pat},email.ilike.${pat},reference.ilike.${pat},phone.ilike.${pat}`);
-  }
-  if (p.sort === "departure") q = q.order("departure_date", { ascending: true, nullsFirst: false }).order("departure_time", { ascending: true });
-  else q = q.order("created_at", { ascending: p.sort === "submitted_asc" });
+  const sub = athensDayRange(p.sfrom, p.sto);
+  if (sub.gte) q = q.gte("created_at", sub.gte);
+  if (sub.lt) q = q.lt("created_at", sub.lt);
+  if (p.q) q = q.or(searchOr(p.q));
+  q = q.order("created_at", { ascending: p.sort === "submitted_asc" });
   const from = (p.page - 1) * PAGE_SIZE;
   const { data, count, error } = await q.range(from, from + PAGE_SIZE - 1);
-  if (error) console.error("[admin] list bookings:", error.message);
+  if (error) console.error("[admin] list inquiries:", error.message);
   return { rows: (data ?? []) as BookingOverviewRow[], total: count ?? 0, pages: Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE)) };
+}
+
+/** Badges on the two section tabs: what needs a reply. */
+export async function getSectionCounts() {
+  const db = await createSupabaseServerClient();
+  const [pending, fresh] = await Promise.all([
+    db.from("bookings").select("id", { count: "exact", head: true }).eq("kind", "booking").eq("status", "pending"),
+    db.from("bookings").select("id", { count: "exact", head: true }).eq("kind", "interest").eq("status", "new"),
+  ]);
+  return { pendingBookings: pending.count ?? 0, newInquiries: fresh.count ?? 0 };
+}
+
+/** Count of inquiries matching a payment filter (to point to them from the bookings view). */
+export async function countInquiryPayments(payment: PaymentFilter) {
+  const db = await createSupabaseServerClient();
+  const { count } = await db
+    .from("booking_overview")
+    .select("id", { count: "exact", head: true })
+    .eq("kind", "interest")
+    .eq(payment === "open" ? "payment_open" : "refund_due", true);
+  return count ?? 0;
 }
 
 /** Excursions for the filter dropdown. */

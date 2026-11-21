@@ -51,7 +51,7 @@ export default async function BookingDetailPage({ params }: PageProps<"/admin/bo
 
   return (
     <>
-      <Link href={b.kind === "interest" ? "/admin/bookings?kind=interest" : "/admin/bookings"} className="mb-4 inline-flex items-center gap-1.5 text-sm text-bark hover:text-ink">
+      <Link href={b.kind === "interest" ? "/admin/bookings?section=inquiries" : `/admin/bookings?departure=${b.departure_id ?? ""}`} className="mb-4 inline-flex items-center gap-1.5 text-sm text-bark hover:text-ink">
         <ArrowLeft aria-hidden className="size-4" /> {B.title}
       </Link>
       <PageHeader

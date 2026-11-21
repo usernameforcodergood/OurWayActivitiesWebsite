@@ -270,7 +270,7 @@ export function DeparturesManager({
                   <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_CLS[r.status]}`}>{D.statuses[r.status]}</span>
                 </td>
                 <td className="whitespace-nowrap px-5 py-3 text-right sm:px-6">
-                  <Link href={`/admin/bookings?excursion=${excursionId}&from=${r.departure_date}&to=${r.departure_date}&sort=departure`} className="mr-1 inline-flex min-h-9 items-center rounded-lg px-2 text-xs font-semibold text-deep-teal hover:bg-turquoise/5">
+                  <Link href={`/admin/bookings?departure=${r.id}`} className="mr-1 inline-flex min-h-9 items-center rounded-lg px-2 text-xs font-semibold text-deep-teal hover:bg-turquoise/5">
                     {D.viewBookings}
                   </Link>
                   <button
