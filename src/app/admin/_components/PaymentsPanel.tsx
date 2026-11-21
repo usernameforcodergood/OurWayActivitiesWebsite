@@ -34,7 +34,20 @@ function useDialog(open: boolean) {
  * actually received (a list of payments and refunds). Totals come from the
  * database view; nothing here adds up money on its own.
  */
-export function PaymentsPanel({ bookingId, kind, money, payments }: { bookingId: string; kind: "booking" | "interest"; money: BookingMoney; payments: PaymentRow[] }) {
+export function PaymentsPanel({
+  bookingId,
+  kind,
+  closed,
+  money,
+  payments,
+}: {
+  bookingId: string;
+  kind: "booking" | "interest";
+  /** Rejected / cancelled booking: nothing is owed any more, only money to give back. */
+  closed: boolean;
+  money: BookingMoney;
+  payments: PaymentRow[];
+}) {
   const router = useRouter();
   const toast = useToast();
   const uid = useId();
@@ -129,9 +142,11 @@ export function PaymentsPanel({ bookingId, kind, money, payments }: { bookingId:
     [P.paid, formatEurAdmin(paid)],
     ...(refunded > 0 ? ([[P.refunded, `− ${formatEurAdmin(refunded)}`]] as Array<[string, React.ReactNode]>) : []),
     ...(refunded > 0 ? ([[P.netPaid, formatEurAdmin(net)]] as Array<[string, React.ReactNode]>) : []),
-    balance !== null && balance < 0
-      ? [P.overpaid, <strong key="b" className="text-amber-800">{formatEurAdmin(-balance)}</strong>]
-      : [P.balance, <strong key="b">{balance === null ? "—" : formatEurAdmin(balance)}</strong>],
+    closed
+      ? [P.dashboardRefunds, <strong key="b" className={net > 0 ? "text-amber-800" : undefined}>{formatEurAdmin(Math.max(net, 0))}</strong>]
+      : balance !== null && balance < 0
+        ? [P.overpaid, <strong key="b" className="text-amber-800">{formatEurAdmin(-balance)}</strong>]
+        : [P.balance, <strong key="b">{balance === null ? "—" : formatEurAdmin(balance)}</strong>],
   ];
 
   return (

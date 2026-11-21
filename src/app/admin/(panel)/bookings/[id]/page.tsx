@@ -97,6 +97,7 @@ export default async function BookingDetailPage({ params }: PageProps<"/admin/bo
             <PaymentsPanel
               bookingId={b.id}
               kind={b.kind}
+              closed={b.kind === "booking" && (b.status === "rejected" || b.status === "cancelled")}
               money={{
                 amount_due_eur: b.amount_due_eur,
                 deposit_due_eur: b.deposit_due_eur,

@@ -172,9 +172,15 @@ export async function listExcursionRequests(excursionId: string) {
 export async function getBookingDetail(id: string) {
   if (!isUuid(id)) return null;
   const db = await createSupabaseServerClient();
-  const [{ data: overview }, { data: extra }, { data: history }, { data: notes }, { data: emails }, { data: payments, error: paymentsError }] = await Promise.all([
+  const [{ data: overview, error: overviewError }, { data: extra, error: extraError }, { data: history }, { data: notes }, { data: emails }, { data: payments, error: paymentsError }] = await Promise.all([
     db.from("booking_overview").select("*").eq("id", id).maybeSingle(),
-    db.from("bookings").select("message, special_requests, consent_at, departure:departures(id, capacity, status, booking_deadline)").eq("id", id).maybeSingle(),
+    // Since 0011 bookings has two keys to departures (departure_id and the composite
+    // (departure_id, excursion_id)), so the embed must name one or PostgREST refuses it.
+    db
+      .from("bookings")
+      .select("message, special_requests, consent_at, departure:departures!bookings_departure_id_fkey(id, capacity, status, booking_deadline)")
+      .eq("id", id)
+      .maybeSingle(),
     db.from("request_status_history").select("id, from_status, to_status, note, changed_by, created_at").eq("booking_id", id).order("created_at"),
     db.from("request_notes").select("id, body, author_id, created_at").eq("booking_id", id).order("created_at", { ascending: false }),
     db.from("email_notifications").select("id, kind, recipient, status, error, created_at").eq("booking_id", id).order("created_at", { ascending: false }),
@@ -185,6 +191,8 @@ export async function getBookingDetail(id: string) {
       .order("paid_on", { ascending: false })
       .order("id", { ascending: false }),
   ]);
+  if (overviewError) console.error("[admin] booking overview:", overviewError.message);
+  if (extraError) console.error("[admin] booking detail:", extraError.message);
   if (paymentsError) console.error("[admin] payments:", paymentsError.message);
   if (!overview || !extra) return null;
   const booking = { ...(overview as BookingOverviewRow), ...(extra as unknown as Omit<BookingDetail, keyof BookingOverviewRow>) } as BookingDetail;
