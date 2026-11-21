@@ -101,8 +101,9 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
         </div>
       </div>
 
-      <div aria-hidden className="container-x select-none overflow-hidden">
-        <Wordmark accent={false} className="block translate-y-[0.18em] text-center text-[clamp(5rem,27vw,26rem)] leading-[0.8] text-bone/[0.07]" />
+      {/* Sized from the container's own width (cqi) so the whole word, including the italic "y", always fits. */}
+      <div aria-hidden className="container-x select-none overflow-hidden [container-type:inline-size]">
+        <Wordmark accent={false} className="block translate-y-[0.18em] whitespace-nowrap text-center text-[min(24cqi,26rem)] leading-[0.8] text-bone/[0.07]" />
       </div>
 
       <div className="border-t border-bone/10">
