@@ -6,7 +6,7 @@ import { BOOKING_STATUSES, INQUIRY_STATUSES, REQUEST_STAGES, type BookingStatus,
 import { cn } from "@/lib/utils";
 import { fmt, t } from "../../_lib/strings";
 import { listBookings, listDepartureOptions, listExcursionOptions, parseBookingParams, type BookingListParams } from "../../_lib/booking-queries";
-import { BookingStatusBadge, EmptyState, PageHeader, formatDate, formatEurAdmin, formatRun } from "../../_components/ui";
+import { BookingStatusBadge, EmptyState, PaymentStatusBadge, PageHeader, formatDate, formatEurAdmin, formatRun } from "../../_components/ui";
 
 export const instant = false;
 export const metadata: Metadata = { title: t.bookings.title };
@@ -22,6 +22,7 @@ function href(p: Partial<BookingListParams>) {
   if (p.from) sp.set("from", p.from);
   if (p.to) sp.set("to", p.to);
   if (p.sort && p.sort !== "submitted") sp.set("sort", p.sort);
+  if (p.payment && p.payment !== "all") sp.set("payment", p.payment);
   if (p.page && p.page > 1) sp.set("page", String(p.page));
   const s = sp.toString();
   return s ? `/admin/bookings?${s}` : "/admin/bookings";
@@ -35,7 +36,13 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
   const p: BookingListParams =
     parsed.departure && parsed.departure !== "none" && !departures.some((d) => d.id === parsed.departure) ? { ...parsed, departure: "" } : parsed;
   const [{ rows, total, pages }, excursions] = await Promise.all([listBookings(p), listExcursionOptions()]);
-  const filtered = Boolean(p.q || p.excursion || p.departure || p.from || p.to) || p.status !== "all" || p.stage !== "all";
+  const filtered = Boolean(p.q || p.excursion || p.departure || p.from || p.to) || p.status !== "all" || p.stage !== "all" || p.payment !== "all";
+  const P = t.payments;
+  const paymentTabs = [
+    ["all", P.filterAll],
+    ["open", P.filterOpen],
+    ["refund", P.filterRefund],
+  ] as const;
   const B = t.bookings;
   const all = p.kind === "all";
   const inquiries = p.kind === "interest";
@@ -98,10 +105,27 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
             </Link>
           ))}
         </nav>
+        <nav aria-label={P.filterLabel} className="flex flex-wrap items-center gap-1">
+          <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-bark">{P.filterLabel}</span>
+          {paymentTabs.map(([key, label]) => (
+            <Link
+              key={key}
+              href={href({ ...p, payment: key, page: 1 })}
+              aria-current={p.payment === key ? "true" : undefined}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-medium",
+                p.payment === key ? "bg-forest text-bone" : "bg-white text-ink ring-1 ring-ink/10 hover:bg-stone/60",
+              )}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
         <form method="get" action="/admin/bookings" className="grid gap-2 md:grid-cols-[1fr_14rem] lg:grid-cols-[1fr_14rem_14rem_9.5rem_9.5rem_12rem_auto]">
           {!all && <input type="hidden" name="kind" value={p.kind} />}
           {p.status !== "all" && <input type="hidden" name="status" value={p.status} />}
           {p.stage !== "all" && <input type="hidden" name="stage" value={p.stage} />}
+          {p.payment !== "all" && <input type="hidden" name="payment" value={p.payment} />}
           <div className="relative">
             <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-bark" />
             <label htmlFor="bq" className="sr-only">
@@ -165,7 +189,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
         <EmptyState title={filtered ? B.emptyFiltered : B.empty} />
       ) : (
         <div className="admin-card overflow-x-auto">
-          <table className="w-full min-w-[60rem] text-left text-sm">
+          <table className="w-full min-w-[68rem] text-left text-sm">
             <thead className="border-b border-ink/10 text-xs uppercase tracking-wide text-bark">
               <tr>
                 <th scope="col" className="px-4 py-3 font-semibold">{B.customer}</th>
@@ -174,6 +198,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                 <th scope="col" className="px-4 py-3 text-right font-semibold">{B.participants}</th>
                 <th scope="col" className="px-4 py-3 text-right font-semibold">{B.total}</th>
                 <th scope="col" className="px-4 py-3 font-semibold">{B.status}</th>
+                <th scope="col" className="px-4 py-3 font-semibold">{P.columnPayment}</th>
                 <th scope="col" className="px-4 py-3 font-semibold">{B.submitted}</th>
               </tr>
             </thead>
@@ -212,6 +237,20 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                   <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums">{formatEurAdmin(r.total_eur)}</td>
                   <td className="px-4 py-3">
                     <BookingStatusBadge status={r.status} />
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    {typeof r.payment_status === "string" ? (
+                      <>
+                        <PaymentStatusBadge status={r.payment_status} />
+                        {(r.payment_open || r.refund_due) && (
+                          <span className="mt-1 block text-xs tabular-nums text-bark">
+                            {r.refund_due ? `${P.filterRefund}: ${formatEurAdmin(r.net_paid_eur)}` : `${P.balance}: ${formatEurAdmin(r.balance_eur)}`}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-bark">—</span>
+                    )}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-xs text-bark">{formatDate(r.created_at, true)}</td>
                 </tr>

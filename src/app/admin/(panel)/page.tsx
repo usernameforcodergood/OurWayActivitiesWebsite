@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, CalendarClock, CalendarRange, CheckCircle2, ClipboardList, Hourglass, Megaphone, MessageCircleQuestionMark, Plus, Upload, Users } from "lucide-react";
+import { AlertTriangle, CalendarClock, CalendarRange, CheckCircle2, ClipboardList, Hourglass, Megaphone, MessageCircleQuestionMark, Plus, Undo2, Upload, Users, Wallet } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { athensToday } from "@/lib/cms/public";
 import { fmt, t } from "../_lib/strings";
 import { getDashboardData } from "../_lib/queries";
 import { getBookingDashboard } from "../_lib/booking-queries";
-import { BookingStatusBadge, BtnLink, Card, PageHeader, StatusBadge, formatDate, formatDay } from "../_components/ui";
+import { BookingStatusBadge, BtnLink, Card, PageHeader, StatusBadge, formatDate, formatDay, formatEurAdmin } from "../_components/ui";
 import { AdminCalendar } from "../_components/AdminCalendar";
 import { isIsoDate } from "../_lib/calendar";
 
@@ -30,6 +30,22 @@ export default async function DashboardPage({ searchParams }: PageProps<"/admin"
     { label: D.confirmedBookings, value: b.confirmedCount, icon: ClipboardList, href: "/admin/bookings?status=confirmed", sub: fmt(D.confirmedPeople, { count: b.confirmedPeople }) },
     { label: D.newInquiries, value: b.newInquiries, icon: MessageCircleQuestionMark, href: "/admin/bookings?kind=interest&status=new", highlight: b.newInquiries > 0 },
     { label: D.newPrivate, value: b.newPrivate, icon: Users, href: "/admin/tailor-made?status=new", highlight: b.newPrivate > 0 },
+    {
+      label: t.payments.dashboardOpen,
+      value: formatEurAdmin(b.paymentsOpenEur),
+      icon: Wallet,
+      href: "/admin/bookings?payment=open",
+      sub: fmt(t.payments.dashboardOpenSub, { count: b.paymentsOpenCount }),
+      highlight: b.paymentsOpenCount > 0,
+    },
+    {
+      label: t.payments.dashboardRefunds,
+      value: formatEurAdmin(b.refundsDueEur),
+      icon: Undo2,
+      href: "/admin/bookings?payment=refund",
+      sub: fmt(t.payments.dashboardRefundsSub, { count: b.refundsDueCount }),
+      highlight: b.refundsDueCount > 0,
+    },
     { label: D.totalAnnouncements, value: d.annTotal, icon: Megaphone, href: "/admin/announcements", sub: fmt(D.activeAnnouncements, { count: d.annActive }) },
   ];
 

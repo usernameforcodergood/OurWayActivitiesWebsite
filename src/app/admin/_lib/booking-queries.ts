@@ -14,10 +14,11 @@ import {
 } from "@/lib/bookings/validation";
 import { ilikePattern } from "../_components/ListToolbar";
 import { PAGE_SIZE } from "./queries";
+import { PAYMENT_FILTERS, num, type BookingMoney, type PaymentFilter, type PaymentRow } from "./payments";
 
 /** Admin reads use the admin's session; RLS hides everything from anyone else. */
 
-export type BookingOverviewRow = {
+export type BookingOverviewRow = BookingMoney & {
   id: string;
   reference: string;
   kind: "booking" | "interest";
@@ -75,6 +76,8 @@ export type BookingListParams = {
   from: string;
   to: string;
   sort: "submitted" | "submitted_asc" | "departure";
+  /** Money still owed ("open") or money to give back ("refund"); "all" = no filter. */
+  payment: "all" | PaymentFilter;
   page: number;
 };
 
@@ -101,6 +104,7 @@ export function parseBookingParams(sp: Record<string, string | string[] | undefi
     from: isDate(one("from")) ? one("from") : "",
     to: isDate(one("to")) ? one("to") : "",
     sort: sort === "submitted_asc" || sort === "departure" ? sort : "submitted",
+    payment: (PAYMENT_FILTERS as readonly string[]).includes(one("payment")) ? (one("payment") as PaymentFilter) : "all",
     page: Number.isFinite(page) && page > 0 ? page : 1,
   };
 }
@@ -116,6 +120,8 @@ export async function listBookings(p: BookingListParams) {
   else if (p.departure) q = q.eq("departure_id", p.departure);
   if (p.from) q = q.gte("departure_date", p.from);
   if (p.to) q = q.lte("departure_date", p.to);
+  if (p.payment === "open") q = q.eq("payment_open", true);
+  else if (p.payment === "refund") q = q.eq("refund_due", true);
   if (p.q) {
     const pat = ilikePattern(p.q);
     q = q.or(`full_name.ilike.${pat},email.ilike.${pat},reference.ilike.${pat},phone.ilike.${pat}`);
@@ -166,13 +172,20 @@ export async function listExcursionRequests(excursionId: string) {
 export async function getBookingDetail(id: string) {
   if (!isUuid(id)) return null;
   const db = await createSupabaseServerClient();
-  const [{ data: overview }, { data: extra }, { data: history }, { data: notes }, { data: emails }] = await Promise.all([
+  const [{ data: overview }, { data: extra }, { data: history }, { data: notes }, { data: emails }, { data: payments, error: paymentsError }] = await Promise.all([
     db.from("booking_overview").select("*").eq("id", id).maybeSingle(),
     db.from("bookings").select("message, special_requests, consent_at, departure:departures(id, capacity, status, booking_deadline)").eq("id", id).maybeSingle(),
     db.from("request_status_history").select("id, from_status, to_status, note, changed_by, created_at").eq("booking_id", id).order("created_at"),
     db.from("request_notes").select("id, body, author_id, created_at").eq("booking_id", id).order("created_at", { ascending: false }),
     db.from("email_notifications").select("id, kind, recipient, status, error, created_at").eq("booking_id", id).order("created_at", { ascending: false }),
+    db
+      .from("booking_payments")
+      .select("id, kind, amount_eur, paid_on, method, note, recorded_by, created_at, voided_at, void_reason")
+      .eq("booking_id", id)
+      .order("paid_on", { ascending: false })
+      .order("id", { ascending: false }),
   ]);
+  if (paymentsError) console.error("[admin] payments:", paymentsError.message);
   if (!overview || !extra) return null;
   const booking = { ...(overview as BookingOverviewRow), ...(extra as unknown as Omit<BookingDetail, keyof BookingOverviewRow>) } as BookingDetail;
   return {
@@ -180,6 +193,7 @@ export async function getBookingDetail(id: string) {
     history: (history ?? []) as HistoryRow[],
     notes: (notes ?? []) as NoteRow[],
     emails: (emails ?? []) as EmailRow[],
+    payments: (payments ?? []) as PaymentRow[],
   };
 }
 
@@ -300,7 +314,7 @@ export async function getPrivateRequestDetail(id: string) {
 export async function getBookingDashboard(today: string) {
   const db = await createSupabaseServerClient();
   const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
-  const [pending, confirmed, upcoming, recent, privNew, failures, inquiriesNew] = await Promise.all([
+  const [pending, confirmed, upcoming, recent, privNew, failures, inquiriesNew, owed, refunds] = await Promise.all([
     db.from("bookings").select("participants").eq("status", "pending").limit(5000),
     db.from("bookings").select("participants").eq("status", "confirmed").limit(5000),
     db
@@ -314,7 +328,14 @@ export async function getBookingDashboard(today: string) {
     db.from("private_requests").select("id", { count: "exact", head: true }).eq("status", "new"),
     db.from("email_notifications").select("id, kind, recipient, status, created_at, booking_id, private_request_id").neq("status", "sent").gte("created_at", since).order("created_at", { ascending: false }).limit(10),
     db.from("bookings").select("id", { count: "exact", head: true }).eq("kind", "interest").eq("status", "new"),
+    db.from("booking_overview").select("balance_eur").eq("payment_open", true).limit(5000),
+    db.from("booking_overview").select("net_paid_eur").eq("refund_due", true).limit(5000),
   ]);
+  if (owed.error) console.error("[admin] dashboard payments:", owed.error.message);
+  if (refunds.error) console.error("[admin] dashboard refunds:", refunds.error.message);
+  // Sum in cents so many small amounts never add up to 99.99999.
+  const cents = (rows: Array<Record<string, string | number | null>> | null, key: string) =>
+    (rows ?? []).reduce((a, r) => a + Math.round((num(r[key]) ?? 0) * 100), 0) / 100;
   const sum = (rows: Array<{ participants: number }> | null) => (rows ?? []).reduce((a, r) => a + r.participants, 0);
   type Up = { id: string; departure_date: string; departure_time: string | null; capacity: number | null; status: string; excursion: { id: string; title_el: string | null; title_en: string | null } | null };
   const ups = (upcoming.data ?? []) as unknown as Up[];
@@ -336,6 +357,10 @@ export async function getBookingDashboard(today: string) {
     recent: (recent.data ?? []) as BookingOverviewRow[],
     newPrivate: privNew.count ?? 0,
     newInquiries: inquiriesNew.count ?? 0,
+    paymentsOpenCount: owed.data?.length ?? 0,
+    paymentsOpenEur: cents(owed.data, "balance_eur"),
+    refundsDueCount: refunds.data?.length ?? 0,
+    refundsDueEur: cents(refunds.data, "net_paid_eur"),
     full,
     failures: (failures.data ?? []) as Array<EmailRow & { booking_id: string | null; private_request_id: string | null }>,
   };
