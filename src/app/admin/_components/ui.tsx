@@ -98,6 +98,22 @@ export function BookingStatusBadge({ status }: { status: keyof typeof t.bookings
   );
 }
 
+const PAYMENT_BADGE: Record<keyof typeof t.payments.statuses, string> = {
+  unpaid: "bg-stone text-bark",
+  partial: "bg-amber-100 text-amber-900",
+  deposit_paid: "bg-sky-100 text-sky-900",
+  paid: "bg-emerald-100 text-emerald-900",
+  refunded: "bg-violet-100 text-violet-900",
+};
+
+export function PaymentStatusBadge({ status }: { status: keyof typeof t.payments.statuses }) {
+  return (
+    <span className={cn("inline-flex whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold", PAYMENT_BADGE[status])}>
+      {t.payments.statuses[status]}
+    </span>
+  );
+}
+
 const PRIVATE_BADGE: Record<string, string> = {
   new: "bg-amber-100 text-amber-900",
   in_review: "bg-indigo-100 text-indigo-900",
