@@ -25,10 +25,10 @@ export default async function DashboardPage({ searchParams }: PageProps<"/admin"
 
   const stats = [
     { label: D.publishedExcursions, value: d.published, icon: CheckCircle2, href: "/admin/excursions?status=published", sub: `${D.totalExcursions}: ${d.total}` },
-    { label: D.upcomingDepartures, value: b.upcomingDepartures, icon: CalendarClock, href: "/admin/bookings?sort=departure" },
+    { label: D.upcomingDepartures, value: b.upcomingDepartures, icon: CalendarClock, href: "/admin/bookings" },
     { label: D.pendingRequests, value: b.pendingCount, icon: Hourglass, href: "/admin/bookings?status=pending", sub: fmt(D.pendingPeople, { count: b.pendingPeople }), highlight: b.pendingCount > 0 },
     { label: D.confirmedBookings, value: b.confirmedCount, icon: ClipboardList, href: "/admin/bookings?status=confirmed", sub: fmt(D.confirmedPeople, { count: b.confirmedPeople }) },
-    { label: D.newInquiries, value: b.newInquiries, icon: MessageCircleQuestionMark, href: "/admin/bookings?kind=interest&status=new", highlight: b.newInquiries > 0 },
+    { label: D.newInquiries, value: b.newInquiries, icon: MessageCircleQuestionMark, href: "/admin/bookings?section=inquiries&status=new", highlight: b.newInquiries > 0 },
     { label: D.newPrivate, value: b.newPrivate, icon: Users, href: "/admin/tailor-made?status=new", highlight: b.newPrivate > 0 },
     {
       label: t.payments.dashboardOpen,
