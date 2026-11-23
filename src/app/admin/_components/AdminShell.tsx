@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+  BarChart3,
   CalendarRange,
   ClipboardList,
   ExternalLink,
@@ -20,11 +21,13 @@ import {
 import { signOut } from "../_actions/auth";
 import { t } from "../_lib/strings";
 import { cn } from "@/lib/utils";
+import { markInternalBrowser } from "@/lib/analytics/client";
 
 const NAV = [
   { href: "/admin", label: t.nav.dashboard, icon: LayoutDashboard, exact: true },
   { href: "/admin/excursions", label: t.nav.excursions, icon: CalendarRange },
   { href: "/admin/bookings", label: t.nav.bookings, icon: ClipboardList },
+  { href: "/admin/analytics", label: t.nav.analytics, icon: BarChart3 },
   { href: "/admin/tailor-made", label: t.nav.privateRequests, icon: Users },
   { href: "/admin/messages", label: t.nav.messages, icon: Mail },
   { href: "/admin/announcements", label: t.nav.announcements, icon: Megaphone },
@@ -89,6 +92,9 @@ function SidebarFooter({ email }: { email: string }) {
 
 export function AdminShell({ email, children }: { email: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+
+  // Staff browsers are never counted in the website statistics.
+  useEffect(() => markInternalBrowser(), []);
 
   useEffect(() => {
     if (!open) return;

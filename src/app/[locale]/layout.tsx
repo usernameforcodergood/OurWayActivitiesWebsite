@@ -9,6 +9,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { ExperienceChoiceProvider } from "@/components/layout/ExperienceChoice";
+import { Analytics } from "@/components/analytics/Analytics";
+import { localePath, routes } from "@/i18n/routes";
 import "../globals.css";
 
 const display = Noto_Serif_Display({
@@ -77,6 +79,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           </main>
           <Footer locale={locale} t={t} />
         </ExperienceChoiceProvider>
+        <Analytics t={t.consent} privacyHref={localePath(locale, routes.privacy)} />
       </body>
     </html>
   );

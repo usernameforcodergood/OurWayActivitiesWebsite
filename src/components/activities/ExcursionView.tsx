@@ -10,6 +10,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { RichText } from "@/components/ui/RichText";
 import { ExperienceRequestForm } from "@/components/booking/ExperienceRequestForm";
 import { REQUEST_FORM_ID } from "@/lib/bookings/validation";
+import { TrackExcursionView } from "@/components/analytics/Analytics";
 
 function formatPrice(eur: number, locale: Locale) {
   return new Intl.NumberFormat(locale === "el" ? "el-GR" : "en-GB", {
@@ -56,6 +57,7 @@ export function ExcursionView({
 
   return (
     <>
+      {!preview && <TrackExcursionView excursionId={excursion.id} />}
       <PageHero
         locale={locale}
         eyebrow={
@@ -136,6 +138,8 @@ export function ExcursionView({
               {hasForm ? (
                 <a
                   href={`#${REQUEST_FORM_ID}`}
+                  data-ow-track="booking_button_click"
+                  data-ow-excursion={excursion.id}
                   className="mt-10 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-turquoise px-6 font-semibold text-ink transition-colors hover:bg-bone"
                 >
                   {t.booking.jumpCta}

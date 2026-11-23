@@ -9,6 +9,7 @@ export const t = {
     excursions: "Εκδρομές",
     announcements: "Ανακοινώσεις",
     bookings: "Κρατήσεις",
+    analytics: "Αναλυτικά Στατιστικά",
     privateRequests: "Αιτήματα Tailor-Made",
     messages: "Μηνύματα επικοινωνίας",
     media: "Πολυμέσα",

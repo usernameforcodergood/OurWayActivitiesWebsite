@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { getSubmissionSupabase } from "@/lib/supabase/server-secret";
 import { siteConfig } from "@/lib/site";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 import { MIN_FILL_MS, bookingRequestSchema, mapDbError, splitFullName, type SubmitResponse } from "@/lib/bookings/validation";
 import { renderAdminNewBooking, renderCustomerBookingEmail, type BookingEmailData } from "@/lib/bookings/emails";
 import { adminInbox, deliver, emailNotificationsEnabled, type EmailKind } from "@/lib/bookings/notify";
+import { recordBookingOutcome } from "@/lib/analytics/server";
 
 /**
  * Scheduled-excursion participation request or general-experience inquiry.
@@ -39,7 +40,13 @@ export async function POST(request: Request) {
   }
   const d = parsed.data;
   if (Date.now() - d.startedAt < MIN_FILL_MS) return json({ ok: false, error: "invalid" }, 400);
-  if (rateLimited(`booking:${clientIp(request)}`, 8, 10 * 60 * 1000)) return json({ ok: false, error: "rateLimited" }, 429);
+  // Analytics (consenting visitors only, recorded after the response): a failure is a
+  // request the server refused; a conversion only exists once the database saved it.
+  const failed = (reason: string) => after(() => recordBookingOutcome(request, { ok: false, excursionId: d.excursionId, reason }));
+  if (rateLimited(`booking:${clientIp(request)}`, 8, 10 * 60 * 1000)) {
+    failed("rateLimited");
+    return json({ ok: false, error: "rateLimited" }, 429);
+  }
 
   const db = getSubmissionSupabase();
   if (!db) return json({ ok: false, error: "notConfigured" }, 503);
@@ -66,10 +73,13 @@ export async function POST(request: Request) {
     const mapped = mapDbError(error?.message);
     if (mapped.error === "generic") console.error("[bookings] submit failed:", error?.code, error?.message);
     const status = mapped.error === "invalid" ? 422 : mapped.error === "generic" ? 500 : 409;
+    failed(mapped.error);
     return json({ ok: false, ...mapped }, status);
   }
 
   const result = data as SubmitResult;
+  // A retried submission is the same request: it never counts twice.
+  if (!result.replayed) after(() => recordBookingOutcome(request, { ok: true, bookingId: result.id }));
   // A retried submission: the request already exists and its emails were handled the first time.
   // Report whether the receipt email of the original submission really went out.
   if (result.replayed || !result.notify_token) return json({ ok: true, reference: result.reference, emailSent: result.email_sent === true }, 200);
