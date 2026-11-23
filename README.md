@@ -232,6 +232,23 @@ OurWay takes **requests, not payments**. There is no checkout, card form or paym
 
 **Setup:** apply `supabase/migrations/0003_bookings.sql` (`npm run db:setup`, or paste it into Supabase → SQL Editor). It is safe to re-run, and it copies any dates in the old "Available dates" list into departures (the old list is kept, so the previously deployed site keeps working until you deploy). **Apply it before deploying this version**: the site's excursion queries depend on the new `departures` table.
 
+## Website analytics (Admin → Αναλυτικά Στατιστικά)
+
+First-party, consent-based analytics stored in our own Supabase database. There is no Google Analytics or other third-party tracker.
+
+**Consent first.** On a visitor's first visit a banner offers **Αποδοχή / Απόρριψη**, with equal weight. Nothing is stored on the device and nothing is sent until the visitor accepts. «Ρυθμίσεις cookies» in the footer reopens the banner. Declining after accepting stops tracking at once, removes the browser's ids and calls `/api/collect/forget`, which deletes everything recorded under that visitor id. The choice is kept in `localStorage` (`ow_consent`). Bump `CONSENT_VERSION` in `src/lib/analytics/shared.ts` to ask everyone again.
+
+**How it works**
+- `src/lib/analytics/client.ts` is the only tracker. It records page views on every route change, engaged (visible) time per page, and a fixed list of events: `session_start`, `excursion_view`, `booking_button_click`, `booking_form_open`, `booking_form_start`, `booking_form_submit`, `search_performed` and `filter_applied`. Events are batched and sent with `fetch(keepalive)`, so nothing blocks the page.
+- `POST /api/collect` drops bots, signed-in (admin) browsers, other origins and floods. It validates every event against a fixed schema and keeps only paths plus the five UTM tags. On the server it derives the traffic channel, device/browser/OS and country/region/city from Vercel's geo headers. **The IP address is never stored.** Browsers that opened `/admin` are marked internal and never tracked.
+- `booking_request_success` / `booking_request_failure` are recorded **by the server** in `/api/bookings`, after the database answers. They are recorded only for consenting visitors, and a success only for a real, newly saved booking. A unique index on `booking_id` makes it count exactly once, even across retries.
+- The dashboard reads only aggregates through `analytics_*` database functions that check `is_admin()` and cap the range at 400 days. With the public key, the event tables can be neither read nor written.
+- Retention: a nightly `pg_cron` job (`analytics-retention`) deletes raw data older than 13 months.
+
+**Setup:** apply `supabase/migrations/0013_website_analytics.sql` in Supabase → SQL Editor **before deploying** the version that contains it. No accounts or API keys are needed; it uses the existing `SUPABASE_SECRET_KEY`. Set `NEXT_PUBLIC_ANALYTICS_ENABLED=false` to switch everything off (no banner, no tracking). Location data exists only on Vercel; locally every visit shows as "Άγνωστο".
+
+**Limits to keep in mind:** only consenting visitors are counted, so totals are lower than real traffic. A visitor who clears storage or switches device counts as new. Page-to-page navigation is shown as the most common next steps, not full paths.
+
 ## Contact form and email setup
 
 The form validates on the client and again on the server (`src/app/api/contact/route.ts`). Spam is blocked by a honeypot field, a minimum fill time and a per-IP rate limit (best effort, in memory). Success appears **only** after the email provider confirms delivery. Without credentials, the API returns `503 notConfigured` and the visitor is told the message was **not** sent. Submissions are never stored or logged.

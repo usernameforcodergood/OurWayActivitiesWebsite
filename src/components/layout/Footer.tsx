@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { BackToTop } from "./BackToTop";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { ExperienceChoiceLink } from "./ExperienceChoice";
+import { ConsentSettingsButton } from "@/components/analytics/Analytics";
 
 /** Cached at build/revalidation time so the footer stays fully static. */
 async function getYear() {
@@ -115,6 +116,7 @@ export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
             <Link href={localePath(locale, routes.privacy)} className="inline-flex min-h-10 items-center hover:text-bone">
               {f.privacy}
             </Link>
+            <ConsentSettingsButton label={f.cookieSettings} className="inline-flex min-h-10 items-center hover:text-bone" />
             <span>{f.photoCredit}</span>
             <BackToTop label={f.backToTop} />
           </div>

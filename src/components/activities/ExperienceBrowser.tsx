@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { track } from "@/lib/analytics/client";
 import { Search } from "lucide-react";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -44,6 +45,19 @@ export function ExperienceBrowser({
     .filter(({ text }) => words.every((w) => text.includes(w)))
     .map(({ e }) => e);
 
+  // Analytics (only with consent): a settled search and each category choice.
+  const normalized = words.join(" ").slice(0, 60);
+  const resultCount = visible.length;
+  useEffect(() => {
+    if (!normalized) return;
+    const id = setTimeout(() => track("search_performed", { props: { query: normalized, results: resultCount } }), 1200);
+    return () => clearTimeout(id);
+  }, [normalized, resultCount]);
+  const chooseCategory = (c: PrimaryCategory | null) => {
+    setCategory(c);
+    track("filter_applied", { props: { filter: "category", value: c ?? "all" } });
+  };
+
   // Only offer categories that have at least one experience.
   const available = PRIMARY_CATEGORIES.filter((c) => items.some((e) => e.primaryCategory === c));
 
@@ -58,11 +72,11 @@ export function ExperienceBrowser({
       <div className="mt-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         {available.length > 0 && (
           <div role="group" aria-label={t.label} className="flex flex-wrap gap-2">
-            <button type="button" aria-pressed={category === null} onClick={() => setCategory(null)} className={chip(category === null)}>
+            <button type="button" aria-pressed={category === null} onClick={() => chooseCategory(null)} className={chip(category === null)}>
               {t.all}
             </button>
             {available.map((c) => (
-              <button key={c} type="button" aria-pressed={category === c} onClick={() => setCategory(category === c ? null : c)} className={chip(category === c)}>
+              <button key={c} type="button" aria-pressed={category === c} onClick={() => chooseCategory(category === c ? null : c)} className={chip(category === c)}>
                 {t.categories[c]}
               </button>
             ))}

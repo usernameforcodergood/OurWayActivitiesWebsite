@@ -21,6 +21,8 @@ import { formatDateLong, formatDateTime, formatEur } from "@/lib/bookings/format
 import { FormField, inputClass } from "@/components/forms/FormField";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { analyticsHeaders, track } from "@/lib/analytics/client";
+import { useBookingFormTracking } from "@/components/analytics/Analytics";
 
 type Props = {
   excursion: Pick<PublicExcursion, "id" | "title" | "bookingMode" | "depositEur">;
@@ -52,6 +54,7 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
   const f = t.form;
   const idPrefix = `request-${excursion.id.slice(0, 8)}`;
   const statusRef = useRef<HTMLDivElement>(null);
+  const trackRef = useBookingFormTracking(excursion.id, preview);
   const [load, setLoad] = useState<Load>(scheduled ? { kind: "loading" } : { kind: "ready", departures: [] });
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
@@ -149,11 +152,13 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
       return;
     }
     setStatus({ kind: "idle" });
+    track("booking_form_submit", { excursionId: excursion.id });
     let res: Response;
     try {
       res = await fetch("/api/bookings", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        // Analytics ids are added only after consent, so the server can record a confirmed conversion.
+        headers: { "Content-Type": "application/json", ...analyticsHeaders() },
         body: JSON.stringify({
           ...data,
           departureId: dated ? data.departureId : null,
@@ -197,7 +202,7 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
   const intro = dated ? t.scheduledBody : t.generalBody;
 
   return (
-    <div id={REQUEST_FORM_ID} className="on-light scroll-mt-28 rounded-sm bg-limestone p-6 text-ink sm:p-10">
+    <div ref={trackRef} id={REQUEST_FORM_ID} className="on-light scroll-mt-28 rounded-sm bg-limestone p-6 text-ink sm:p-10">
       <p className="text-eyebrow text-bark">{excursion.title}</p>
       <h2 id={`${idPrefix}-title`} className="text-display-sm mt-2">
         {title}

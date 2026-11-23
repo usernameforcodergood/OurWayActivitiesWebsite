@@ -479,8 +479,8 @@
         "body": "[The retention period for requests will be set by OurWay.] You can always ask us to delete your data sooner."
       },
       {
-        "title": "Cookies and tracking",
-        "body": "The public website uses no advertising or analytics cookies and no third-party tracking tools. Only the private admin area uses a strictly necessary sign-in cookie for administrators."
+        "title": "Cookies and visitor statistics",
+        "body": "Visitor statistics are recorded only if you accept them in the notice shown on your first visit (legal basis: consent — Art. 6(1)(a) GDPR and Art. 4(5) of Greek Law 3471/2006). Without acceptance nothing is stored on your device and nothing is recorded. If you accept, your browser keeps a random visitor and session identifier (localStorage) and sends us: the pages and excursions you view, how long each page is visible, whether you opened or submitted the request form (never its contents), searches and filters on the excursions list, the website or campaign (UTM parameters) you came from, device type, browser, operating system, a screen-size class and the country/region/city as determined by our hosting provider. We do not store your IP address, name, email or phone number in these statistics, we do not use fingerprinting and we do not share them with Google, ad networks or other third parties; they are stored in our own database (Supabase) and only OurWay administrators see them, in aggregate. Detailed records are deleted automatically after 13 months. You can withdraw your consent at any time from “Cookie settings” at the bottom of every page: recording stops immediately and what was recorded under your identifier is deleted. The private admin area additionally uses a strictly necessary sign-in cookie for administrators."
       },
       {
         "title": "Your rights",
@@ -501,7 +501,8 @@
     "rights": "All rights reserved.",
     "language": "Language",
     "backToTop": "Back to top",
-    "photoCredit": "Placeholder photography: Unsplash"
+    "photoCredit": "Placeholder photography: Unsplash",
+    "cookieSettings": "Cookie settings"
   },
   "notFound": {
     "eyebrow": "404",
@@ -744,5 +745,14 @@
         "generic": "Something went wrong and your request was not sent. Please try again shortly."
       }
     }
+  },
+  "consent": {
+    "title": "Visitor statistics",
+    "body": "If you agree, we measure which pages and excursions you visit and where you came from, so we can improve the website. We use our own tool (not Google or ad networks) and a random identifier stored in your browser. We do not record your name, contact details or IP address. You can change your mind at any time from “Cookie settings” at the bottom of the page.",
+    "privacyLink": "Privacy policy",
+    "accept": "Accept",
+    "decline": "Decline",
+    "currentOn": "Current choice: you accepted statistics. Choosing “Decline” stops them immediately and deletes what was recorded under your identifier.",
+    "currentOff": "Current choice: you declined statistics."
   }
 }
