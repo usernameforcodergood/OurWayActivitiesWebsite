@@ -155,3 +155,10 @@ html.js-motion [data-anim="hide"] {
     transform: translateY(100%);
   }
 }
+
+/* Netlify injects a "Powered by Netlify" badge (iframe) on Free-plan sites.
+   The owner chose to hide it (2026-11-25). Netlify's own switch is locked on
+   Free; remove this rule if the plan changes or Netlify asks for the badge. */
+iframe#nl-badge-frame {
+  display: none !important;
+}
