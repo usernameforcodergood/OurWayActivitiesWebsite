@@ -98,7 +98,7 @@ export async function POST(request: Request) {
     const config = getEmailConfig();
     if (config) {
       try {
-        await config.provider.send({ to: config.to, replyTo: data.email, ...buildEmail(data, result.reference) });
+        await config.provider.send({ to: config.recipients, replyTo: data.email, ...buildEmail(data, result.reference) });
       } catch (err) {
         console.error(`[contact] email via ${config.provider.name} failed (message is saved):`, err instanceof Error ? err.message : "unknown");
       }

@@ -256,7 +256,7 @@ Every visitor request is **database-first**: the contact form, experience reques
 Emails are an optional extra, sent through Resend after the save:
 
 - `EMAIL_NOTIFICATIONS_ENABLED=true` turns them on. Anything else means nothing is sent anywhere (the gate is in `src/lib/bookings/notify.ts`).
-- `RESEND_API_KEY`: Resend API key. `CONTACT_EMAIL`: the inbox for new-request notifications (`BOOKINGS_EMAIL` overrides it for experience requests).
+- `RESEND_API_KEY`: Resend API key. `CONTACT_EMAIL`: the inbox(es) for new-request notifications. List several separated by commas (e.g. `ourway.activities@gmail.com,someone@gmail.com`) and every one receives each notification. The first is the reply-to address on customer emails. `BOOKINGS_EMAIL` overrides it for experience and tailor-made requests.
 - `CONTACT_FROM_EMAIL="OurWay <hello@ourway-activities.gr>"`: needs the domain **verified** in Resend (region eu-west-1). Without a verified domain, Resend rejects that sender with 403. The fallback `onboarding@resend.dev` only delivers to the Resend account owner.
 
 Which emails exist: customer receipts for an experience request or an interest request, confirmed / not confirmed / cancelled (sent from the admin), the tailor-made receipt (each in Greek and English), plus admin notifications for each new request and contact message. To see them all at once:
@@ -282,7 +282,7 @@ The smoke test checks the public pages, the 404 page and the admin login redirec
 
 Production runs on Netlify (Free plan; Vercel Hobby does not allow commercial use). The project is `ourwayactivitieswebsite` and every push to `main` deploys to production. Server functions run in US East, the free plan's fixed region.
 
-Environment variables (Netlify → Site configuration → Environment variables): `NEXT_PUBLIC_SITE_URL=https://ourway-activities.gr`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `ADMIN_RECOVERY_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`, `CONTACT_FROM_EMAIL` and `EMAIL_NOTIFICATIONS_ENABLED`. Do **not** add `SUPABASE_DB_URL`.
+Environment variables (Netlify → Site configuration → Environment variables): `NEXT_PUBLIC_SITE_URL=https://ourway-activities.gr`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `ADMIN_RECOVERY_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL` (comma-separated inboxes), `CONTACT_FROM_EMAIL` and `EMAIL_NOTIFICATIONS_ENABLED`. Do **not** add `SUPABASE_DB_URL`.
 
 ## Domain (ourway-activities.gr)
 
