@@ -1,11 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 let lenisInstance: Lenis | null = null;
+let firstPathname: string | null = null;
+let navigated = false;
+
+/**
+ * True once the visitor has moved to another page inside the app (not on the
+ * first page load). Set in a layout effect that runs before the new page's own
+ * layout effects, so a page can read it while setting up its intro.
+ */
+export function isClientNavigation(): boolean {
+  return navigated;
+}
 
 /** Access the active Lenis instance (null when reduced motion is on). */
 export function getLenis(): Lenis | null {
@@ -49,9 +60,16 @@ export function SmoothScroll() {
     };
   }, []);
 
-  // New page: start at the top and re-measure all triggers.
-  useEffect(() => {
-    lenisInstance?.scrollTo(0, { immediate: true, force: true });
+  // New page: start at the top *before* it is painted (a passive effect let
+  // Safari show the new page at the old scroll position for a frame or two),
+  // then re-measure all triggers. Links with a #hash are left to the router.
+  useLayoutEffect(() => {
+    if (firstPathname === null) firstPathname = pathname;
+    else if (pathname !== firstPathname) navigated = true;
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+      lenisInstance?.scrollTo(0, { immediate: true, force: true });
+    }
     const id = requestAnimationFrame(() => ScrollTrigger.refresh());
     return () => cancelAnimationFrame(id);
   }, [pathname]);

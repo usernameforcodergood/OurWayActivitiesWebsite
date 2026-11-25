@@ -8,8 +8,16 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { useExperienceChoice } from "@/components/layout/ExperienceChoice";
+import { isClientNavigation } from "@/components/layout/SmoothScroll";
 
 type Props = { locale: Locale; t: Dictionary["home"]["hero"] };
+
+/**
+ * The full cinematic intro plays only when Home is the first page loaded.
+ * Arriving through the menu or logo uses a short reveal instead: replaying the
+ * dark fade-in and slow text rise every time made Home look like it was still
+ * loading.
+ */
 
 /**
  * Cinematic opening: the photograph settles from a slow zoom while the
@@ -30,20 +38,36 @@ export function Hero({ locale, t }: Props) {
         const title = q("[data-hero-title]")[0];
         let split: SplitText | null = null;
 
+        const quick = isClientNavigation();
         const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
-        intro
-          .fromTo(q("[data-hero-media]"), { scale: 1.18 }, { scale: 1, duration: 2.6, ease: "power3.out" }, 0)
-          .fromTo(q("[data-hero-shade]"), { opacity: 1 }, { opacity: 0, duration: 1.6, ease: "power2.out" }, 0);
+        if (quick) {
+          gsap.set(q("[data-hero-shade]"), { opacity: 0 });
+          intro.fromTo(q("[data-hero-media]"), { scale: 1.06 }, { scale: 1, duration: 1.4, ease: "power3.out" }, 0);
+        } else {
+          intro
+            .fromTo(q("[data-hero-media]"), { scale: 1.18 }, { scale: 1, duration: 2.6, ease: "power3.out" }, 0)
+            .fromTo(q("[data-hero-shade]"), { opacity: 1 }, { opacity: 0, duration: 1.6, ease: "power2.out" }, 0);
+        }
 
-        document.fonts.ready.then(() => {
+        const reveal = () => {
           if (!title) return;
           split = SplitText.create(title, { type: "lines", mask: "lines", linesClass: "split-line" });
           gsap.set(q("[data-anim=hide]"), { visibility: "visible" });
-          intro
-            .from(split.lines, { yPercent: 115, duration: 1.5, stagger: 0.12 }, 0.35)
-            .from(q("[data-hero-fade]"), { y: 28, opacity: 0, duration: 1.2, stagger: 0.1 }, 0.85)
-            .from(q("[data-hero-cue]"), { opacity: 0, duration: 1 }, 1.4);
-        });
+          if (quick) {
+            intro
+              .from(split.lines, { yPercent: 115, duration: 0.8, stagger: 0.06 }, 0.05)
+              .from(q("[data-hero-fade]"), { y: 16, opacity: 0, duration: 0.6, stagger: 0.05 }, 0.2)
+              .from(q("[data-hero-cue]"), { opacity: 0, duration: 0.6 }, 0.4);
+          } else {
+            intro
+              .from(split.lines, { yPercent: 115, duration: 1.5, stagger: 0.12 }, 0.35)
+              .from(q("[data-hero-fade]"), { y: 28, opacity: 0, duration: 1.2, stagger: 0.1 }, 0.85)
+              .from(q("[data-hero-cue]"), { opacity: 0, duration: 1 }, 1.4);
+          }
+        };
+        // Fonts are already loaded after the first visit: reveal in the same frame.
+        if (quick && document.fonts.status === "loaded") reveal();
+        else document.fonts.ready.then(reveal);
 
         // Scroll-out choreography (scrubbed to the scrollbar).
         const out = gsap.timeline({

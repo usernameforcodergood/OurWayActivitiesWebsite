@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -64,8 +64,39 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
 
   const close = useCallback(() => setOpen(false), []);
 
-  // Menu side-effects: lock scroll, Escape to close, focus trap, focus return.
+  // Menu link to another page: keep the menu covering the screen until the
+  // new page has rendered, then wipe it away. Closing at tap time revealed the
+  // old page for the duration of the request, which read as a loading glitch.
+  const [leaving, setLeaving] = useState(false);
+  const navigateFromMenu = (href: string) => {
+    if (href === pathname) {
+      close();
+      return;
+    }
+    setLeaving(true);
+  };
+  // Close on any route change (menu links, logo, language switch, back button).
+  const [lastPath, setLastPath] = useState(pathname);
+  if (pathname !== lastPath) {
+    setLastPath(pathname);
+    setOpen(false);
+    setLeaving(false);
+  }
+  // Safety net: never leave the menu stuck if a navigation fails.
   useEffect(() => {
+    if (!leaving) return;
+    const id = window.setTimeout(() => {
+      setLeaving(false);
+      setOpen(false);
+    }, 6000);
+    return () => window.clearTimeout(id);
+  }, [leaving]);
+
+  // Menu side-effects: lock scroll, Escape to close, focus trap, focus return.
+  // A layout effect so the scroll lock is released in the same commit that
+  // renders the next page, before SmoothScroll resets it to the top (a locked
+  // `overflow: clip` root ignores programmatic scrolling).
+  useLayoutEffect(() => {
     if (!open) return;
     const lenis = getLenis();
     lenis?.stop();
@@ -73,7 +104,9 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
     const trigger = menuButton.current;
     const focusables = () =>
       Array.from(dialog.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])") ?? []);
-    requestAnimationFrame(() => focusables()[0]?.focus());
+    // preventScroll: the links are still sliding up inside overflow-hidden rows;
+    // a plain focus() makes Safari scroll the row and the first item jumps.
+    requestAnimationFrame(() => focusables()[0]?.focus({ preventScroll: true }));
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -98,7 +131,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
       document.removeEventListener("keydown", onKey);
       document.documentElement.style.overflow = "";
       lenis?.start();
-      trigger?.focus();
+      trigger?.focus({ preventScroll: true });
     };
   }, [open]);
 
@@ -111,7 +144,8 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
     <>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-50 transition-[transform,background-color,border-color] duration-700 ease-out-expo",
+          // Background fades fast so text never shows through the logo; the slide stays slow.
+          "fixed inset-x-0 top-0 z-50 transition-[transform,background-color,border-color] duration-[700ms,250ms,250ms] ease-out-expo",
           scrolled && !open ? "border-b border-bone/10 bg-ink/80 backdrop-blur-md" : "border-b border-transparent",
           hidden && !open ? "-translate-y-full" : "translate-y-0",
         )}
@@ -200,7 +234,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
             className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-forest pt-[var(--header-h)] xl:hidden"
             initial={{ clipPath: "inset(0% 0% 100% 0%)" }}
             animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-            exit={{ clipPath: "inset(0% 0% 100% 0%)" }}
+            exit={{ clipPath: "inset(0% 0% 100% 0%)", transition: { duration: 0.55, ease } }}
             transition={{ duration: 0.8, ease }}
           >
             <nav aria-label={t.primary} className="container-x flex flex-1 flex-col justify-center py-10">
@@ -215,7 +249,7 @@ export function Navbar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) 
                     >
                       <Link
                         href={localePath(locale, routes[key])}
-                        onClick={close}
+                        onClick={() => navigateFromMenu(localePath(locale, routes[key]))}
                         aria-current={isActive(key) ? "page" : undefined}
                         className="group flex items-baseline gap-4 py-1.5 font-display text-[clamp(2.4rem,9vw,4rem)] leading-[1.05] text-bone/85 transition-colors hover:text-bone aria-[current=page]:text-turquoise"
                       >
