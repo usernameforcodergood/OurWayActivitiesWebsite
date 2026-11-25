@@ -4,7 +4,7 @@ import { siteConfig } from "@/lib/site";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 import { MIN_FILL_MS, bookingRequestSchema, mapDbError, splitFullName, type SubmitResponse } from "@/lib/bookings/validation";
 import { renderAdminNewBooking, renderCustomerBookingEmail, type BookingEmailData } from "@/lib/bookings/emails";
-import { adminInbox, deliver, emailNotificationsEnabled, type EmailKind } from "@/lib/bookings/notify";
+import { adminInbox, adminInboxes, deliver, emailNotificationsEnabled, type EmailKind } from "@/lib/bookings/notify";
 import { recordBookingOutcome } from "@/lib/analytics/server";
 
 /**
@@ -114,9 +114,10 @@ export async function POST(request: Request) {
   };
 
   const inbox = adminInbox();
+  const inboxes = adminInboxes();
   const adminEmail = renderAdminNewBooking(emailData, `${siteConfig.url}/admin/bookings/${result.id}`);
   const [adminRes, customerRes] = await Promise.all([
-    inbox ? deliver(inbox, d.email, adminEmail) : Promise.resolve({ status: "not_configured" as const, recipient: "—", error: "No admin inbox configured" }),
+    inboxes.length ? deliver(inboxes, d.email, adminEmail) : Promise.resolve({ status: "not_configured" as const, recipient: "—", error: "No admin inbox configured" }),
     deliver(d.email, inbox, renderCustomerBookingEmail("received", emailData)),
   ]);
 

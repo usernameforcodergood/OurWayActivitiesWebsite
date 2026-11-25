@@ -12,7 +12,7 @@ import {
   type TailorMadeRequestData,
 } from "@/lib/bookings/validation";
 import { formatDateLong, renderAdminNewPrivate, renderPrivateReceived } from "@/lib/bookings/emails";
-import { adminInbox, deliver, emailNotificationsEnabled, type EmailKind } from "@/lib/bookings/notify";
+import { adminInbox, adminInboxes, deliver, emailNotificationsEnabled, type EmailKind } from "@/lib/bookings/notify";
 
 /**
  * Tailor-made experience request. Saved as "new" in public.private_requests;
@@ -135,9 +135,10 @@ export async function POST(request: Request) {
 
   const base = { reference: result.reference, firstName: name.first, lastName: name.last, email: d.email, phone: d.phone, participants: d.participants };
   const inbox = adminInbox();
+  const inboxes = adminInboxes();
   const [adminRes, customerRes] = await Promise.all([
-    inbox
-      ? deliver(inbox, d.email, renderAdminNewPrivate({ ...base, locale: "el", details: details(d, "el") }, `${siteConfig.url}/admin/tailor-made/${result.id}`))
+    inboxes.length
+      ? deliver(inboxes, d.email, renderAdminNewPrivate({ ...base, locale: "el", details: details(d, "el") }, `${siteConfig.url}/admin/tailor-made/${result.id}`))
       : Promise.resolve({ status: "not_configured" as const, recipient: "—", error: "No admin inbox configured" }),
     deliver(d.email, inbox, renderPrivateReceived({ ...base, locale: d.locale, details: details(d, d.locale) })),
   ]);
