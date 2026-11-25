@@ -14,8 +14,8 @@ export type EmailKind =
 export type DeliveryResult = { status: "sent" | "failed" | "not_configured"; error?: string; recipient: string };
 
 /**
- * Email notifications are OFF until the domain and sender are set up.
- * Turn them on later with EMAIL_NOTIFICATIONS_ENABLED=true (Vercel + .env.local).
+ * Email notifications are OFF unless EMAIL_NOTIFICATIONS_ENABLED=true
+ * (set on the host's environment variables and in .env.local).
  * While off, nothing is sent to Resend from any route or admin action, and
  * saving a request never depends on email.
  */

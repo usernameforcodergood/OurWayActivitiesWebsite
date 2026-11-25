@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local tooling: Claude Code worktrees and Netlify CLI state.
+    ".claude/**",
+    ".netlify/**",
   ]),
 ]);
 

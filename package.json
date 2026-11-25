@@ -10,7 +10,9 @@
     "db:setup": "node scripts/db-setup.mjs",
     "admin:grant": "node scripts/admin-grant.mjs",
     "typecheck": "tsc --noEmit",
-    "admin:recovery-key": "node scripts/admin-recovery-key.mjs"
+    "admin:recovery-key": "node scripts/admin-recovery-key.mjs",
+    "smoke": "node scripts/smoke-live.mjs",
+    "email:test": "node scripts/send-test-emails.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -47,6 +49,7 @@
     "dotenv": "^18.0.10",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "jiti": "^2.7.0",
     "pg": "^8.23.1",
     "tailwindcss": "4.3.3",
     "typescript": "^5"

@@ -19,7 +19,7 @@ import {
 } from "@/lib/bookings/validation";
 import { formatDateLong, formatDateTime, formatEur } from "@/lib/bookings/format";
 import { FormField, inputClass } from "@/components/forms/FormField";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { analyticsHeaders, track } from "@/lib/analytics/client";
 import { useBookingFormTracking } from "@/components/analytics/Analytics";

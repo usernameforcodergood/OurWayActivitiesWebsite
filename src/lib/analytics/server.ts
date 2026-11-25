@@ -30,12 +30,37 @@ export function geoFromHeaders(headers: Headers): { country: string | null; regi
       return null;
     }
   };
-  const country = headers.get("x-vercel-ip-country")?.toUpperCase() ?? null;
+  const valid = (c: string | null | undefined) => {
+    const v = c?.toUpperCase() ?? null;
+    return v && /^[A-Z]{2}$/.test(v) && v !== "XX" ? v : null;
+  };
+  // Netlify: base64-encoded JSON {country: {code}, subdivision: {code}, city}.
+  const nf = netlifyGeo(headers.get("x-nf-geo"));
+  if (nf) {
+    const clip = (v: unknown) => (typeof v === "string" && v ? v.slice(0, 80) : null);
+    return { country: valid(nf.country?.code), region: clip(nf.subdivision?.code), city: clip(nf.city) };
+  }
+  // Vercel (kept so the code works on either host).
   return {
-    country: country && /^[A-Z]{2}$/.test(country) && country !== "XX" ? country : null,
+    country: valid(headers.get("x-vercel-ip-country")),
     region: decode(headers.get("x-vercel-ip-country-region")),
     city: decode(headers.get("x-vercel-ip-city")),
   };
+}
+
+type NetlifyGeo = { city?: string; country?: { code?: string }; subdivision?: { code?: string } };
+
+function netlifyGeo(raw: string | null): NetlifyGeo | null {
+  if (!raw) return null;
+  for (const text of [() => Buffer.from(raw, "base64").toString("utf8"), () => raw]) {
+    try {
+      const v = JSON.parse(text());
+      if (v && typeof v === "object") return v as NetlifyGeo;
+    } catch {
+      /* try the next form */
+    }
+  }
+  return null;
 }
 
 /** Visitor/session ids the booking form attached (present only after consent). */
