@@ -251,32 +251,52 @@ First-party, consent-based analytics stored in our own Supabase database. There 
 
 ## Contact form and email setup
 
-The form validates on the client and again on the server (`src/app/api/contact/route.ts`). Spam is blocked by a honeypot field, a minimum fill time and a per-IP rate limit (best effort, in memory). Success appears **only** after the email provider confirms delivery. Without credentials, the API returns `503 notConfigured` and the visitor is told the message was **not** sent. Submissions are never stored or logged.
+Every visitor request is **database-first**: the contact form, experience requests and tailor-made requests are saved in Supabase (visible in the admin) and success depends only on that save. The forms validate on the client and again on the server; spam is blocked by a honeypot field, a minimum fill time and a per-IP rate limit (best effort, in memory).
 
-1. Create an account at <https://resend.com> and an API key.
-2. Set `RESEND_API_KEY` and `CONTACT_EMAIL` (the inbox that receives inquiries, e.g. `ourway.activities@gmail.com`).
-3. For production, verify the OurWay domain in Resend (it adds DNS records) and set `CONTACT_FROM_EMAIL="OurWay <hello@your-domain.gr>"`. Until then the shared `onboarding@resend.dev` sender is used, and Resend only delivers to the account owner's own address.
+Emails are an optional extra, sent through Resend after the save:
+
+- `EMAIL_NOTIFICATIONS_ENABLED=true` turns them on. Anything else means nothing is sent anywhere (the gate is in `src/lib/bookings/notify.ts`).
+- `RESEND_API_KEY`: Resend API key. `CONTACT_EMAIL`: the inbox for new-request notifications (`BOOKINGS_EMAIL` overrides it for experience requests).
+- `CONTACT_FROM_EMAIL="OurWay <hello@ourway-activities.gr>"`: needs the domain **verified** in Resend (region eu-west-1). Without a verified domain, Resend rejects that sender with 403. The fallback `onboarding@resend.dev` only delivers to the Resend account owner.
+
+Which emails exist: customer receipts for an experience request or an interest request, confirmed / not confirmed / cancelled (sent from the admin), the tailor-made receipt (each in Greek and English), plus admin notifications for each new request and contact message. To see them all at once:
+
+```bash
+npm run email:test -- --dry      # render only
+npm run email:test               # send all 16 via the shared test sender (to CONTACT_EMAIL)
+npm run email:test -- --domain   # send from CONTACT_FROM_EMAIL once the domain is verified
+```
 
 To change provider, implement `EmailProvider` in `src/lib/email.ts`.
 
-## Deploying to Vercel
+## Live smoke test
 
-1. Push this repository to GitHub.
-2. In Vercel: **Add New → Project → Import** the repository. The framework is detected as Next.js; keep the default build settings.
-3. Under **Settings → Environment Variables**, add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `ADMIN_RECOVERY_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`, optionally `CONTACT_FROM_EMAIL` and `BOOKINGS_EMAIL`, and `NEXT_PUBLIC_SITE_URL` (the final domain, e.g. `https://www.ourway.gr`). Do **not** add `SUPABASE_DB_URL`.
-4. Deploy. Every push to `main` deploys to production; other branches get preview URLs.
+```bash
+npm run smoke                                            # https://ourway-activities.gr
+npm run smoke -- https://ourwayactivitieswebsite.netlify.app
+```
 
-## Connecting the domain
+The smoke test checks the public pages, the 404 page and the admin login redirect. For the three request APIs it covers validation, anti-spam, success, duplicate submissions, the duplicate-person guard and capacity. It saves real requests and then deletes exactly those rows, so it needs `SUPABASE_SECRET_KEY` in `.env.local`. With emails enabled, customer copies go to Resend's `delivered@resend.dev` test inbox (no real mailbox), and each run also sends about four admin notifications to `CONTACT_EMAIL`.
 
-1. Vercel → Project → **Settings → Domains** → add `your-domain.gr` and `www.your-domain.gr`.
-2. At the domain registrar's DNS panel, add the records Vercel shows. Typically:
-   - apex `your-domain.gr`: **A** record → `76.76.21.21`
-   - `www`: **CNAME** → `cname.vercel-dns.com`
+## Hosting (Netlify)
 
-   Always use the exact values shown in your Vercel dashboard.
-3. Choose the primary domain in Vercel (e.g. `www`) and let the other one redirect to it.
-4. HTTPS certificates are issued automatically once DNS propagates (minutes to a few hours).
-5. Set `NEXT_PUBLIC_SITE_URL` to the primary domain and redeploy, so canonical URLs, hreflang tags and the sitemap use it.
+Production runs on Netlify (Free plan; Vercel Hobby does not allow commercial use). The project is `ourwayactivitieswebsite` and every push to `main` deploys to production. Server functions run in US East, the free plan's fixed region.
+
+Environment variables (Netlify → Site configuration → Environment variables): `NEXT_PUBLIC_SITE_URL=https://ourway-activities.gr`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `ADMIN_RECOVERY_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`, `CONTACT_FROM_EMAIL` and `EMAIL_NOTIFICATIONS_ENABLED`. Do **not** add `SUPABASE_DB_URL`.
+
+## Domain (ourway-activities.gr)
+
+Registered at Papaki, which also keeps the DNS (Papaki nameservers). The apex is the primary domain and `www` redirects to it. Records in the Papaki zone:
+
+| Name | Type | Value | Purpose |
+| --- | --- | --- | --- |
+| `@` | A | `75.2.60.5` | Netlify load balancer |
+| `www` | CNAME | `ourwayactivitieswebsite.netlify.app` | Netlify |
+| `resend._domainkey` | TXT | DKIM key from Resend | Resend signing (DKIM) |
+| `send` | CNAME | `send.forge.rmta.net` | Resend SPF / Return-Path |
+| `rsend` | CNAME | `rsend-euw1.forge.rmta.net` | Resend SPF / Return-Path |
+
+Papaki's own mail MX/SPF records stay as they are. Netlify issues the HTTPS certificate automatically once the domain resolves publicly. Supabase Auth → URL configuration uses the domain as Site URL and allows `/admin/reset-password` on the domain and on the netlify.app address.
 
 DNS changes need the domain owner's access and are not made by this project.
 

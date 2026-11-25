@@ -1,7 +1,7 @@
 /**
  * Best-effort in-memory rate limit (per serverless instance). The database's
  * duplicate checks are the real guard; this only slows down floods.
- * For stronger protection add Vercel Firewall rules or an Upstash limiter.
+ * For stronger protection add host firewall rules or an Upstash limiter.
  */
 const buckets = new Map<string, number[]>();
 
@@ -14,6 +14,11 @@ export function rateLimited(key: string, max: number, windowMs: number): boolean
   return recent.length > max;
 }
 
+/** Netlify's own header first (set by its edge, cannot be spoofed by the client). */
 export function clientIp(request: Request): string {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  return (
+    request.headers.get("x-nf-client-connection-ip")?.trim() ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "unknown"
+  );
 }
