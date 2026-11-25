@@ -7,8 +7,8 @@
 //
 // It creates real requests in the production database and deletes exactly
 // those rows (by reference) at the end. Needs SUPABASE_SECRET_KEY in
-// .env.local. With EMAIL_NOTIFICATIONS_ENABLED=true on the site, the test
-// requests also send emails (customer copies go to test@example.com).
+// .env.local. With emails enabled on the site, customer copies go to Resend's
+// delivered@resend.dev test inbox and admin notifications to CONTACT_EMAIL.
 import { randomUUID } from "node:crypto";
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
@@ -30,7 +30,8 @@ const post = async (path, body, raw) => {
   return { status: r.status, body: json };
 };
 const filledLongAgo = () => Date.now() - 10_000; // passes the minimum fill time
-const testPerson = { email: "test@example.com", phone: "+30 690 000 0000", consent: true, website: "" };
+// Resend test inbox: accepted and "delivered" without reaching a real mailbox.
+const testPerson = { email: "delivered@resend.dev", phone: "+30 690 000 0000", consent: true, website: "" };
 
 try {
   /* ---------------- pages ---------------- */
@@ -74,7 +75,7 @@ try {
   check("booking: unknown excursion → 409 unavailable", r.status === 409 && r.body?.error === "unavailable");
   if (!ex) check("booking: a published excursion exists", false);
   if (scheduled) {
-    r = await post("/api/bookings", booking({ departureId: null, email: "test-interest@example.com" }));
+    r = await post("/api/bookings", booking({ departureId: null, email: "delivered+interest@resend.dev" }));
     check("booking: scheduled excursion without a departure → saved as interest (201)", r.status === 201);
   }
   if (dep) {
@@ -86,7 +87,7 @@ try {
     r = await post("/api/bookings", booking());
     check("booking: same person + same departure → 409 duplicate", r.status === 409 && r.body?.error === "duplicate");
     if (dep.capacity) {
-      r = await post("/api/bookings", booking({ email: "test-capacity@example.com", participants: Math.min(100, dep.capacity + 1) }));
+      r = await post("/api/bookings", booking({ email: "delivered+capacity@resend.dev", participants: Math.min(100, dep.capacity + 1) }));
       check("booking: more people than places → 409", r.status === 409 && ["capacity", "full"].includes(r.body?.error), `${r.body?.error} remaining=${r.body?.remaining}`);
     }
   } else {

@@ -25,9 +25,9 @@ export const siteConfig: SiteConfig = {
    * Pre-launch switch. While false, every page tells search engines
    * "noindex, nofollow" and robots.txt drops the sitemap, so the site stays
    * out of Google even though anyone with the link can open it.
-   * Set to true at launch.
+   * Launched 2026-11-25 on ourway-activities.gr.
    */
-  indexable: false,
+  indexable: true,
   /**
    * Official logo. Save the file (transparent PNG or SVG) to /public/brand/
    * and set `src`, e.g. "/brand/ourway-logo.png", plus its real width/height.

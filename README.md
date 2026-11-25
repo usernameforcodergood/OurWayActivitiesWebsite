@@ -276,7 +276,7 @@ npm run smoke                                            # https://ourway-activi
 npm run smoke -- https://ourwayactivitieswebsite.netlify.app
 ```
 
-The smoke test checks the public pages, the 404 page and the admin login redirect. For the three request APIs it covers validation, anti-spam, success, duplicate submissions, the duplicate-person guard and capacity. It saves real requests and then deletes exactly those rows, so it needs `SUPABASE_SECRET_KEY` in `.env.local`. When emails are enabled on the site, the test requests send emails too.
+The smoke test checks the public pages, the 404 page and the admin login redirect. For the three request APIs it covers validation, anti-spam, success, duplicate submissions, the duplicate-person guard and capacity. It saves real requests and then deletes exactly those rows, so it needs `SUPABASE_SECRET_KEY` in `.env.local`. With emails enabled, customer copies go to Resend's `delivered@resend.dev` test inbox (no real mailbox), and each run also sends about four admin notifications to `CONTACT_EMAIL`.
 
 ## Hosting (Netlify)
 
