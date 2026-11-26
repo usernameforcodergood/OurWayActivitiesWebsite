@@ -14,16 +14,16 @@ import { ButtonLink } from "@/components/ui/Button";
  */
 export function PrivateTripsSection({ locale, t }: { locale: Locale; t: Dictionary["home"]["private"] }) {
   return (
-    <section aria-labelledby="private-title" className="relative overflow-hidden bg-moss text-bone">
+    <section aria-labelledby="private-title" className="relative overflow-clip bg-moss text-bone">
       <div className="grid md:grid-cols-12">
         <div className="relative md:col-span-5">
           <ImageReveal
-            image="roadPause"
+            image="owEverest"
             locale={locale}
             sizes="(min-width: 768px) 42vw, 100vw"
             direction="left"
             parallax={8}
-            className="aspect-[4/3] h-full md:aspect-auto md:min-h-[42rem]"
+            className="aspect-[4/5] md:sticky md:top-0"
           />
         </div>
         <div className="section-y container-x flex flex-col justify-center md:col-span-7 md:pl-14 lg:pl-20">

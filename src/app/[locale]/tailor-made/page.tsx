@@ -91,7 +91,7 @@ export default async function TailorMadePage({ params }: PageProps<"/[locale]/ta
           </div>
           <div className="relative md:order-2 md:col-span-5">
             <ImageReveal
-              image="folkDanceCircle"
+              image="owCyclists"
               locale={locale}
               sizes="(min-width: 768px) 42vw, 100vw"
               direction="right"

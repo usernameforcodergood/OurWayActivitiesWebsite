@@ -46,7 +46,7 @@ export function StorySection({ locale, t }: { locale: Locale; t: Dictionary["hom
       {/* A — image left, text right */}
       <div className="container-x grid items-center gap-10 pt-20 md:grid-cols-12 md:gap-8 md:pt-32">
         <ImageReveal
-          image="ridgeAutumn"
+          image="owWaterfall"
           locale={locale}
           sizes="(min-width: 768px) 55vw, 100vw"
           direction="left"
@@ -69,7 +69,7 @@ export function StorySection({ locale, t }: { locale: Locale; t: Dictionary["hom
             className="aspect-[5/4]"
           />
           <ImageReveal
-            image="folkDanceWomen"
+            image="owWorkshopPress"
             locale={locale}
             sizes="(min-width: 768px) 20vw, 40vw"
             direction="up"
@@ -90,7 +90,7 @@ export function StorySection({ locale, t }: { locale: Locale; t: Dictionary["hom
 
       {/* D — layered, overlapping, asymmetric */}
       <div className="container-x section-y">
-        <LayeredImages locale={locale} primary="stoneHouse" secondary="hillChapel" tertiary="villageSteps">
+        <LayeredImages locale={locale} primary="owStoneLane" secondary="owCaveChapel" tertiary="owLocalProducts">
           <BlockText block={place} index={3} />
         </LayeredImages>
       </div>

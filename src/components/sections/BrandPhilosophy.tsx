@@ -40,7 +40,7 @@ export function BrandPhilosophy({ locale, t, values }: Props) {
 
         <div className="grid gap-10 md:col-span-12 md:grid-cols-12 md:items-end md:gap-8">
           <ImageReveal
-            image="sittingGorge"
+            image="owCoastTrail"
             locale={locale}
             sizes="(min-width: 768px) 30vw, 70vw"
             direction="up"

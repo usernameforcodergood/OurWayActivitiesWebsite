@@ -14,21 +14,21 @@ type TileKey = "activities" | "tailorMade" | "gallery";
 const TILES: Array<{ key: TileKey; image: MediaKey; frame: string; wrap: string; parallax: number }> = [
   {
     key: "activities",
-    image: "bridgeVillage",
+    image: "owMeadowGroup",
     frame: "aspect-[4/5] md:aspect-[5/6]",
     wrap: "md:col-span-6 md:row-span-2",
     parallax: 8,
   },
   {
     key: "tailorMade",
-    image: "valleyVillage",
+    image: "owSummitFlag",
     frame: "aspect-[4/3]",
     wrap: "md:col-span-5 md:col-start-8 md:mt-24",
     parallax: 10,
   },
   {
     key: "gallery",
-    image: "gorgeAutumn",
+    image: "owRidgeCrest",
     frame: "aspect-[16/10]",
     wrap: "md:col-span-4 md:col-start-8",
     parallax: 12,
