@@ -5,7 +5,7 @@ import { Wordmark } from "@/components/ui/Wordmark";
 import { BackgroundVideo } from "./BackgroundVideo";
 
 /** Pre-launch Coming Soon page (see src/lib/coming-soon.ts). */
-const LAUNCH_LABEL = "Coming Soon · 2026";
+const LAUNCH_LABEL = "Coming Soon · 2027";
 const TAGLINE = "The journey begins soon.";
 
 const copy: Record<
