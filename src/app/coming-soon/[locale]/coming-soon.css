@@ -1,0 +1,61 @@
+/* Coming Soon page animations. Reduced motion is handled by the global rule in
+   globals.css, which shortens every animation to ~0 (content stays visible). */
+
+.cs-rise {
+  animation: cs-rise 1.2s var(--ease-out-expo) both;
+}
+@keyframes cs-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Wordmark: letters settle in from wide spacing. */
+.cs-title {
+  letter-spacing: 0.06em;
+  animation: cs-title 2.2s 0.45s var(--ease-out-expo) both;
+}
+@keyframes cs-title {
+  from {
+    opacity: 0;
+    letter-spacing: 0.32em;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.06em;
+    filter: none;
+  }
+}
+
+.cs-line {
+  transform-origin: right;
+  animation: cs-line 1.4s 0.5s var(--ease-out-expo) both;
+}
+.cs-line-r {
+  transform-origin: left;
+}
+@keyframes cs-line {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.cs-drift {
+  animation: cs-drift 28s var(--ease-in-out-quart) infinite alternate;
+}
+@keyframes cs-drift {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+  }
+}
