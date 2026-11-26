@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: LayoutProps<"/coming-soon/[lo
     metadataBase: new URL(siteConfig.url),
     title: el ? "OurWay — Το ταξίδι ξεκινά σύντομα" : "OurWay — The journey begins soon",
     description: el
-      ? "Αυθεντικές εμπειρίες, νέοι προορισμοί και περιπέτειες που αξίζει να ζήσεις. Το OurWay ετοιμάζεται να ξεκινήσει το δικό του ταξίδι."
+      ? "Αυθεντικές εμπειρίες, νέοι προορισμοί και περιπέτειες που αξίζει να ζήσεις. Η OurWay ετοιμάζεται να ξεκινήσει το δικό της ταξίδι."
       : "Authentic experiences, new destinations and adventures worth experiencing. OurWay is getting ready to begin its journey.",
     applicationName: siteConfig.name,
     // Pre-launch page: never index it (the proxy also sends X-Robots-Tag).
