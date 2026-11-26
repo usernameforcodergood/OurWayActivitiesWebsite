@@ -282,7 +282,23 @@ The smoke test checks the public pages, the 404 page and the admin login redirec
 
 Production runs on Netlify (Free plan; Vercel Hobby does not allow commercial use). The project is `ourwayactivitieswebsite` and every push to `main` deploys to production. Server functions run in US East, the free plan's fixed region.
 
-Environment variables (Netlify → Site configuration → Environment variables): `NEXT_PUBLIC_SITE_URL=https://ourway-activities.gr`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `ADMIN_RECOVERY_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL` (comma-separated inboxes), `CONTACT_FROM_EMAIL` and `EMAIL_NOTIFICATIONS_ENABLED`. Do **not** add `SUPABASE_DB_URL`.
+Environment variables (Netlify → Site configuration → Environment variables): `NEXT_PUBLIC_SITE_URL=https://ourway-activities.gr`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `ADMIN_RECOVERY_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL` (comma-separated inboxes), `CONTACT_FROM_EMAIL`, `EMAIL_NOTIFICATIONS_ENABLED` and, only before launch, `COMING_SOON_MODE` (see below). Do **not** add `SUPABASE_DB_URL`.
+
+## Coming Soon mode (pre-launch page)
+
+One switch: the environment variable **`COMING_SOON_MODE`**.
+
+| Value | Result |
+| --- | --- |
+| `true` | Every public page (`/`, `/el/…`, `/en/…`) shows the bilingual "The journey begins soon" page at its own URL. |
+| unset, or anything else | The full website, exactly as before (this is the launch). |
+
+- **Turn on:** Netlify → Site configuration → Environment variables → add `COMING_SOON_MODE` = `true` → Deploys → Trigger deploy.
+- **Launch the full site:** delete the variable (or set it to `false`) → Trigger deploy. Netlify applies env changes on the next deploy.
+- **Not affected:** `/admin` (dashboard, login, password recovery), admin draft previews (`/el|en/preview/…`), all `/api` routes, images, video, `robots.txt` and `sitemap.xml`. Nothing in the database or the pages is changed or deleted.
+- The page is `noindex, nofollow` (meta tag + `X-Robots-Tag`) and `no-store`, so it is not indexed or cached. It is served with status 200 (Next ignores custom statuses on rewrites to prerendered pages), so while it is on, Google may drop pages it had already indexed; they come back after launch once recrawled.
+- Code: the flag is read in `src/lib/coming-soon.ts`, the gate is in `src/proxy.ts` (`comingSoonGate`), and the page (copy, "Coming Soon · 2026" label) is in `src/app/coming-soon/[locale]/`. To remove the feature entirely, delete those and the gate.
+- Local test: add `COMING_SOON_MODE=true` to `.env.local` and restart `npm run dev`.
 
 ## Domain (ourway-activities.gr)
 
