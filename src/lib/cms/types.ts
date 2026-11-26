@@ -165,6 +165,12 @@ export type PublicExcursion = {
   cancellationPolicy: string[];
   /** Upcoming departures (dates, times, prices). Live places come from /api/availability. */
   departures: Array<{ id: string; date: string; time: string | null; priceEur: number | null; status: DepartureStatus }>;
+  /**
+   * Days that can still be requested (open runs with places), soonest first.
+   * [] = none right now ("on request"); null = not applicable or unknown.
+   * Filled by getPublishedExcursions(); null elsewhere.
+   */
+  availableDates: string[] | null;
   featured: boolean;
   /** Languages in which this excursion is complete (title + summary). */
   locales: Locale[];
@@ -202,4 +208,65 @@ export type PublicAnnouncement = {
   publishAt: string;
   expiresAt: string | null;
   updatedAt: string;
+};
+
+/* ------------------------------------------------------------------------- */
+/* Our Journeys (migration 0014): public archive of completed runs           */
+/* ------------------------------------------------------------------------- */
+
+/** Row of public.journeys (+ optional joins). Never holds booking or participant data. */
+export type JourneyRow = {
+  id: string;
+  excursion_id: string;
+  departure_id: string | null;
+  slug: string;
+  status: ContentStatus;
+  cover_media_id: string | null;
+  title_el: string | null;
+  title_en: string | null;
+  summary_el: string | null;
+  summary_en: string | null;
+  description_el: string | null;
+  description_en: string | null;
+  quote_el: string | null;
+  quote_en: string | null;
+  location_el: string | null;
+  location_en: string | null;
+  occurred_on: string;
+  occurred_until: string | null;
+  photo_consent_confirmed: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  cover?: MediaRow | null;
+  images?: Array<{ position: number; media: MediaRow | null }>;
+  /** Null for visitors when the excursion itself is not published. */
+  excursion?: {
+    slug: string;
+    primary_category: PrimaryCategory | null;
+    destination_el: string | null;
+    destination_en: string | null;
+  } | null;
+};
+
+export type PublicJourney = {
+  id: string;
+  slug: string;
+  /** Languages in which this entry is complete (title + summary). */
+  locales: Locale[];
+  title: string;
+  summary: string;
+  /** Editor HTML — render only through <RichText>. */
+  description: string;
+  quote?: string;
+  location?: string;
+  /** First day (YYYY-MM-DD) and, for multi-day trips, the last. */
+  date: string;
+  dateUntil: string | null;
+  year: number;
+  category: PrimaryCategory | null;
+  /** Link to the excursion page while it is published. */
+  excursionSlug: string | null;
+  cover: CmsImage | null;
+  gallery: CmsImage[];
 };

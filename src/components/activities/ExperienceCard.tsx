@@ -1,6 +1,9 @@
 import Link from "next/link";
-import { ImageOff } from "lucide-react";
+import { CalendarDays, ImageOff } from "lucide-react";
 import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries";
+import { format } from "@/i18n/dictionaries";
+import { formatDayList } from "@/lib/bookings/format";
 import type { PublicExcursion } from "@/lib/cms/types";
 import { localePath, routes } from "@/i18n/routes";
 import { ImageReveal } from "@/components/animations/ImageReveal";
@@ -11,17 +14,21 @@ export function ExperienceCard({
   locale,
   index,
   cta,
+  dates,
   layout = "alternate",
 }: {
   excursion: PublicExcursion;
   locale: Locale;
   index: number;
   cta: string;
+  /** Labels for the available-dates line; omitted = no line. */
+  dates?: Dictionary["activities"]["availability"];
   /** "alternate": wide/half rhythm (listing page); "column": equal columns (home). */
   layout?: "alternate" | "column";
 }) {
   const wide = layout === "alternate" && index % 3 === 0;
   const meta = [excursion.destination, excursion.duration].filter(Boolean).join(" · ");
+  const days = dates && excursion.availableDates ? formatDayList(excursion.availableDates, locale) : null;
   return (
     <article className={layout === "column" ? "" : wide ? "md:col-span-12" : "md:col-span-6"}>
       <Link href={localePath(locale, `${routes.activities}/${excursion.slug}`)} className="group block">
@@ -43,6 +50,20 @@ export function ExperienceCard({
           <div className={layout === "column" ? "" : "md:col-span-6"}>
             {meta && <p className="text-eyebrow mb-3 text-mint">{meta}</p>}
             <h3 className="text-display-sm">{excursion.title}</h3>
+            {dates && days && (
+              <p className="mt-3 flex items-start gap-2 text-sm font-semibold text-bone">
+                <CalendarDays aria-hidden className="mt-0.5 size-4 shrink-0 text-turquoise" />
+                {days.text ? (
+                  <span>
+                    <span className="sr-only">{dates.label}: </span>
+                    {days.text}
+                    {days.more > 0 && <span className="font-normal text-fog"> {format(dates.more, { count: days.more })}</span>}
+                  </span>
+                ) : (
+                  <span className="text-fog">{dates.onRequest}</span>
+                )}
+              </p>
+            )}
           </div>
           <p className={layout === "column" ? "mt-3 text-fog" : "text-fog md:col-span-5 md:col-start-8"}>{excursion.summary}</p>
         </div>

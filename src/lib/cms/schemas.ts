@@ -263,3 +263,45 @@ export function issuesToFields(issues: Array<{ path: PropertyKey[]; message: str
   }
   return out;
 }
+
+/**
+ * "Our Journeys" entry (migration 0014). Links an existing excursion and,
+ * when there was one, the exact run it documents. The database re-checks the
+ * link, the dates and the photo-consent rule.
+ */
+export const journeySchema = z
+  .object({
+    id: z.uuid().optional(),
+    excursion_id: z.uuid("excursionRequired"),
+    departure_id: z.uuid().nullable(),
+    slug: slugSchema,
+    status: z.enum(["draft", "published"]),
+    cover_media_id: z.uuid().nullable(),
+    title_el: optText(200),
+    title_en: optText(200),
+    summary_el: optText(600),
+    summary_en: optText(600),
+    description_el: optText(50000),
+    description_en: optText(50000),
+    quote_el: optText(600),
+    quote_en: optText(600),
+    location_el: optText(200),
+    location_en: optText(200),
+    occurred_on: isoDate,
+    occurred_until: isoDate.nullable(),
+    photo_consent_confirmed: z.boolean(),
+    gallery: z.array(z.uuid()).max(200),
+  })
+  .superRefine((v, ctx) => {
+    if (!v.title_el && !v.title_en) ctx.addIssue({ code: "custom", path: ["title_el"], message: "titleRequired" });
+    if (v.occurred_until && v.occurred_until < v.occurred_on) {
+      ctx.addIssue({ code: "custom", path: ["occurred_until"], message: "journeyDateOrder" });
+    }
+    if (v.status === "published") {
+      const complete = (v.title_el && v.summary_el) || (v.title_en && v.summary_en);
+      if (!complete) ctx.addIssue({ code: "custom", path: ["summary_el"], message: "publishNeedsLanguage" });
+      if (!v.photo_consent_confirmed) ctx.addIssue({ code: "custom", path: ["photo_consent_confirmed"], message: "consentRequired" });
+    }
+  });
+
+export type JourneyInput = z.input<typeof journeySchema>;

@@ -1,4 +1,6 @@
 import { NextResponse, after } from "next/server";
+import { revalidateTag } from "next/cache";
+import { TAGS } from "@/lib/cms/public";
 import { getSubmissionSupabase } from "@/lib/supabase/server-secret";
 import { siteConfig } from "@/lib/site";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
@@ -78,6 +80,8 @@ export async function POST(request: Request) {
   }
 
   const result = data as SubmitResult;
+  // A participation request holds places: the dates shown on experience cards may change.
+  if (!result.replayed && result.kind === "booking") revalidateTag(TAGS.availability, "max");
   // A retried submission is the same request: it never counts twice.
   if (!result.replayed) after(() => recordBookingOutcome(request, { ok: true, bookingId: result.id }));
   // A retried submission: the request already exists and its emails were handled the first time.

@@ -7,10 +7,14 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { media, type MediaKey } from "@/content/media";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
+import type { CmsImage } from "@/lib/cms/types";
 import { getLenis } from "@/components/layout/SmoothScroll";
 import { gsap, useGSAP, MQ } from "@/lib/gsap";
 
-type Props = { items: MediaKey[]; locale: Locale; t: Dictionary["gallery"] };
+/** A built-in photo (by key) or a photo from the media library (e.g. a journey's gallery). */
+type Props = { items: Array<MediaKey | CmsImage>; locale: Locale; t: Dictionary["gallery"] };
+
+type Shown = { src: string; width: number; height: number; alt: string };
 
 const fill = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k: string) => String(v[k]));
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -20,7 +24,10 @@ const ease = [0.16, 1, 0.3, 1] as const;
  * lightbox: focus moves into the dialog and back, Esc closes, ←/→ navigate,
  * focus is trapped, page scroll is locked, swipe works on touch.
  */
-export function GalleryGrid({ items, locale, t }: Props) {
+export function GalleryGrid({ items: input, locale, t }: Props) {
+  const items: Shown[] = input.map((it) =>
+    typeof it === "string" ? { src: media[it].src, width: media[it].width, height: media[it].height, alt: media[it].alt[locale] } : it,
+  );
   const [index, setIndex] = useState<number | null>(null);
   const [dir, setDir] = useState(0);
   const grid = useRef<HTMLUListElement>(null);
@@ -102,15 +109,14 @@ export function GalleryGrid({ items, locale, t }: Props) {
     if (index !== null) lastIndex.current = index;
   }, [index]);
 
-  const current = index !== null ? media[items[index]] : null;
+  const current = index !== null ? items[index] : null;
 
   return (
     <>
       <ul ref={grid} className="columns-1 gap-4 sm:columns-2 md:gap-6 lg:columns-3">
-        {items.map((key, i) => {
-          const m = media[key];
+        {items.map((m, i) => {
           return (
-            <li key={key} data-tile className="mb-4 break-inside-avoid md:mb-6">
+            <li key={m.src} data-tile className="mb-4 break-inside-avoid md:mb-6">
               <button
                 ref={(el) => {
                   triggers.current[i] = el;
@@ -120,7 +126,7 @@ export function GalleryGrid({ items, locale, t }: Props) {
                   setDir(0);
                   setIndex(i);
                 }}
-                aria-label={fill(t.open, { alt: m.alt[locale] })}
+                aria-label={fill(t.open, { alt: m.alt })}
                 className="group relative block w-full overflow-hidden bg-moss"
                 style={{ aspectRatio: `${m.width} / ${m.height}` }}
               >
@@ -135,7 +141,7 @@ export function GalleryGrid({ items, locale, t }: Props) {
                   aria-hidden
                   className="absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-ink/80 to-transparent p-4 pt-12 text-left text-sm text-bone opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100"
                 >
-                  {m.alt[locale]}
+                  {m.alt}
                 </span>
               </button>
             </li>
@@ -193,14 +199,14 @@ export function GalleryGrid({ items, locale, t }: Props) {
                   <div className="relative min-h-0 w-full flex-1">
                     <Image
                       src={current.src}
-                      alt={current.alt[locale]}
+                      alt={current.alt}
                       fill
                       sizes="100vw"
                       className="pointer-events-none select-none object-contain"
                       draggable={false}
                     />
                   </div>
-                  <figcaption className="mt-4 max-w-2xl text-center text-sm text-fog">{current.alt[locale]}</figcaption>
+                  <figcaption className="mt-4 max-w-2xl text-center text-sm text-fog">{current.alt}</figcaption>
                 </motion.figure>
               </AnimatePresence>
 

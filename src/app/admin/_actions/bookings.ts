@@ -1,7 +1,9 @@
 "use server";
 
 import { z } from "zod";
+import { updateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
+import { TAGS } from "@/lib/cms/public";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { siteConfig } from "@/lib/site";
 import type { ActionResult } from "@/lib/cms/schemas";
@@ -100,6 +102,8 @@ export async function setBookingStatus(input: z.input<typeof statusInput>): Prom
     if (e.error === "generic") console.error("[admin] set status:", error.message);
     return { ok: false, ...e };
   }
+  // Places held on the run changed: refresh the dates shown on experience cards.
+  updateTag(TAGS.availability);
   const template: CustomerBookingEmail | null = status === "completed" ? null : status;
   const email: EmailOutcome = notify && template ? await sendAndLog(db, id, template, n) : "skipped";
   return { ok: true, data: { email } };
@@ -111,6 +115,7 @@ export async function extendBookingHold(id: string): Promise<ActionResult & { co
   const db = await createSupabaseServerClient();
   const { error } = await db.rpc("admin_extend_booking_hold", { p_booking_id: id });
   if (error) return { ok: false, ...dbError(error.message) };
+  updateTag(TAGS.availability);
   return { ok: true };
 }
 

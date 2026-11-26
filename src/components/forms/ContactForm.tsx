@@ -248,7 +248,7 @@ export function ContactForm({ locale, t, privacyHref }: Props) {
 
       <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-xs text-xs text-bark">{t.privacyNote}</p>
-        <Button type="submit" disabled={isSubmitting} aria-busy={isSubmitting} className="!bg-ink !text-bone">
+        <Button type="submit" disabled={isSubmitting} aria-busy={isSubmitting} variant="dark">
           {isSubmitting ? t.sending : t.submit}
         </Button>
       </div>

@@ -31,6 +31,15 @@ export type DepartureAvailabilityRow = {
 
 const num = (v: number | string | null | undefined) => (v === null || v === undefined || v === "" ? null : Number(v));
 
+/**
+ * Days a visitor can still request, from public_departures(): only runs in
+ * state "open" (the database already marks cancelled, completed, started,
+ * past-deadline and full runs otherwise). Unique, soonest first.
+ */
+export function availableDays(rows: Pick<DepartureAvailabilityRow, "departure_date" | "state">[]): string[] {
+  return [...new Set(rows.filter((d) => d.state === "open").map((d) => d.departure_date))].sort();
+}
+
 export function toPublicDeparture(r: DepartureAvailabilityRow): PublicDeparture {
   return {
     id: r.id,
@@ -108,6 +117,7 @@ export function toPublicExcursion(row: ExcursionRow, locale: Locale): PublicExcu
         priceEur: num(d.price_eur) ?? (Number.isFinite(price) ? (price as number) : null),
         status: d.status,
       })),
+    availableDates: null,
     featured: row.featured,
     locales: availableLocales(row),
     title,

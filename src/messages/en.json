@@ -44,6 +44,10 @@
       "tailorMade": {
         "title": "Tailor-Made Experiences",
         "description": "Tailor-made experiences in Greece: together we design an experience around you — nature, adventure, culture, food — for friends, families, couples and corporate groups."
+      },
+      "journeys": {
+        "title": "Our Journeys",
+        "description": "Trips OurWay has already made: photos, places and stories from real journeys."
       }
     }
   },
@@ -65,7 +69,8 @@
     "homeLink": "OurWay — home page",
     "switchLanguage": "Αλλαγή σε Ελληνικά",
     "languageGroup": "Language selection",
-    "news": "News"
+    "news": "News",
+    "journeys": "Our Journeys"
   },
   "common": {
     "scroll": "Scroll",
@@ -300,6 +305,11 @@
       "meetingPoint": "Meeting point",
       "cancellation": "Cancellation policy",
       "eventLabel": "Event"
+    },
+    "availability": {
+      "label": "Available dates",
+      "onRequest": "On request",
+      "more": "+{count} more"
     }
   },
   "destinations": {
@@ -754,5 +764,47 @@
     "decline": "Decline",
     "currentOn": "Current choice: you accepted statistics. Choosing “Decline” stops them immediately and deletes what was recorded under your identifier.",
     "currentOff": "Current choice: you declined statistics."
+  },
+  "journeys": {
+    "label": "Our Journeys",
+    "title": "Our Journeys",
+    "intro": "Every journey has its own story. Discover the experiences we have already shared.",
+    "teaserTitle": "Journeys we have already lived",
+    "all": "All journeys",
+    "completed": "Completed",
+    "view": "View the journey",
+    "back": "All journeys",
+    "date": "Date",
+    "location": "Location",
+    "gallery": "Moments from the journey",
+    "photoCount": "{count} photos",
+    "photoOf": "Photo {index} of {total}",
+    "close": "Close",
+    "previous": "Previous",
+    "next": {
+      "title": "Want to join the next one?",
+      "body": "See the trips we are preparing and save your place in the group.",
+      "button": "See the next experiences"
+    },
+    "experienceLink": "See the experience and its next dates",
+    "filters": {
+      "label": "Journey filters",
+      "category": "Category",
+      "year": "Year",
+      "allCategories": "All",
+      "allYears": "All years",
+      "sort": "Sort",
+      "newest": "Most recent first",
+      "oldest": "Oldest first",
+      "results": "{count} journeys",
+      "resultsOne": "1 journey",
+      "none": "No journeys match these filters.",
+      "reset": "Show all journeys"
+    },
+    "empty": {
+      "title": "Our first journeys are coming soon",
+      "body": "Once a trip is over, you will find its photos and story here.",
+      "cta": "See the next experiences"
+    }
   }
 }

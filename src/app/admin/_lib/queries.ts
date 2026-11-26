@@ -89,17 +89,22 @@ export async function getDashboardData() {
 
 export async function getMediaWithUsage(): Promise<Array<MediaRow & { usage: number }>> {
   const db = await createSupabaseServerClient();
-  const [{ data: media }, { data: covers }, { data: gallery }, { data: ann }] = await Promise.all([
+  const [{ data: media }, { data: covers }, { data: gallery }, { data: ann }, { data: jCovers }, { data: jImages }] = await Promise.all([
     db.from("media").select("*").order("created_at", { ascending: false }).limit(500),
     db.from("excursions").select("cover_media_id").not("cover_media_id", "is", null),
     db.from("excursion_images").select("media_id"),
     db.from("announcements").select("image_media_id").not("image_media_id", "is", null),
+    // Our Journeys (0014); empty before that migration.
+    db.from("journeys").select("cover_media_id").not("cover_media_id", "is", null),
+    db.from("journey_images").select("media_id"),
   ]);
   const usage = new Map<string, number>();
   const bump = (id: string | null) => id && usage.set(id, (usage.get(id) ?? 0) + 1);
   (covers ?? []).forEach((r) => bump(r.cover_media_id as string));
   (gallery ?? []).forEach((r) => bump(r.media_id as string));
   (ann ?? []).forEach((r) => bump(r.image_media_id as string));
+  (jCovers ?? []).forEach((r) => bump(r.cover_media_id as string));
+  (jImages ?? []).forEach((r) => bump(r.media_id as string));
   return ((media ?? []) as MediaRow[]).map((m) => ({ ...m, usage: usage.get(m.id) ?? 0 }));
 }
 
