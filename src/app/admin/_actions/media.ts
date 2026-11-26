@@ -45,6 +45,7 @@ export async function updateMediaAlt(id: string, alt_el: string, alt_en: string)
   if (error) return { ok: false, error: "generic" };
   updateTag(TAGS.excursions);
   updateTag(TAGS.announcements);
+  updateTag(TAGS.journeys);
   return { ok: true };
 }
 
@@ -60,5 +61,6 @@ export async function deleteMedia(id: string): Promise<ActionResult> {
   if (removed.error) console.error("[admin] storage remove:", removed.error.message);
   updateTag(TAGS.excursions);
   updateTag(TAGS.announcements);
+  updateTag(TAGS.journeys);
   return { ok: true };
 }

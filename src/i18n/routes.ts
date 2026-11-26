@@ -10,6 +10,7 @@ export const routes = {
   gallery: "/gallery",
   contact: "/contact",
   news: "/news",
+  journeys: "/journeys",
   tailorMade: "/tailor-made",
   privacy: "/privacy",
 } as const;

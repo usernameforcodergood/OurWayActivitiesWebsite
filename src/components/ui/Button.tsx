@@ -3,13 +3,15 @@ import type { ComponentProps, ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "outline" | "outline-dark" | "text";
+/** "dark": ink pill for light backgrounds (forms); its hover fill keeps the label readable. */
+type Variant = "primary" | "dark" | "outline" | "outline-dark" | "text";
 
 const base =
   "group group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full font-semibold tracking-tight transition-colors duration-500 ease-out-expo min-h-12 select-none";
 
 const variants: Record<Variant, string> = {
   primary: "bg-turquoise text-ink px-7 py-3.5 text-[0.95rem] hover:text-ink",
+  dark: "bg-ink text-bone px-7 py-3.5 text-[0.95rem] hover:text-ink",
   outline: "border border-bone/35 text-bone px-7 py-3.5 text-[0.95rem] hover:border-bone hover:text-ink",
   "outline-dark": "border border-ink/30 text-ink px-7 py-3.5 text-[0.95rem] hover:border-ink hover:text-bone",
   text: "text-current px-0 py-2 text-[0.95rem] min-h-11 rounded-none",
@@ -17,6 +19,7 @@ const variants: Record<Variant, string> = {
 
 const fill: Record<Variant, string | null> = {
   primary: "bg-bone",
+  dark: "bg-turquoise",
   outline: "bg-bone",
   "outline-dark": "bg-ink",
   text: null,

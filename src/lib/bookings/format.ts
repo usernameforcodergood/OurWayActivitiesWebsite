@@ -39,3 +39,36 @@ export function formatEur(n: number, locale: Locale): string {
     maximumFractionDigits: n % 1 ? 2 : 0,
   }).format(n);
 }
+
+/**
+ * Compact list of calendar days for experience cards, month and year written
+ * once per group: "15 Δεκεμβρίου 2026", "15 & 22 Δεκεμβρίου 2026",
+ * "28 Νοεμβρίου, 5 & 12 Δεκεμβρίου 2026", "28 December 2026 & 4 January 2027".
+ * Duplicates are dropped; at most `max` days are written, `more` counts the rest.
+ */
+export function formatDayList(dates: string[], locale: Locale, max = 4): { text: string; more: number } {
+  const all = [...new Set(dates)].sort();
+  const list = all.slice(0, max);
+  const tokens = list.map((iso, i) => {
+    const next = list[i + 1];
+    const lastOfYear = !next || next.slice(0, 4) !== iso.slice(0, 4);
+    const lastOfMonth = lastOfYear || next.slice(0, 7) !== iso.slice(0, 7);
+    if (!lastOfMonth) return String(Number(iso.slice(8, 10)));
+    return new Intl.DateTimeFormat(tag(locale), {
+      day: "numeric",
+      month: "long",
+      ...(lastOfYear ? { year: "numeric" as const } : {}),
+      timeZone: "UTC",
+    }).format(new Date(`${iso}T00:00:00Z`));
+  });
+  const text = tokens.length < 2 ? (tokens[0] ?? "") : `${tokens.slice(0, -1).join(", ")} & ${tokens[tokens.length - 1]}`;
+  return { text, more: all.length - list.length };
+}
+
+/** "15 Δεκεμβρίου 2026", or a range for multi-day trips: "14–15 Δεκεμβρίου 2026". */
+export function formatDayRange(from: string, until: string | null | undefined, locale: Locale): string {
+  const f = new Intl.DateTimeFormat(tag(locale), { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  const a = new Date(`${from}T00:00:00Z`);
+  if (!until || until === from) return f.format(a);
+  return f.formatRange(a, new Date(`${until}T00:00:00Z`));
+}

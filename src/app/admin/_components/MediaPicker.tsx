@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUp, Check, ImagePlus, Images, Loader2, Trash2, Upload, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, ImagePlus, Images, Loader2, Star, Trash2, Upload, X } from "lucide-react";
 import { listMedia } from "../_actions/media";
 import { ACCEPT_ATTR, uploadImages } from "../_lib/upload";
 import { t, fmt } from "../_lib/strings";
@@ -228,11 +228,14 @@ export function GalleryPicker({
   label,
   value,
   onChange,
+  cover,
 }: {
   id: string;
   label: string;
   value: MediaRow[];
   onChange: (items: MediaRow[]) => void;
+  /** Optional "main photo" choice among the gallery photos. */
+  cover?: { id: string | null; onChange: (id: string | null) => void; label: string; setLabel: string };
 }) {
   const [library, setLibrary] = useState(false);
   const add = (items: MediaRow[]) => {
@@ -254,13 +257,28 @@ export function GalleryPicker({
       {value.length > 0 && (
         <ul className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {value.map((m, i) => (
-            <li key={m.id} className="overflow-hidden rounded-lg bg-white ring-1 ring-ink/10">
+            <li key={m.id} className={cn("overflow-hidden rounded-lg bg-white ring-1", cover?.id === m.id ? "ring-2 ring-amber-500" : "ring-ink/10")}>
               <div className="relative aspect-[4/3] bg-stone">
                 <Image src={mediaUrl(m.path)} alt={m.alt_el || m.alt_en || ""} fill sizes="240px" className="object-cover" />
+                {cover?.id === m.id && (
+                  <span className="absolute left-1.5 top-1.5 rounded-full bg-amber-500 px-2 py-0.5 text-[0.7rem] font-semibold text-white">{cover.label}</span>
+                )}
               </div>
               <div className="flex items-center justify-between gap-1 p-1.5">
                 <span className="px-1 text-xs tabular-nums text-bark">{i + 1}</span>
                 <span className="flex">
+                  {cover && (
+                    <button
+                      type="button"
+                      onClick={() => cover.onChange(cover.id === m.id ? null : m.id)}
+                      aria-pressed={cover.id === m.id}
+                      aria-label={`${cover.setLabel} (${i + 1})`}
+                      title={cover.setLabel}
+                      className="rounded p-2 hover:bg-ink/5"
+                    >
+                      <Star aria-hidden className={cn("size-4", cover.id === m.id ? "fill-amber-400 text-amber-500" : "text-bark")} />
+                    </button>
+                  )}
                   <button
                     type="button"
                     disabled={i === 0}
@@ -281,7 +299,10 @@ export function GalleryPicker({
                   </button>
                   <button
                     type="button"
-                    onClick={() => onChange(value.filter((x) => x.id !== m.id))}
+                    onClick={() => {
+                      onChange(value.filter((x) => x.id !== m.id));
+                      if (cover?.id === m.id) cover.onChange(null);
+                    }}
                     aria-label={t.media.remove}
                     className="rounded p-2 text-red-700 hover:bg-red-50"
                   >

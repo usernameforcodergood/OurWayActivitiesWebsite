@@ -95,7 +95,7 @@ export default async function DestinationsPage({ params }: PageProps<"/[locale]/
                   <h3 className="text-display-md mb-10">{place}</h3>
                   <div className="grid gap-x-8 gap-y-16 md:grid-cols-3">
                     {items.map((ex, i) => (
-                      <ExperienceCard key={ex.slug} excursion={ex} locale={locale} index={i} cta={t.activities.viewExperience} layout="column" />
+                      <ExperienceCard key={ex.slug} excursion={ex} locale={locale} index={i} cta={t.activities.viewExperience} dates={t.activities.availability} layout="column" />
                     ))}
                   </div>
                 </div>

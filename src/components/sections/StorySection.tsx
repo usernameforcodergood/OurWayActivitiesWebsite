@@ -35,7 +35,7 @@ export function StorySection({ locale, t }: { locale: Locale; t: Dictionary["hom
   return (
     <section aria-labelledby="story-title" className="on-light relative bg-stone text-ink">
       <div className="container-x section-y pb-0">
-        <SectionLabel index="02" className="text-bark">
+        <SectionLabel index="03" className="text-bark">
           {t.label}
         </SectionLabel>
         <TextReveal as="h2" id="story-title" className="text-display-lg mt-8 max-w-[16ch]">

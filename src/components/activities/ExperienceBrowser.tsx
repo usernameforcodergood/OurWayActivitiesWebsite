@@ -29,11 +29,13 @@ export function ExperienceBrowser({
   locale,
   t,
   cta,
+  dates,
 }: {
   items: PublicExcursion[];
   locale: Locale;
   t: Filters;
   cta: string;
+  dates: Dictionary["activities"]["availability"];
 }) {
   const [category, setCategory] = useState<PrimaryCategory | null>(null);
   const [query, setQuery] = useState("");
@@ -107,7 +109,7 @@ export function ExperienceBrowser({
       {visible.length > 0 ? (
         <div className="mt-10 grid gap-x-8 gap-y-20 md:grid-cols-12">
           {visible.map((excursion, i) => (
-            <ExperienceCard key={excursion.slug} excursion={excursion} locale={locale} index={i} cta={cta} />
+            <ExperienceCard key={excursion.slug} excursion={excursion} locale={locale} index={i} cta={cta} dates={dates} />
           ))}
         </div>
       ) : (

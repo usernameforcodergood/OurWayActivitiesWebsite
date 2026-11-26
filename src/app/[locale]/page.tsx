@@ -7,7 +7,6 @@ import { siteConfig } from "@/lib/site";
 import { Hero } from "@/components/sections/Hero";
 import { BrandPhilosophy } from "@/components/sections/BrandPhilosophy";
 import { StorySection } from "@/components/sections/StorySection";
-import { ExperienceShowcase } from "@/components/sections/ExperienceShowcase";
 import { PinnedStorySection } from "@/components/sections/PinnedStorySection";
 import { DiscoverSection } from "@/components/sections/DiscoverSection";
 import { CTASection } from "@/components/sections/CTASection";
@@ -15,7 +14,9 @@ import { FeaturedExcursions } from "@/components/sections/FeaturedExcursions";
 import { LatestNews } from "@/components/sections/LatestNews";
 import { PrivateTripsSection } from "@/components/sections/PrivateTripsSection";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
+import { JourneysTeaser } from "@/components/sections/JourneysTeaser";
 import { getActiveAnnouncements, getFeaturedExcursions, getUpcomingEvents } from "@/lib/cms/public";
+import { getPublishedJourneys } from "@/lib/cms/journeys";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -34,10 +35,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   if (!hasLocale(locale)) notFound();
   const t = await getDictionary(locale);
-  const [featured, news, events] = await Promise.all([
+  const [featured, news, events, journeys] = await Promise.all([
     getFeaturedExcursions(locale, 3),
     getActiveAnnouncements(locale, 3),
     getUpcomingEvents(locale, 3),
+    getPublishedJourneys(locale),
   ]);
 
   // Only facts that are confirmed: the name and the website.
@@ -51,16 +53,25 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* 1. Hero */}
       <Hero locale={locale} t={t.home.hero} />
+      {/* 2. Who we are */}
       <BrandPhilosophy locale={locale} t={t.home.philosophy} values={t.about.values} />
-      <StorySection locale={locale} t={t.home.story} />
-      <ExperienceShowcase locale={locale} t={t.home.showcase} />
+      {/* 3. What is coming up: real scheduled excursions, soonest available run first */}
       <FeaturedExcursions items={featured} locale={locale} t={t} />
       <UpcomingEvents items={events.items} today={events.today} locale={locale} t={t} />
+      {/* 4. What you discover: nature, culture, landscapes, people */}
+      <StorySection locale={locale} t={t.home.story} />
+      {/* 5. The journey: how a day out unfolds */}
       <PinnedStorySection locale={locale} t={t.home.pinned} />
-      <DiscoverSection locale={locale} t={t.home.discover} />
+      {/* 6. Tailor-made */}
       <PrivateTripsSection locale={locale} t={t.home.private} />
+      {/* 7. Our Journeys: public archive of trips that really took place (hidden while empty) */}
+      <JourneysTeaser items={journeys.slice(0, 3)} locale={locale} t={t.journeys} />
+      {/* 8. Gallery / entry points, then announcements */}
+      <DiscoverSection locale={locale} t={t.home.discover} />
       <LatestNews items={news} locale={locale} t={t} />
+      {/* 9. Closing call to action */}
       <CTASection locale={locale} t={t.home.cta} />
     </>
   );

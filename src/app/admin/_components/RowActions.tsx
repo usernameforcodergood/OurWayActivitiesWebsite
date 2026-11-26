@@ -6,13 +6,14 @@ import { useState, useTransition } from "react";
 import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { deleteExcursion, setExcursionStatus } from "../_actions/excursions";
 import { deleteAnnouncement, setAnnouncementStatus } from "../_actions/announcements";
+import { deleteJourney, setJourneyStatus } from "../_actions/journeys";
 import { errorMessage, fmt, t } from "../_lib/strings";
 import { useToast } from "./Toast";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { btnClass } from "./ui";
 
 type Props = {
-  kind: "excursion" | "announcement";
+  kind: "excursion" | "announcement" | "journey";
   id: string;
   status: "draft" | "published";
   name: string;
@@ -27,12 +28,14 @@ export function RowActions({ kind, id, status, name, editHref, publicHref }: Pro
   const [pending, start] = useTransition();
   const [confirm, setConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const strings = kind === "excursion" ? t.excursions : t.announcements;
+  const strings = kind === "excursion" ? t.excursions : kind === "journey" ? t.journeys : t.announcements;
+  const setStatus = kind === "excursion" ? setExcursionStatus : kind === "journey" ? setJourneyStatus : setAnnouncementStatus;
+  const remove = kind === "excursion" ? deleteExcursion : kind === "journey" ? deleteJourney : deleteAnnouncement;
 
   const toggle = () =>
     start(async () => {
       const next = status === "published" ? "draft" : "published";
-      const res = kind === "excursion" ? await setExcursionStatus(id, next) : await setAnnouncementStatus(id, next);
+      const res = await setStatus(id, next);
       if (!res.ok) {
         toast("error", errorMessage(res.error) ?? t.common.error);
         return;
@@ -72,7 +75,7 @@ export function RowActions({ kind, id, status, name, editHref, publicHref }: Pro
         onClose={() => setConfirm(false)}
         onConfirm={async () => {
           setDeleting(true);
-          const res = kind === "excursion" ? await deleteExcursion(id) : await deleteAnnouncement(id);
+          const res = await remove(id);
           setDeleting(false);
           setConfirm(false);
           if (!res.ok) {

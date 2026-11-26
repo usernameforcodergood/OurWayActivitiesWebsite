@@ -2,7 +2,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import type { Locale } from "@/i18n/config";
 import { getPublicSupabase } from "@/lib/supabase/public";
-import { toPublicAnnouncement, toPublicExcursion } from "./mappers";
+import { availableDays, toPublicAnnouncement, toPublicExcursion, type DepartureAvailabilityRow } from "./mappers";
 import type { AnnouncementRow, ExcursionRow, PublicAnnouncement, PublicExcursion, SiteSettingsRow } from "./types";
 
 /**
@@ -14,6 +14,9 @@ export const TAGS = {
   excursions: "cms:excursions",
   announcements: "cms:announcements",
   settings: "cms:settings",
+  /** Live places on runs (changes with every request and admin decision). */
+  availability: "cms:availability",
+  journeys: "cms:journeys",
 } as const;
 
 const EXCURSION_SELECT =
@@ -57,16 +60,66 @@ function isListed(e: PublicExcursion, today: string): boolean {
   return e.departures.some((d) => isUpcomingRun(d, today));
 }
 
-/** Published excursions that are complete in `locale` and not archived. */
-export async function getPublishedExcursions(locale: Locale): Promise<PublicExcursion[]> {
-  const [rows, today] = await Promise.all([fetchPublishedExcursionRows(), athensToday()]);
-  return rows.map((r) => toPublicExcursion(r, locale)).filter((e) => e.locales.includes(locale) && isListed(e, today));
+/**
+ * Dates a visitor can still request, per excursion: the same live availability
+ * the booking form uses (public_departures(): only "open" runs, so cancelled,
+ * completed, started, past-deadline and full runs — by status or by places
+ * held — are excluded). Unique days, soonest first. An excursion whose lookup
+ * failed is left out (unknown), never shown as "no dates".
+ * Cached for minutes; new requests and admin decisions expire it sooner.
+ */
+async function fetchAvailableDates(excursionIds: string[]): Promise<Record<string, string[]>> {
+  "use cache";
+  cacheTag(TAGS.excursions, TAGS.availability);
+  cacheLife("minutes");
+  const db = getPublicSupabase();
+  if (!db || excursionIds.length === 0) return {};
+  const results = await Promise.all(
+    excursionIds.map(async (id) => {
+      const { data, error } = await db.rpc("public_departures", { p_excursion_id: id });
+      logError(`availability ${id}`, error);
+      if (error) return null;
+      return [id, availableDays((data ?? []) as DepartureAvailabilityRow[])] as const;
+    }),
+  );
+  return Object.fromEntries(results.filter((r): r is readonly [string, string[]] => r !== null));
 }
 
+/** Published excursions that are complete in `locale` and not archived, with their available dates. */
+export async function getPublishedExcursions(locale: Locale): Promise<PublicExcursion[]> {
+  const [rows, today] = await Promise.all([fetchPublishedExcursionRows(), athensToday()]);
+  const list = rows.map((r) => toPublicExcursion(r, locale)).filter((e) => e.locales.includes(locale) && isListed(e, today));
+  // Only scheduled excursions with a run still ahead need a live lookup.
+  const scheduled = new Set(
+    list.filter((e) => e.bookingMode === "departures" && e.departures.some((d) => isUpcomingRun(d, today))).map((e) => e.id),
+  );
+  const dates = await fetchAvailableDates([...scheduled].sort());
+  return list.map((e) => {
+    if (e.bookingMode === "none") return e;
+    if (!scheduled.has(e.id)) return { ...e, availableDates: [] };
+    return dates[e.id] === undefined ? e : { ...e, availableDates: dates[e.id] };
+  });
+}
+
+/**
+ * "Next experiences" on the homepage: excursions with an available run come
+ * first, soonest first; then featured ones; then the rest (newest first).
+ */
 export async function getFeaturedExcursions(locale: Locale, limit = 3): Promise<PublicExcursion[]> {
   const all = (await getPublishedExcursions(locale)).filter((e) => e.kind === "excursion");
-  const featured = all.filter((e) => e.featured);
-  return (featured.length ? featured : all).slice(0, limit);
+  const next = (e: PublicExcursion) => e.availableDates?.[0];
+  return all
+    .map((e, i) => ({ e, i }))
+    .sort((a, b) => {
+      const na = next(a.e);
+      const nb = next(b.e);
+      if (na && nb) return na.localeCompare(nb) || a.i - b.i;
+      if (na || nb) return na ? -1 : 1;
+      if (a.e.featured !== b.e.featured) return a.e.featured ? -1 : 1;
+      return a.i - b.i;
+    })
+    .slice(0, limit)
+    .map(({ e }) => e);
 }
 
 /**

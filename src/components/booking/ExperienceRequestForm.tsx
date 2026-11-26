@@ -34,6 +34,21 @@ type Props = {
   preview?: boolean;
 };
 
+/** A request that has not answered by then is reported as a connection problem (the button never stays stuck). */
+const SUBMIT_TIMEOUT_MS = 25_000;
+/** Fields the visitor never sees: an error on one of them must still be reported. */
+const VISIBLE_FIELDS = new Set(["departureId", "fullName", "email", "phone", "participants", "preferredPeriod", "message", "consent"]);
+
+/** RFC 4122 v4 id; crypto.randomUUID() is missing on some older mobile browsers. */
+function newIdempotencyKey(): string {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
 type Load = { kind: "loading" } | { kind: "ready"; departures: PublicDeparture[] } | { kind: "error" };
 type Status =
   | { kind: "idle" }
@@ -57,6 +72,8 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
   const trackRef = useBookingFormTracking(excursion.id, preview);
   const [load, setLoad] = useState<Load>(scheduled ? { kind: "loading" } : { kind: "ready", departures: [] });
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  // Synchronous guard: clicks that land before React re-renders the disabled button are ignored.
+  const inFlight = useRef(false);
 
   const refresh = useCallback(async () => {
     if (!scheduled) return;
@@ -106,7 +123,7 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
   useEffect(() => {
     // Values that must only exist on the client.
     setValue("startedAt", Date.now());
-    setValue("idempotencyKey", crypto.randomUUID());
+    setValue("idempotencyKey", newIdempotencyKey());
   }, [setValue]);
 
   const departures = useMemo(() => (load.kind === "ready" ? load.departures : []), [load]);
@@ -138,6 +155,14 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
     return (f.errors as Record<string, string>)[code] ?? f.errors.generic;
   };
 
+  // Validation failed on a field the visitor cannot see or fix (page open too long, autofilled
+  // hidden field…): say so instead of leaving the button silently doing nothing.
+  const onInvalid = (errs: Partial<Record<keyof BookingRequestInput, unknown>>) => {
+    if (Object.keys(errs).some((k) => !VISIBLE_FIELDS.has(k))) setStatus({ kind: "error", code: "invalid" });
+  };
+
+  // Double clicks: the button is disabled while submitting, and a second POST that slips
+  // through carries the same idempotency key, so the database returns the first request.
   const onSubmit = async (data: BookingRequestData) => {
     if (dated && !data.departureId) {
       setError("departureId", { message: "departure" });
@@ -154,8 +179,11 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
     setStatus({ kind: "idle" });
     track("booking_form_submit", { excursionId: excursion.id });
     let res: Response;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), SUBMIT_TIMEOUT_MS);
     try {
       res = await fetch("/api/bookings", {
+        signal: controller.signal,
         method: "POST",
         // Analytics ids are added only after consent, so the server can record a confirmed conversion.
         headers: { "Content-Type": "application/json", ...analyticsHeaders() },
@@ -166,9 +194,12 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
         }),
       });
     } catch {
+      // Offline, blocked or timed out. Retrying is safe: the same idempotency key never creates a second request.
+      clearTimeout(timer);
       setStatus({ kind: "error", code: "network" });
       return;
     }
+    clearTimeout(timer);
     let body: SubmitResponse | null = null;
     try {
       body = (await res.json()) as SubmitResponse;
@@ -187,6 +218,17 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
     } else {
       setStatus({ kind: "error", code: "generic" });
     }
+  };
+
+  const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    if (inFlight.current) {
+      e.preventDefault();
+      return;
+    }
+    inFlight.current = true;
+    void handleSubmit(onSubmit, onInvalid)(e).finally(() => {
+      inFlight.current = false;
+    });
   };
 
   const errorText = (s: Extract<Status, { kind: "error" }>) =>
@@ -219,7 +261,7 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
           <p className="mt-2 text-xs text-bark">{dated ? t.noPayment : t.noPaymentGeneral}</p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} noValidate aria-labelledby={`${idPrefix}-title`} className="mt-8 border-t border-ink/10 pt-8">
+        <form onSubmit={onFormSubmit} noValidate aria-labelledby={`${idPrefix}-title`} className="mt-8 border-t border-ink/10 pt-8">
           <p className="text-sm text-bark">{f.requiredNote}</p>
           {preview && <p className="mt-3 rounded-sm bg-turquoise/15 p-3 text-sm">{t.previewDisabled}</p>}
           {noDates && <p className="mt-3 text-sm text-bark">{t.noDeparturesInterest}</p>}
@@ -391,7 +433,7 @@ export function ExperienceRequestForm({ excursion, locale, t, privacyHref, previ
 
           <div className="mt-8 flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-sm text-xs text-bark">{dated ? t.noPayment : t.noPaymentGeneral}</p>
-            <Button type="submit" disabled={isSubmitting || (scheduled && load.kind !== "ready")} aria-busy={isSubmitting} className="!bg-ink !text-bone">
+            <Button type="submit" disabled={isSubmitting || (scheduled && load.kind !== "ready")} aria-busy={isSubmitting} variant="dark">
               {isSubmitting ? f.sending : dated ? f.submitScheduled : f.submitGeneral}
             </Button>
           </div>

@@ -18,7 +18,7 @@ async function getYear() {
 export async function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
   const f = t.footer;
   const year = await getYear();
-  const explore = (["home", "activities", "about", "news", "gallery", "tailorMade", "contact"] as const).map((k) => ({
+  const explore = (["home", "activities", "journeys", "about", "news", "gallery", "tailorMade", "contact"] as const).map((k) => ({
     href: localePath(locale, routes[k]),
     label: t.nav[k],
   }));

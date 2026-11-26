@@ -49,7 +49,7 @@ export default async function ActivitiesPage({ params }: PageProps<"/[locale]/ac
             <h2 id="list-title" className="sr-only">
               {a.listTitle}
             </h2>
-            <ExperienceBrowser items={list} locale={locale} t={a.filters} cta={a.viewExperience} />
+            <ExperienceBrowser items={list} locale={locale} t={a.filters} cta={a.viewExperience} dates={a.availability} />
           </div>
         </section>
       )}
