@@ -297,7 +297,7 @@ One switch: the environment variable **`COMING_SOON_MODE`**.
 - **Launch the full site:** delete the variable (or set it to `false`) → Trigger deploy. Netlify applies env changes on the next deploy.
 - **Not affected:** `/admin` (dashboard, login, password recovery), admin draft previews (`/el|en/preview/…`), all `/api` routes, images, video, `robots.txt` and `sitemap.xml`. Nothing in the database or the pages is changed or deleted.
 - The page is `noindex, nofollow` (meta tag + `X-Robots-Tag`) and `no-store`, so it is not indexed or cached. It is served with status 200 (Next ignores custom statuses on rewrites to prerendered pages), so while it is on, Google may drop pages it had already indexed; they come back after launch once recrawled.
-- Code: the flag is read in `src/lib/coming-soon.ts`, the gate is in `src/proxy.ts` (`comingSoonGate`), and the page (copy, "Coming Soon · 2026" label) is in `src/app/coming-soon/[locale]/`. To remove the feature entirely, delete those and the gate.
+- Code: the flag is read in `src/lib/coming-soon.ts`, the gate is in `src/proxy.ts` (`comingSoonGate`), and the page (copy, "Coming Soon · 2027" label) is in `src/app/coming-soon/[locale]/`. To remove the feature entirely, delete those and the gate.
 - Local test: add `COMING_SOON_MODE=true` to `.env.local` and restart `npm run dev`.
 
 ## Domain (ourway-activities.gr)

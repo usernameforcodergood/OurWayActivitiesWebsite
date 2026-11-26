@@ -5,7 +5,7 @@ import { Wordmark } from "@/components/ui/Wordmark";
 import { BackgroundVideo } from "./BackgroundVideo";
 
 /** Pre-launch Coming Soon page (see src/lib/coming-soon.ts). */
-const LAUNCH_LABEL = "Coming Soon · 2026";
+const LAUNCH_LABEL = "Coming Soon · 2027";
 const TAGLINE = "The journey begins soon.";
 
 const copy: Record<
@@ -14,7 +14,7 @@ const copy: Record<
 > = {
   el: {
     headline: "Ετοιμάζουμε κάτι ξεχωριστό.",
-    body: "Αυθεντικές εμπειρίες, νέοι προορισμοί και περιπέτειες που αξίζει να ζήσεις. Το OurWay ετοιμάζεται να ξεκινήσει το δικό του ταξίδι.",
+    body: "Αυθεντικές εμπειρίες, νέοι προορισμοί και περιπέτειες που αξίζει να ζήσεις. Η OurWay ετοιμάζεται να ξεκινήσει το δικό της ταξίδι.",
     languageGroup: "Επιλογή γλώσσας",
     switchTo: "Switch to English",
     contact: "Επικοινωνία",
