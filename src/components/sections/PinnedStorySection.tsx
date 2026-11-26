@@ -11,7 +11,7 @@ import { ImageReveal } from "@/components/animations/ImageReveal";
 import { pad } from "@/lib/utils";
 
 /** One photograph per chapter (by position). */
-const CHAPTER_IMAGES: MediaKey[] = ["mesaPlain", "streamRocks", "folkDanceCircle", "roadPause"];
+const CHAPTER_IMAGES: MediaKey[] = ["owAutumnPath", "owFogForest", "owWorkshopTable", "owSummitMarker"];
 
 type Props = { locale: Locale; t: Dictionary["home"]["pinned"] };
 

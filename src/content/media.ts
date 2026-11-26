@@ -285,28 +285,222 @@ export const media = {
     },
     source: "Unsplash",
   },
+
+  // ── OurWay's own photography (public/images/ourway) ─────────────────────
+  owEverest: {
+    src: "/images/ourway/everest-base-camp.jpg",
+    width: 1080,
+    height: 1351,
+    alt: {
+      el: "Τρεις ταξιδιώτισσες στο Everest Base Camp κρατούν τη σημαία της OurWay, με σημαιάκια προσευχής και χιονισμένες κορυφές πίσω τους",
+      en: "Three travellers at Everest Base Camp holding the OurWay flag, with prayer flags and snowy peaks behind them",
+    },
+  },
+  owCoastTrail: {
+    src: "/images/ourway/coast-trail.jpg",
+    width: 863,
+    height: 1078,
+    alt: {
+      el: "Πεζοπόρος κατεβαίνει πράσινο μονοπάτι προς τη θάλασσα, με νησί στον ορίζοντα",
+      en: "A hiker walks down a green trail towards the sea, with an island on the horizon",
+    },
+  },
+  owWaterfall: {
+    src: "/images/ourway/waterfall-cliff.jpg",
+    width: 1440,
+    height: 1800,
+    alt: {
+      el: "Ψηλός καταρράκτης κυλά πάνω σε στρωματωμένο βράχο, με πεζοπόρο να ξεκουράζεται στη βάση του",
+      en: "A tall waterfall runs down layered rock, with a hiker resting at its foot",
+    },
+  },
+  owWorkshopPress: {
+    src: "/images/ourway/workshop-press.jpg",
+    width: 1200,
+    height: 1600,
+    alt: {
+      el: "Συμμετέχων σε εργαστήρι βιβλιοδεσίας δουλεύει σε παλιά ξύλινη πρέσα",
+      en: "A participant in a bookbinding workshop working at an old wooden press",
+    },
+  },
+  owWorkshopTable: {
+    src: "/images/ourway/workshop-table.jpg",
+    width: 1200,
+    height: 1600,
+    alt: {
+      el: "Παρέα γύρω από το τραπέζι ενός εργαστηρίου βιβλιοδεσίας, μαθαίνοντας την τέχνη",
+      en: "A group around the table of a bookbinding workshop, learning the craft",
+    },
+  },
+  owStoneLane: {
+    src: "/images/ourway/stone-lane.jpg",
+    width: 1138,
+    height: 1138,
+    alt: {
+      el: "Πέτρινο σπίτι με γαλάζια παράθυρα και λουλούδια σε πλακόστρωτο σοκάκι ορεινού χωριού",
+      en: "A stone house with blue windows and flowers on a cobbled lane in a mountain village",
+    },
+  },
+  owCaveChapel: {
+    src: "/images/ourway/cave-chapel.jpg",
+    width: 1728,
+    height: 1296,
+    alt: {
+      el: "Ασβεστωμένο ξωκλήσι χτισμένο μέσα σε σπηλιά, κάτω από βράχο",
+      en: "A whitewashed chapel built inside a cave, beneath an overhanging rock",
+    },
+  },
+  owLocalProducts: {
+    src: "/images/ourway/local-products.jpg",
+    width: 1728,
+    height: 1152,
+    alt: {
+      el: "Μπουκάλια με τοπικό προϊόν και ετικέτα OurWay σε ξύλινο τελάρο, κάτω από δέντρα",
+      en: "Bottles of a local product with OurWay labels in a wooden crate, beneath the trees",
+    },
+  },
+  owAutumnPath: {
+    src: "/images/ourway/autumn-path.jpg",
+    width: 1536,
+    height: 1536,
+    alt: {
+      el: "Χωμάτινος δρόμος σκεπασμένος με φθινοπωρινά φύλλα μέσα σε ορεινό δάσος",
+      en: "A dirt road covered in autumn leaves running through a mountain forest",
+    },
+  },
+  owFogForest: {
+    src: "/images/ourway/fog-forest.jpg",
+    width: 1200,
+    height: 1500,
+    alt: {
+      el: "Πεζοπόρος σταματά και κοιτάζει ψηλά τα δέντρα ενός ομιχλιασμένου δάσους",
+      en: "A hiker stops to look up at the trees of a misty forest",
+    },
+  },
+  owSummitMarker: {
+    src: "/images/ourway/summit-marker.jpg",
+    width: 1253,
+    height: 1875,
+    alt: {
+      el: "Δύο πεζοπόροι στέκονται στο τριγωνομετρικό της κορυφής, με οροσειρές και ουρανό γύρω τους",
+      en: "Two hikers stand on the summit marker, surrounded by mountain ranges and sky",
+    },
+  },
+  owMeadowGroup: {
+    src: "/images/ourway/meadow-group.jpg",
+    width: 1253,
+    height: 1875,
+    alt: {
+      el: "Ομάδα πεζοπόρων σε ορεινό λιβάδι πάνω από τη θάλασσα, κάποιοι κάνουν χαρούμενα ασκήσεις ισορροπίας",
+      en: "A group of hikers on a mountain meadow above the sea, some striking playful balance poses",
+    },
+  },
+  owSummitFlag: {
+    src: "/images/ourway/summit-flag.jpg",
+    width: 1200,
+    height: 900,
+    alt: {
+      el: "Η παρέα της OurWay στην κορυφή με τη σημαία της, πάνω από θάλασσα από σύννεφα και χιονισμένα βουνά",
+      en: "The OurWay group on the summit with its flag, above a sea of clouds and snowy mountains",
+    },
+  },
+  owRidgeCrest: {
+    src: "/images/ourway/ridge-crest.jpg",
+    width: 2000,
+    height: 1336,
+    alt: {
+      el: "Πεζοπόροι σε σειρά στην κόψη ενός χορταριασμένου βουνού, κάτω από μεγάλα σύννεφα",
+      en: "Hikers in a line along the crest of a grassy mountain beneath big clouds",
+    },
+  },
+  owSlopeAscent: {
+    src: "/images/ourway/slope-ascent.jpg",
+    width: 2000,
+    height: 1336,
+    alt: {
+      el: "Ομάδα πεζοπόρων ανεβαίνει μονοπάτι σε απότομη χορταριασμένη πλαγιά",
+      en: "A group of hikers climbs a path across a steep grassy slope",
+    },
+  },
+  owCyclists: {
+    src: "/images/ourway/cyclists.jpg",
+    width: 1728,
+    height: 1152,
+    alt: {
+      el: "Παρέα ποδηλατών με κράνη και ανακλαστικά γιλέκα σε χωματόδρομο ανάμεσα σε πράσινους λόφους",
+      en: "A group of cyclists in helmets and high-visibility vests on a dirt road among green hills",
+    },
+  },
+  owCairnClouds: {
+    src: "/images/ourway/cairn-clouds.jpg",
+    width: 865,
+    height: 1080,
+    alt: {
+      el: "Πέτρινο ανθρωπάκι πάνω από θάλασσα από σύννεφα, με χιονισμένη οροσειρά στο βάθος",
+      en: "A stone cairn above a sea of clouds, with a snow-capped range in the distance",
+    },
+  },
+  owTrailClimb: {
+    src: "/images/ourway/trail-climb.jpg",
+    width: 1875,
+    height: 1253,
+    alt: {
+      el: "Πεζοπόροι με σακίδια ανεβαίνουν βραχώδες μονοπάτι σε ορεινό λιβάδι",
+      en: "Hikers with backpacks climb a rocky path across a mountain meadow",
+    },
+  },
+  owRefugeCircle: {
+    src: "/images/ourway/refuge-circle.jpg",
+    width: 1875,
+    height: 1253,
+    alt: {
+      el: "Η ομάδα σε κύκλο έξω από ορεινό καταφύγιο, πριν ξεκινήσει η πεζοπορία",
+      en: "The group gathered in a circle outside a mountain refuge before the hike",
+    },
+  },
+  owRefugeEvening: {
+    src: "/images/ourway/refuge-evening.jpg",
+    width: 1875,
+    height: 785,
+    alt: {
+      el: "Μεγάλη παρέα φωτογραφίζεται μπροστά στο τζάκι ενός καταφυγίου το βράδυ",
+      en: "A large group poses in front of the fireplace of a refuge in the evening",
+    },
+  },
+  owForestBridge: {
+    src: "/images/ourway/forest-bridge.jpg",
+    width: 1728,
+    height: 1296,
+    alt: {
+      el: "Παρέα πεζοπόρων χαμογελά πάνω σε ξύλινο γεφυράκι μέσα στο δάσος",
+      en: "A group of hikers smiles on a small wooden bridge in the forest",
+    },
+  },
 } satisfies Record<string, MediaItem>;
 
 export type MediaKey = keyof typeof media;
 
 /** Ordered list used by the gallery page. Add, remove or reorder keys freely. */
 export const galleryKeys: MediaKey[] = [
-  "valleyVillage",
-  "folkDanceCircle",
-  "roadPause",
-  "gorgeRiver",
-  "stoneHouse",
-  "shepherd",
-  "cliffMonastery",
-  "riverForest",
-  "sittingGorge",
-  "bridgeVillage",
-  "coastCliff",
-  "folkDanceWomen",
-  "mesaPlain",
-  "villageSteps",
-  "hillChapel",
-  "streamRocks",
-  "goatsCoast",
-  "canyonAutumn",
+  "owCairnClouds",
+  "owTrailClimb",
+  "owWaterfall",
+  "owStoneLane",
+  "owRefugeCircle",
+  "owAutumnPath",
+  "owCyclists",
+  "owCaveChapel",
+  "owRidgeCrest",
+  "owFogForest",
+  "owForestBridge",
+  "owEverest",
+  "owRefugeEvening",
+  "owLocalProducts",
+  "owCoastTrail",
+  "owMeadowGroup",
+  "owWorkshopTable",
+  "owSummitMarker",
+  "owSummitFlag",
+  "owSlopeAscent",
+  "owWorkshopPress",
 ];
